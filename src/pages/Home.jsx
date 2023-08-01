@@ -3,9 +3,8 @@ import Annoucement from "../components/Annoucement";
 import Navbar from "../components/Navbar";
 import Slider from "../components/Slider";
 import Categories from "../components/Categories";
-const Container = styled.main`
-  padding: 0px 15px;
-`;
+import Products from "../components/Products";
+const Container = styled.main``;
 const Home = () => {
   return (
     <Container>
@@ -13,6 +12,7 @@ const Home = () => {
       <Navbar />
       <Slider />
       <Categories />
+      <Products />
     </Container>
   );
 };

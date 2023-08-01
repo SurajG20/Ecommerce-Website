@@ -84,8 +84,8 @@ const Slider = () => {
         <ArrowBackOutlinedIcon />
       </Arrow>
       <Wrapper slideInd={slideInd}>
-        {sliderItems.map((item, index) => (
-          <Slide bg={item.bg} key={index}>
+        {sliderItems.map((item) => (
+          <Slide bg={item.bg} key={item.id}>
             <ImgContainer>
               <Image src={item.img} />
             </ImgContainer>

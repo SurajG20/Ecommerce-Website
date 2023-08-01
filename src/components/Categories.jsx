@@ -8,8 +8,8 @@ const Container = styled.div`
 const Categories = () => {
   return (
     <Container>
-      {categories.map((items, index) => (
-        <CategoriesItems items={items} key={index} />
+      {categories.map((items) => (
+        <CategoriesItems items={items} key={items.id} />
       ))}
     </Container>
   );
