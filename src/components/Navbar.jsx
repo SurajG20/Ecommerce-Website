@@ -4,9 +4,9 @@ import { styled } from "styled-components";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 const Container = styled.div`
   height: 60px;
+  padding: 10px 20px;
 `;
 const Wrapper = styled.div`
-  padding: 10px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
