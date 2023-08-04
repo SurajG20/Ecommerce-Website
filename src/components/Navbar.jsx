@@ -31,6 +31,7 @@ const SearchContainer = styled.div`
   align-items: center;
   margin-left: 25px;
   padding: 5px;
+  ${mobile({ marginLeft: "0px" })}
 `;
 const Input = styled.input`
   border: None;
@@ -42,6 +43,7 @@ const Center = styled.div`
 `;
 const Logo = styled.h1`
   font-weight: bold;
+
   ${mobile({ fontSize: "24px" })}
 `;
 const Right = styled.div`
@@ -49,13 +51,13 @@ const Right = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  ${mobile({ justifyContent: "center", flex: 2 })}
+  ${mobile({ justifyContent: "center", flex: 2, gap: "10px" })}
 `;
 const MenuItem = styled.div`
   font-size: 14px;
   cursor: pointer;
   margin-left: 25px;
-  ${mobile({ fontSize: "12px", marginLeft: "10px" })}
+  ${mobile({ fontSize: "12px", marginLeft: "0px" })}
 `;
 const Navbar = () => {
   return (

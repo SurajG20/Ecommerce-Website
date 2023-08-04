@@ -9,7 +9,7 @@ import { mobile } from "../Responsive";
 const Wrapper = styled.div`
   padding: 50px;
   display: flex;
-  /* ${mobile({ padding: "30px" })} */
+  ${mobile({ padding: "10px", flexDirection: "column" })}
 `;
 const ImgContainer = styled.div`
   flex: 1;
@@ -17,13 +17,14 @@ const ImgContainer = styled.div`
 const Image = styled.img`
   width: 100%;
   height: 90vh;
-  /* ${mobile({ height: "70vh", width: "80%" })} */
+  ${mobile({ height: "40vh" })}
 
   object-fit: cover;
 `;
 const InfoContainer = styled.div`
   flex: 1;
   padding: 0 50px;
+  ${mobile({ padding: "10px" })}
 `;
 const Title = styled.h1`
   font-weight: 200;
@@ -39,6 +40,7 @@ const FilterContainer = styled.div`
   width: 50%;
   display: flex;
   justify-content: space-between;
+  ${mobile({ width: "100%" })}
 `;
 const Filter = styled.div`
   display: flex;
@@ -68,6 +70,7 @@ const AddContainer = styled.div`
   justify-content: space-between;
   align-items: center;
   margin-top: 40px;
+  ${mobile({ width: "100%" })}
 `;
 const AmountContainer = styled.div`
   display: flex;
