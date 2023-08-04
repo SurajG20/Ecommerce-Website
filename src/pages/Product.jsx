@@ -5,9 +5,11 @@ import Newsletter from "../components/Newsletter";
 import Footer from "../components/Footer";
 import { styled } from "styled-components";
 import { Add, Remove } from "@mui/icons-material";
+import { mobile } from "../Responsive";
 const Wrapper = styled.div`
   padding: 50px;
   display: flex;
+  /* ${mobile({ padding: "30px" })} */
 `;
 const ImgContainer = styled.div`
   flex: 1;
@@ -15,6 +17,8 @@ const ImgContainer = styled.div`
 const Image = styled.img`
   width: 100%;
   height: 90vh;
+  /* ${mobile({ height: "70vh", width: "80%" })} */
+
   object-fit: cover;
 `;
 const InfoContainer = styled.div`

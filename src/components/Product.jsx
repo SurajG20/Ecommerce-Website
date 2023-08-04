@@ -2,6 +2,7 @@ import { styled } from "styled-components";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import SearchOutlinedIcon from "@mui/icons-material/SearchOutlined";
 import FavoriteBorderOutlinedIcon from "@mui/icons-material/FavoriteBorderOutlined";
+import { mobile } from "../Responsive";
 const Info = styled.div`
   height: 100%;
   width: 100%;
@@ -20,16 +21,17 @@ const Info = styled.div`
 const Container = styled.div`
   flex: 1;
   margin: 5px;
-  min-width: 350px;
+  min-width: 280px;
   height: 350px;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #f5fbfd;
+  background-color: lightpink;
   position: relative;
   &:hover ${Info} {
     opacity: 1;
   }
+  ${mobile({ width: "280px", height: "300px", margin: "10px" })}
 `;
 const Circle = styled.div`
   height: 200px;

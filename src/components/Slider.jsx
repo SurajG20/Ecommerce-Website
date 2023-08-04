@@ -3,12 +3,14 @@ import ArrowBackOutlinedIcon from "@mui/icons-material/ArrowBackOutlined";
 import ArrowForwardOutlinedIcon from "@mui/icons-material/ArrowForwardOutlined";
 import { sliderItems } from "../data";
 import { useState } from "react";
+import { mobile } from "../Responsive";
 const Container = styled.div`
   width: 100%;
   height: 100vh;
   display: flex;
   position: relative;
   overflow: hidden;
+  ${mobile({ display: "none" })}
 `;
 const Arrow = styled.div`
   width: 50px;
@@ -29,7 +31,7 @@ const Arrow = styled.div`
 const Wrapper = styled.div`
   height: 100%;
   display: flex;
-  transform: translateX(${(props) => props.slideInd * -100}vw);
+  transform: translateX(${(props) => props.SlideInd * -100}vw);
   transition: all 1.5s ease;
 `;
 const Slide = styled.div`
@@ -70,12 +72,12 @@ const Button = styled.button`
 `;
 
 const Slider = () => {
-  const [slideInd, setSetInd] = useState(0);
+  const [SlideInd, setSetInd] = useState(0);
   const handleClick = (direction) => {
     if (direction === "left") {
-      setSetInd(slideInd > 0 ? slideInd - 1 : 2);
+      setSetInd(SlideInd > 0 ? SlideInd - 1 : 2);
     } else {
-      setSetInd(slideInd < 2 ? slideInd + 1 : 0);
+      setSetInd(SlideInd < 2 ? SlideInd + 1 : 0);
     }
   };
   return (
@@ -83,7 +85,7 @@ const Slider = () => {
       <Arrow direction="left" onClick={() => handleClick("left")}>
         <ArrowBackOutlinedIcon />
       </Arrow>
-      <Wrapper slideInd={slideInd}>
+      <Wrapper SlideInd={SlideInd}>
         {sliderItems.map((item) => (
           <Slide bg={item.bg} key={item.id}>
             <ImgContainer>
