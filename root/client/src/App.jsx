@@ -5,8 +5,11 @@ import Product from "./pages/Product";
 import ProductList from "./pages/ProductList";
 import Register from "./pages/Register";
 import { Navigate, Route, Routes } from "react-router-dom";
+import Success from "./pages/Success";
+import { useSelector } from "react-redux";
+
 function App() {
-  const user = true;
+  const user = useSelector((State) => State.user.currentUser);
   return (
     <Routes>
       <Route path="/" element={<Home />} />
@@ -18,6 +21,7 @@ function App() {
         path="/register"
         element={user ? <Navigate to="/" /> : <Register />}
       />
+      <Route path="/success" element={<Success />} />
     </Routes>
   );
 }

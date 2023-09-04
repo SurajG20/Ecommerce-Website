@@ -32,9 +32,7 @@ const Login = async (req, res) => {
     throw new BadRequestError("Please Provide Valid Username ");
   }
   const user = await User.findOne({ username });
-  if (!user) {
-    throw new UnauthenticatedError("Invalid Authentication");
-  }
+  if (!user) return res.status(401).json("Wrong credentials!");
   const hashedPassword = CryptoJS.AES.decrypt(
     user.password,
     process.env.PASS_SEC
