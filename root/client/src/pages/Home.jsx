@@ -1,23 +1,25 @@
-import { styled } from "styled-components";
-import Annoucement from "../components/Annoucement";
-import Navbar from "../components/Navbar";
-import Slider from "../components/Slider";
-import Categories from "../components/Categories";
-import Products from "../components/Products";
-import Newsletter from "../components/Newsletter";
-import Footer from "../components/Footer";
-const Container = styled.main``;
+import React from 'react';
+
+import Navbar from '../layout/Navbar';
+import Announcement from '../layout/Announcement';
+import Carousel from '../components/Carousel';
+import Categories from '../components/Categories';
+import Products from '../components/Products';
+import Newsletter from '../components/Newsletter';
+import Footer from '../layout/Footer';
+
 const Home = () => {
   return (
-    <Container>
-      <Annoucement />
+    <>
+      <Announcement />
       <Navbar />
-      <Slider />
+      <Carousel />
       <Categories />
       <Products />
       <Newsletter />
       <Footer />
-    </Container>
+    </>
   );
 };
+
 export default Home;

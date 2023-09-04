@@ -1,19 +1,36 @@
-import { styled } from "styled-components";
-import { categories } from "../data";
-import CategoriesItems from "./CategoriesItems";
-import { mobile } from "../Responsive";
-const Container = styled.div`
-  display: flex;
-  padding: 20px;
-  ${mobile({ padding: "0px", flexDirection: "column" })}
-`;
+import React from 'react';
+
+import Categorie from './Categorie';
+
 const Categories = () => {
   return (
-    <Container>
-      {categories.map((items) => (
-        <CategoriesItems items={items} key={items.id} />
-      ))}
-    </Container>
+    <section className='p-8' id='categories'>
+      <div className='grid gap-2 md:grid-cols-3 mb-2'>
+        <Categorie
+          name='Clothes'
+          image='https://api.lorem.space/image/fashion?w=640&h=480&r=3529'
+        />
+        <Categorie
+          name='Shoes'
+          image='https://api.lorem.space/image/shoes?w=640&h=480&r=3452'
+        />
+        <Categorie
+          name='Electronics'
+          image='https://api.lorem.space/image/watch?w=640&h=480&r=6182'
+        />
+      </div>
+      <div className='grid gap-2 md:grid-cols-2'>
+        <Categorie
+          name='Furniture'
+          image='https://api.lorem.space/image/furniture?w=640&h=480&r=1235'
+        />
+        <Categorie
+          name='Others'
+          image='https://api.lorem.space/image?w=640&h=480&r=1848'
+        />
+      </div>
+    </section>
   );
 };
+
 export default Categories;

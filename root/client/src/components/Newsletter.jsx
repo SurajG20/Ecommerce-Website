@@ -1,58 +1,31 @@
-import SendIcon from "@mui/icons-material/Send";
-import { styled } from "styled-components";
-import { mobile } from "../Responsive";
-const Container = styled.div`
-  height: 60vh;
-  display: flex;
-  background-color: #fcf5f5;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-`;
-const Title = styled.h1`
-  font-size: 70px;
-  margin-bottom: 20px;
-`;
-const Desc = styled.div`
-  font-size: 24px;
-  font-weight: 300;
-  margin-bottom: 20px;
-  ${mobile({ textAlign: "center" })}
-`;
-const InputContainer = styled.div`
-  width: 50%;
-  height: 40px;
-  background-color: white;
-  display: flex;
-  justify-content: space-between;
-  border: 1px solid lightgray;
-  ${mobile({ justifyContent: "center", width: "80%" })}
-`;
-const Input = styled.input`
-  flex: 8;
-  font-size: 18px;
-  padding-left: 10px;
-  border: none;
-`;
-const Button = styled.button`
-  flex: 1;
-  border: none;
-  background-color: teal;
-  color: white;
-`;
+import React from 'react';
+
+import { Send } from '@mui/icons-material';
 
 const Newsletter = () => {
   return (
-    <Container>
-      <Title>Newsletter</Title>
-      <Desc>Get timely updates from your favorite products.</Desc>
-      <InputContainer>
-        <Input placeholder="Your email" />
-        <Button>
-          <SendIcon />
-        </Button>
-      </InputContainer>
-    </Container>
+    <section className='bg-[#FDF5F6] py-32 px-8 flex flex-col items-center'>
+      <h2 className='font-bold text-5xl sm:text-6xl md:text-7xl mb-10'>
+        Newsletter
+      </h2>
+      <p className='text-2xl mb-10 text-center'>
+        Get timely updates from your favorite products
+      </p>
+      <form
+        action=''
+        className='border rounded-lg overflow-hidden flex flex-nowrap'
+      >
+        <input
+          type='text'
+          placeholder='Your email'
+          className='px-6 py-2 focus:outline-none'
+        />
+        <button className='bg-teal-600 px-6 py-2 text-white'>
+          <Send />
+        </button>
+      </form>
+    </section>
   );
 };
+
 export default Newsletter;

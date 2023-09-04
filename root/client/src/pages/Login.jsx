@@ -1,97 +1,62 @@
-import { styled } from "styled-components";
-import { mobile } from "../Responsive";
-import { useDispatch, useSelector } from "react-redux";
-import { useState } from "react";
-import { login } from "../redux/apiCalls";
-const Container = styled.div`
-  width: 100vw;
-  height: 100vh;
-  background: linear-gradient(
-      rgba(255, 255, 255, 0.5),
-      rgba(255, 255, 255, 0.5)
-    ),
-    url("https://images.pexels.com/photos/6984661/pexels-photo-6984661.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940")
-      center;
-  background-size: cover;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`;
-const Wrapper = styled.div`
-  width: 25%;
-  background-color: white;
-  padding: 20px;
-  ${mobile({ width: "75%" })}
-`;
-const Title = styled.h1`
-  font-size: 24px;
-  font-weight: 300;
-`;
-const Form = styled.form`
-  display: flex;
-  flex-direction: column;
-`;
-const Input = styled.input`
-  flex: 1;
-  min-width: 40%;
-  padding: 10px;
-  margin: 10px 0px;
-`;
+import React, { useRef } from 'react';
 
-const Button = styled.button`
-  border: none;
-  width: 40%;
-  padding: 15px 20px;
-  background-color: teal;
-  color: white;
-  margin-bottom: 10px;
-  &:disabled {
-    color: green;
-    cursor: not-allowed;
-  }
-`;
-const Link = styled.a`
-  margin: 5px 0;
-  font-size: 12px;
-  text-decoration: underline;
-`;
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
 
-const Error = styled.span`
-  color: red;
-`;
+import { login } from '../store/auth-actions';
+
 const Login = () => {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const dispatch = useDispatch();
-  const { isFetching, error } = useSelector((state) => state.user);
-
-  const handleClick = (e) => {
+  const auth = useSelector((store) => store.auth);
+  const usernameRef = useRef();
+  const passwordRef = useRef();
+  const formSubmitHandler = (e) => {
     e.preventDefault();
-    login(dispatch, { username, password });
+    const username = usernameRef.current.value;
+    const password = passwordRef.current.value;
+    if (!password.trim() || !username.trim()) return;
+    dispatch(
+      login({
+        username,
+        password,
+      })
+    );
+    usernameRef.current.value = '';
+    passwordRef.current.value = '';
   };
   return (
-    <Container>
-      <Wrapper>
-        <Title>Create an Account</Title>
-        <Form>
-          <Input
-            placeholder="Username"
-            onChange={(e) => setUsername(e.target.value)}
-          ></Input>
-          <Input
-            type="password"
-            placeholder="Password"
-            onChange={(e) => setPassword(e.target.value)}
-          ></Input>
-          <Button onClick={handleClick} disabled={isFetching}>
-            Sign In
-          </Button>
-          {error && <Error>Something went wrong...</Error>}
-          <Link>DO NOT YOU REMEMBER THE PASSWORD?</Link>
-          <Link>CREATE A NEW ACCOUNT</Link>
-        </Form>
-      </Wrapper>
-    </Container>
+    <div className='px-4 w-full h-screen flex justify-center items-center bg-login bg-no-repeat bg-cover'>
+      <form
+        onSubmit={formSubmitHandler}
+        action=''
+        className='border bg-white p-6 flex flex-col min-w-[17rem] sm:min-w-[22rem] md:min-w-[25rem]'
+      >
+        <h1 className='uppercase text-xl mb-4 font-bold'>Log in</h1>
+        <input
+          className='p-2 mb-4 border-2 rounded focus:outline-none'
+          type='text'
+          placeholder='Username'
+          ref={usernameRef}
+        />
+        <input
+          className='p-2 mb-4 border-2 rounded focus:outline-none'
+          type='password'
+          placeholder='Password'
+          ref={passwordRef}
+        />
+        <button
+          className='mb-4 bg-teal-700 text-white p-2 disabled:bg-teal-500 disabled:cursor-not-allowed'
+          disabled={auth.isFetching}
+        >
+          Login
+        </button>
+        {auth.error && <p>Something went wrong. Please try later...</p>}
+        <Link to='/signup' className='capitalize underline mb-4'>
+          create a new account
+        </Link>
+      </form>
+    </div>
   );
 };
+
 export default Login;
