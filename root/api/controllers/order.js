@@ -1,86 +1,94 @@
-const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, UnauthenticatedError } = require("../errors");
-const Order = require("../models/Order");
+const Order = require('../models/Order');
 
-const createOrder = async (req, res) => {
+module.exports.createOrder = async (req, res) => {
   const newOrder = new Order(req.body);
-
-  if (!newOrder) {
-    throw new BadRequestError("Please Provide complete Data");
-  }
   try {
     const savedOrder = await newOrder.save();
-    res.status(StatusCodes.CREATED).json({ savedOrder });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(201).json({
+      message: 'Order is created successfully.',
+      product: savedOrder
+    });
+  } catch (err) {
+    res.status(500).send(err);
   }
 };
-const updateOrder = async (req, res) => {
+
+module.exports.updateOrder = async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
-    res.status(StatusCodes.ACCEPTED).json({ updatedOrder });
-  } catch (error) {
-    throw new UnauthenticatedError("Invalid Authentication");
+      {
+        $set: req.body
+      },
+      {
+        new: true
+      });
+    res.status(200).json({
+      message: "Order is updated successfully.",
+      updatedOrder
+    });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
-const deleteOrder = async (req, res) => {
+
+module.exports.deleteOrder = async (req, res) => {
   try {
     await Order.findByIdAndDelete(req.params.id);
-    res.status(StatusCodes.OK).json("Order has been deleted");
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(200).json({
+      message: "Order is deleted successfully."
+    });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
-const getOrder = async (req, res) => {
+
+module.exports.getUserOrders = async (req, res) => {
   try {
-    const Order = await Order.find({ userId: req.params.userId });
-    res.status(StatusCodes.OK).json(Order);
+    const orders = await Order.find({
+      userId: req.params.userId
+    });
+    res.status(200).json(orders);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
 };
-const getAllOrder = async (req, res) => {
+
+
+module.exports.getOrders = async (req, res) => {
   try {
-    const Orders = await Order.find();
-    res.status(StatusCodes.OK).json(Orders);
+    const orders = await Order.find();
+    res.status(200).json(orders);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
 };
-const getIncome = async (req, res) => {
+
+module.exports.getMonthlyIncome = async (req, res) => {
   const date = new Date();
-  const lastMonth = new Date(date.setMonth(date.getMonth() - 1));
-  const previousMonth = new Date(date.setMonth(lastMonth.getMonth() - 1));
+  const lastMonthDate = new Date(date.setMonth(date.getMonth() - 1));
+  const prevMonthDate = new Date(new Date().setMonth(lastMonthDate.getMonth() - 1));
+
   try {
     const income = await Order.aggregate([
-      { $match: { createdAt: { $gte: previousMonth } } },
+      { $match: { createdAt: { $gte: prevMonthDate } } },
       {
         $project: {
-          month: { $month: "$createdAt" },
-          sales: "$amount",
-        },
+          month: { $month: '$createdAt' }, // Add a new field (month) with the $month of $createdAt
+          sales: "$amount" // Rename the field amount to sales
+        }
       },
       {
         $group: {
-          _id: "$month",
-          total: { $sum: "$sales" },
-        },
-      },
+          _id: '$month',
+          total: {
+            $sum: "$sales"
+          }
+        }
+      }
     ]);
-    res.status(StatusCodes.OK).json(income);
+    res.status(200).json(income);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
-};
-module.exports = {
-  createOrder,
-  updateOrder,
-  deleteOrder,
-  getOrder,
-  getAllOrder,
-  getIncome,
 };

@@ -1,19 +1,23 @@
-const router = require("express").Router();
-const {
-  VerifyTokenAndAuth,
-  VerifyTokenAndAdmin,
-} = require("../middleware/authentication");
-const {
-  updateUser,
-  deleteUser,
-  getUser,
-  getAllUsers,
-  getStats,
-} = require("../controllers/user");
+const express = require('express');
 
-router.patch("/:id", VerifyTokenAndAuth, updateUser);
-router.delete("/:id", VerifyTokenAndAuth, deleteUser);
-router.get("/find/:id", VerifyTokenAndAdmin, getUser);
-router.get("/", VerifyTokenAndAdmin, getAllUsers);
-router.get("/stats", VerifyTokenAndAdmin, getStats);
+const { updateUser, deleteUser, getUser, getUsers, getUsersStats } = require('../controllers/user');
+const { verifyTokenAndAuthorization, verifyTokenAndAdmin } = require('../middlewares/verifyToken');
+
+const router = express.Router();
+
+// PUT => /api/users/:id
+router.patch('/:id', verifyTokenAndAuthorization, updateUser);
+
+// DELETE => /api/users/:id
+router.delete('/:id', verifyTokenAndAuthorization, deleteUser);
+
+// GET => /api/users/stats
+router.get('/stats', verifyTokenAndAdmin, getUsersStats);   // must be here
+
+// GET => /api/users/:id
+router.get('/:id', verifyTokenAndAdmin, getUser);           // must be here
+
+// GET => /api/users
+router.get('/', verifyTokenAndAdmin, getUsers);
+
 module.exports = router;

@@ -1,20 +1,22 @@
-const router = require("express").Router();
-const {
-  VerifyTokenAndAuth,
-  VerifyTokenAndAdmin,
-} = require("../middleware/authentication");
-const {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  getProduct,
-  getAllProducts,
-  getProductStats,
-} = require("../controllers/product");
+const express = require('express');
 
-router.post("/", VerifyTokenAndAdmin, createProduct);
-router.patch("/:id", VerifyTokenAndAdmin, updateProduct);
-router.delete("/:id", VerifyTokenAndAdmin, deleteProduct);
-router.get("/find/:id", getProduct);
-router.get("/", getAllProducts);
+const { addProduct, updateProduct, deleteProduct, getProduct, getProducts } = require('../controllers/product');
+const { verifyTokenAndAdmin } = require('../middlewares/verifyToken');
+
+const router = express.Router();
+
+// POST => /api/products
+router.post('/', verifyTokenAndAdmin, addProduct);
+
+// PATCH => /api/products/:id
+router.patch('/:id', verifyTokenAndAdmin, updateProduct);
+
+// DELETE => /api/products/:id
+router.delete('/:id', verifyTokenAndAdmin, deleteProduct);
+
+// GET => /api/products/:id
+router.get('/:id', getProduct);
+
+// GET => /api/products
+router.get('/', getProducts);
 module.exports = router;

@@ -1,60 +1,65 @@
-const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, UnauthenticatedError } = require("../errors");
-const Cart = require("../models/Cart");
+const Cart = require('../models/Cart');
 
-const createCart = async (req, res) => {
+module.exports.createCart = async (req, res) => {
   const newCart = new Cart(req.body);
-
-  if (!newCart) {
-    throw new BadRequestError("Please Provide complete Data");
-  }
   try {
     const savedCart = await newCart.save();
-    res.status(StatusCodes.CREATED).json({ savedCart });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(201).json({
+      message: 'Cart is created successfully.',
+      product: savedCart
+    });
+  } catch (err) {
+    res.status(500).send(err);
   }
 };
-const updateCart = async (req, res) => {
+
+module.exports.updateCart = async (req, res) => {
   try {
     const updatedCart = await Cart.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
-    res.status(StatusCodes.ACCEPTED).json({ updatedCart });
-  } catch (error) {
-    throw new UnauthenticatedError("Invalid Authentication");
+      {
+        $set: req.body
+      },
+      {
+        new: true
+      });
+    res.status(200).json({
+      message: "Cart is updated successfully.",
+      updatedCart
+    });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
-const deleteCart = async (req, res) => {
+
+module.exports.deleteCart = async (req, res) => {
   try {
     await Cart.findByIdAndDelete(req.params.id);
-    res.status(StatusCodes.OK).json("Cart has been deleted");
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(200).json({
+      message: "Cart is deleted successfully."
+    });
+  } catch (err) {
+    res.status(500).json(err);
   }
 };
-const getCart = async (req, res) => {
+
+module.exports.getUserCart = async (req, res) => {
   try {
-    const cart = await Cart.findOne({ userId: req.params.userId });
-    res.status(StatusCodes.OK).json(cart);
+    const cart = await Cart.findOne({
+      userId: req.params.userId
+    });
+    res.status(200).json(cart);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
 };
-const getAllCart = async (req, res) => {
+
+
+module.exports.getCarts = async (req, res) => {
   try {
     const carts = await Cart.find();
-    res.status(StatusCodes.OK).json(carts);
+    res.status(200).json(carts);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
-};
-module.exports = {
-  createCart,
-  updateCart,
-  deleteCart,
-  getCart,
-  getAllCart,
 };

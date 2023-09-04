@@ -1,79 +1,79 @@
-const { StatusCodes } = require("http-status-codes");
-const { BadRequestError, UnauthenticatedError } = require("../errors");
-const User = require("../models/User");
+const User = require('../models/User');
 
-const updateUser = async (req, res) => {
-  if (req.body.password) {
-    req.body.password = CryptoJS.AES.decrypt(
-      password,
-      process.env.PASS_SEC
-    ).toString(CryptoJS.enc.Utf8);
-  }
-
+module.exports.updateUser = async (req, res) => {
   try {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
-      { new: true }
+      {
+        $set: req.body
+      },
+      {
+        new: true
+      }
     );
-    res.status(StatusCodes.ACCEPTED).json({ updatedUser });
+    // updatedUser is the document after update because of new: true
+    res.status(200).json({
+      message: 'User is updated successfully!',
+      updatedUser
+    });
   } catch (error) {
-    throw new UnauthenticatedError("Invalid Authentication");
+    res.status(500).json(error);
   }
 };
 
-const deleteUser = async (req, res) => {
+module.exports.deleteUser = async (req, res) => {
   try {
     await User.findByIdAndDelete(req.params.id);
-    res.status(StatusCodes.OK).json("User has been deleted");
+    res.status(200).json({
+      message: 'User is deleted successfully!'
+    });
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
 };
 
-const getUser = async (req, res) => {
+module.exports.getUser = async (req, res) => {
   try {
     const user = await User.findById(req.params.id);
-    const { password, ...others } = user._doc;
-    res.status(StatusCodes.OK).json(user);
+    res.status(200).json(user);
   } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
-  }
-};
-const getAllUsers = async (req, res) => {
-  const query = req.query.new;
-  try {
-    const users = query
-      ? await User.find().limit(5).sort({ _id: -1 })
-      : await User.find();
-    res.status(StatusCodes.OK).json(users);
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(error);
+    res.status(500).json(error);
   }
 };
 
-const getStats = async (req, res) => {
+module.exports.getUsers = async (req, res) => {
+  const query = req.query.new || false;
+  try {
+    const users = query ?
+      await User.find().sort({ _id: -1 }).limit(5) : // -1 => descending order & 1 => ascending order 
+      await User.find();
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+};
+
+module.exports.getUsersStats = async (req, res) => {
   const date = new Date();
-  const lastYear = new Date(date.setFullYear(date.getFullYear() - 1));
-
+  const lastYearDate = new Date(date.setFullYear(date.getFullYear() - 1)); // setFullYear returns a new timestamp.
   try {
+    // TODO Make sure I understand it
     const data = await User.aggregate([
-      { $match: { createdAt: { $gte: lastYear } } },
+      { $match: { createdAt: { $gte: lastYearDate } } },
       {
         $project: {
-          month: { $month: "$createdAt" },
-        },
+          month: { $month: "$createdAt" } // Add a new field (month) with the $month of $createdAt
+        }
       },
       {
         $group: {
           _id: "$month",
           total: { $sum: 1 },
-        },
-      },
+        }
+      }
     ]);
     res.status(200).json(data);
-  } catch (err) {
-    res.status(500).json(err);
+  } catch (error) {
+    res.status(500).json(error);
   }
 };
-module.exports = { updateUser, deleteUser, getUser, getAllUsers, getStats };
