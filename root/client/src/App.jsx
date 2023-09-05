@@ -7,7 +7,7 @@ import ShoppingCategorie from "./pages/ShoppingCategorie";
 import SingleProduct from "./pages/SingleProduct";
 import ShoppingCart from "./pages/ShoppingCart";
 import Orders from "./pages/Orders";
-import Signup from "./pages/Signup";
+import Register from "./pages/Register";
 import Login from "./pages/Login";
 
 const App = () => {
@@ -19,9 +19,9 @@ const App = () => {
       <Route path="/products/:id" element={<SingleProduct />} />
       <Route path="/cart" element={<ShoppingCart />} />
       <Route path="/orders" element={<Orders />} />
-      <Route path="/login" element={user ? Navigate("/") : <Login />} />
+      <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
 
-      <Route path="/signup" element={<Signup />}></Route>
+      <Route path="/register" element={<Register />}></Route>
     </Routes>
   );
 };

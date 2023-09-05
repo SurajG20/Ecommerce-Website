@@ -1,14 +1,14 @@
-const express = require('express');
+const express = require("express");
 
 const router = express.Router();
-const stripe = require('stripe')(process.env.STRIPE_KEY);
+const stripe = require("stripe")(process.env.STRIPE_KEY);
 
-router.post('/', (req, res) => {
+router.post("/", (req, res) => {
   stripe.charges.create(
     {
       source: req.body.tokenId,
-      amount: req.body.amount,
-      currency: 'USD'
+      amount: req.body.amount * 80,
+      currency: "INR",
     },
     (stripeErr, stripeRes) => {
       if (stripeErr) {

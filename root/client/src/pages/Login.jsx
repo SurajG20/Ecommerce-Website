@@ -51,7 +51,7 @@ const Login = () => {
           Login
         </button>
         {auth.error && <p>Something went wrong. Please try later...</p>}
-        <Link to='/signup' className='capitalize underline mb-4'>
+        <Link to='/register' className='capitalize underline mb-4'>
           create a new account
         </Link>
       </form>

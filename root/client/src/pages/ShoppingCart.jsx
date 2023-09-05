@@ -10,14 +10,14 @@ import Navbar from "../layout/Navbar";
 import Announcement from "../layout/Announcement";
 import Footer from "../layout/Footer";
 import CartProduct from "../components/CartProduct";
-const KEY = import.meta.VITE_APP_STRIPE;
+const KEY = import.meta.env.VITE_APP_STRIPE;
 const ShoppingCart = () => {
   const [stripeToken, setStripeToken] = useState(null);
-  const history = useNavigate();
+  const navigate = useNavigate();
   const cart = useSelector((store) => store.cart);
 
   const continueShoppingClickHandler = () => {
-    history.goBack();
+    navigate(-1);
   };
 
   const onToken = (token) => {
@@ -32,7 +32,7 @@ const ShoppingCart = () => {
           tokenId: stripeToken.id,
           amount: cart.totalPrice * 100,
         });
-        history.push("/orders");
+        navigate("./orders");
       } catch (err) {
         console.log(err);
       }
