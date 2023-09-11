@@ -29,9 +29,7 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api/", (req, res) => {
-  res.send("<h1>Welcome to Ecommerce Api </h1>");
-});
+
 app.use("/api/users", userRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/carts", cartRoutes);

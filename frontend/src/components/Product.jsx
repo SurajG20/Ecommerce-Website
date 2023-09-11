@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import StarIcon from "@mui/icons-material/Star";
+import { Link } from "react-router-dom";
 
-import { Link } from 'react-router-dom';
-
-const Product = ({ image, id }) => {
+const Product = ({ product }) => {
   const [overlayIsShown, setOverlayIsShown] = useState(false);
+  console.log(product);
   return (
     <figure
-      className='relative'
+      className="relative p-4"
       onMouseEnter={() => {
         setOverlayIsShown(true);
       }}
@@ -14,11 +15,43 @@ const Product = ({ image, id }) => {
         setOverlayIsShown(false);
       }}
     >
-      <img src={image} alt='' className='w-full h-full object-cover' />
+      <div className=" aspect-square overflow-hidden relative group">
+        <img
+          src={product.image}
+          alt=""
+          className="w-full h-full object-cover object-center ease-in group-hover:scale-110 transition-transform duration-500 "
+        />
+      </div>
+      <div className="mt-4">
+        <div className="flex justify-between text-sm md:text-base capitalize mb-2 text-text-black">
+          <Link
+            to={`/product/${product._id}`}
+            className="cursor-pointer line-clamp-1"
+          >
+            {product.title}
+          </Link>
+        </div>
+        <div className="flex mb-2 gap-1 items-center">
+          <div className="bg-green-600 text-xs md:text-sm rounded-sm p-1 text-white font-semibold flex items-center gap-1">
+            <span>{product.rating}</span>
+            <StarIcon className="text-xs md:text-sm" />
+          </div>
+        </div>
+      </div>
+      <div className="text-sm text-text-black flex gap-2">
+        <span className="font-semibold whitespace-nowrap">
+          ₹{product.discountPrice}
+        </span>
+        <span className="line-through whitespace-nowrap">₹{product.price}</span>
+        <span className="text-green-600 whitespace-nowrap">
+          {product.discountPercent}% off
+        </span>
+      </div>
+
       {overlayIsShown && (
         <Link
-          to={`/products/${id}`}
-          className='cursor-pointer absolute top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center'
+          to={`/products/${product._id}`}
+          className="cursor-pointer absolute top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center"
         ></Link>
       )}
     </figure>

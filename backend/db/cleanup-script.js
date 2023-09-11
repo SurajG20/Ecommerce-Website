@@ -1,5 +1,4 @@
 const fs = require("fs");
-var randomHex = require("random-hex");
 
 fs.readFile("fake.json", "utf-8", (err, products) => {
   products = JSON.parse(products);
@@ -7,17 +6,23 @@ fs.readFile("fake.json", "utf-8", (err, products) => {
     return {
       title: product.title,
       description: product.description,
-      image: product.images[0],
-      category: product.category.name.toLowerCase(),
+      image: product.image,
+      category: product.category.toLowerCase(),
       size:
-        product.category.name === "Clothes"
+        product.category === "Clothes"
           ? ["S", "M", "L"]
-          : product.category.name === "Shoes"
+          : product.category === "Shoes"
           ? ["40", "41", "42", "43", "44", "45"]
           : [],
       color: ["red", "green", "yellow", "orange"],
       price: product.price,
       inStock: true,
+      discountPercent: Math.floor(Math.random() * (25 - 10 + 1) + 10),
+      discountPrice: Math.floor(
+        product.price -
+          (product.price * Math.floor(Math.random() * (25 - 10 + 1) + 10)) / 100
+      ),
+      rating: product.rating.rate,
     };
   });
   products = JSON.stringify(products);

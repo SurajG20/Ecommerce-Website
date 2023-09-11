@@ -5,7 +5,6 @@ import Announcement from '../layout/Announcement';
 import Carousel from '../components/Carousel';
 import Categories from '../components/Categories';
 import Products from '../components/Products';
-import Newsletter from '../components/Newsletter';
 import Footer from '../layout/Footer';
 
 const Home = () => {
@@ -16,7 +15,6 @@ const Home = () => {
       <Carousel />
       <Categories />
       <Products />
-      <Newsletter />
       <Footer />
     </>
   );

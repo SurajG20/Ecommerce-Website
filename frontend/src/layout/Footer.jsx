@@ -1,74 +1,145 @@
-import React from 'react';
+import React from "react";
 
-import { Place, MailOutline, LocalPhone } from '@mui/icons-material';
+import {
+  Place,
+  MailOutline,
+  LocalPhone,
+  LinkedIn,
+  Language,
+  GitHub,
+} from "@mui/icons-material";
 
 const Footer = () => {
   return (
-    <footer className='p-8 grid gap-x-16 gap-y-4 md:grid-cols-3'>
-      <div>
-        <h1 className='font-bold text-3xl uppercase mb-4 tracking-wider'>
-          <a href=''>Bazaar</a>
-        </h1>
-        <p className='text-justify'>
-          Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ratione
-          recusandae nobis sunt aliquid tempore vitae sapiente ea voluptatibus
-          ab repellat asperiores eius cum laboriosam facilis eos, maiores
-          deleniti nemo consequuntur assumenda sed consectetur culpa voluptatum
-          quisquam quibusdam? Saepe, soluta quibusdam.
-        </p>
-      </div>
-      <div>
-        <h2 className='font-bold text-2xl mb-4 tracking-wider'>Useful Links</h2>
-        <div className='grid grid-cols-2'>
-          <ul>
-            <li>
-              <a href=''>Home</a>
-            </li>
-            <li>
-              <a href=''>Man Fashion</a>
-            </li>
-            <li>
-              <a href=''>Accessories</a>
-            </li>
-            <li>
-              <a href=''>Order Tracking</a>
-            </li>
-          </ul>
-          <ul>
-            <li>
-              <a href=''>Cart</a>
-            </li>
-            <li>
-              <a href=''>My Account</a>
-            </li>
-            <li>
-              <a href=''>Wishlist</a>
-            </li>
-            <li>
-              <a href=''>Terms</a>
-            </li>
-          </ul>
+    <footer className="relative bg-teal-200 pt-8 pb-6 ">
+      <div className="container mx-auto px-4">
+        <div className="flex flex-wrap text-left lg:text-left">
+          <div className="w-full lg:w-6/12 px-4">
+            <h1 className="font-bold text-3xl uppercase mb-2 tracking-wider">
+              <a href="">Bazaar</a>
+            </h1>
+            <h4 className="text-3xl fonat-semibold text-blueGray-700">
+              Let's keep in touch!
+            </h4>
+            <h5 className="text-lg mt-0 mb-2 text-blueGray-600">
+              Find us on any of these platforms, we respond 1-2 business days.
+            </h5>
+            <div className="mt-6 lg:mb-0 mb-6">
+              <button
+                className="bg-white text-lightBlue-400 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+                type="button"
+              >
+                <a
+                  href="https://github.com/SurajG20/Ecommerce-Website"
+                  target="_blank"
+                >
+                  <LinkedIn />
+                </a>
+              </button>
+              <button
+                className="bg-white text-lightBlue-600 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+                type="button"
+              >
+                <a href="https://www.surajgoswami.me/" target="_blank">
+                  <Language />
+                </a>
+              </button>
+
+              <button
+                className="bg-white text-blueGray-800 shadow-lg font-normal h-10 w-10 items-center justify-center align-center rounded-full outline-none focus:outline-none mr-2"
+                type="button"
+              >
+                <a
+                  href="https://github.com/SurajG20/Ecommerce-Website"
+                  target="_blank"
+                >
+                  <GitHub />
+                </a>
+              </button>
+            </div>
+          </div>
+          <div className="w-full lg:w-6/12 px-4">
+            <div className="flex flex-wrap items-top mb-6">
+              <div className="w-full lg:w-4/12 px-4 ml-auto">
+                <span className="block uppercase text-blueGray-500 text-sm font-semibold mb-2">
+                  Useful Links
+                </span>
+                <ul className="list-unstyled">
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="/"
+                    >
+                      Home
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="/"
+                    >
+                      My Account
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="/cart"
+                    >
+                      Cart
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="/cart"
+                    >
+                      Wishlist
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="w-full lg:w-4/12 px-4">
+                <span className="block uppercase text-blueGray-500 text-sm font-semibold mb-2">
+                  Contact Us
+                </span>
+                <ul className="list-unstyled">
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="https://github.com/creativetimofficial/notus-js/blob/main/LICENSE.md?ref=njs-profile"
+                    >
+                      <Place className="mr-4" />
+                      <span>Bhopal, India</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="https://creative-tim.com/terms?ref=njs-profile"
+                    >
+                      <LocalPhone className="mr-4" />
+                      <span>+9112345789</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a
+                      className="text-blueGray-600 hover:text-blueGray-800 font-semibold block pb-2 text-sm"
+                      href="https://creative-tim.com/privacy?ref=njs-profile"
+                    >
+                      <MailOutline className="mr-4" />
+                      <span>Email Us</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div>
-        <h2 className='font-bold text-2xl mb-4 tracking-wider'>Contact</h2>
-        <ul>
-          <li>
-            <Place className='mr-4' />
-            <span>Bhopal, India</span>
-          </li>
-          <li>
-            <LocalPhone className='mr-4' />
-            <span>+9112345789</span>
-          </li>
-          <li>
-            <MailOutline className='mr-4' />
-            <span>contact@bazaar.com</span>
-          </li>
-        </ul>
+        <hr className="my-2 border-blueGray-300" />
       </div>
     </footer>
   );
 };
-
 export default Footer;
