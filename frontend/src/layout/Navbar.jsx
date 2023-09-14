@@ -1,25 +1,38 @@
-import React, { useEffect } from "react";
-
 import { Badge } from "@mui/material";
-import { Search, ShoppingCart } from "@mui/icons-material";
+import { ShoppingCart } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const totalQuantity = useSelector((store) => store.cart.totalQuantity);
-
+  const isAuthenticated = useSelector((store) => store.auth.currentUser);
   return (
-    <nav className="grid grid-cols-2 p-4 border-b font-semibold h-18">
-      <h1 className="font-bold text-3xl uppercase flex items-center justify-start px-4 tracking-wider">
+    <nav className="grid grid-cols-2 p-4 border-b font-semibold h-16">
+      <h1 className="font-bold text-2xl uppercase flex items-center justify-start px-4 tracking-wider">
         <a href="/">Bazaar</a>
       </h1>
-      <div className="flex justify-end items-center px-4 text-md md:text-lg">
-        <Link to="/register" className="uppercase px-4 py-2">
-          Register
-        </Link>
-        <Link to="/login" className="uppercase px-4 py-2">
-          Sign in
-        </Link>
+      <div className="flex justify-end items-center gap-6 text-sm md:text-md px-6">
+        {isAuthenticated ? (
+          // Display user-related links when authenticated
+          <div className="hidden md:flex space-x-6">
+            <Link to="/profile" className="uppercase">
+              Profile
+            </Link>
+            <Link to="/logout" className="uppercase">
+              Logout
+            </Link>
+          </div>
+        ) : (
+          // Display login and register links when not authenticated
+          <div className="hidden md:flex space-x-6">
+            <Link to="/register" className="uppercase">
+              Register
+            </Link>
+            <Link to="/login" className="uppercase">
+              Login
+            </Link>
+          </div>
+        )}
         <Link to="/cart">
           <Badge
             badgeContent={totalQuantity}

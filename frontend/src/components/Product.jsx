@@ -6,7 +6,7 @@ const Product = ({ product }) => {
   const [overlayIsShown, setOverlayIsShown] = useState(false);
   return (
     <figure
-      className="relative p-4"
+      className="relative p-4 border border-gray-300 rounded-sm bg-white hover:shadow-md transition-shadow duration-300 ease-in-out"
       onMouseEnter={() => {
         setOverlayIsShown(true);
       }}
@@ -14,10 +14,10 @@ const Product = ({ product }) => {
         setOverlayIsShown(false);
       }}
     >
-      <div className=" aspect-square overflow-hidden relative group">
+      <div className="aspect-square overflow-hidden relative group">
         <img
           src={product.image}
-          alt=""
+          alt={product.title}
           className="w-full h-full object-cover object-center ease-in group-hover:scale-110 transition-transform duration-500 "
         />
       </div>
@@ -25,7 +25,7 @@ const Product = ({ product }) => {
         <div className="flex justify-between text-sm md:text-base capitalize mb-2 text-text-black">
           <Link
             to={`/product/${product._id}`}
-            className="cursor-pointer line-clamp-1"
+            className="cursor-pointer line-clamp-1 font-urbanist"
           >
             {product.title}
           </Link>
@@ -50,7 +50,7 @@ const Product = ({ product }) => {
       {overlayIsShown && (
         <Link
           to={`/products/${product._id}`}
-          className="cursor-pointer absolute top-0 left-0 w-full h-full bg-black/50 flex justify-center items-center"
+          className="cursor-pointer absolute top-0 left-0 w-full h-full bg-black/10 flex justify-center items-center"
         ></Link>
       )}
     </figure>

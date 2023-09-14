@@ -40,6 +40,8 @@ const ShoppingCart = () => {
 
     if (result.error) {
       console.log(result.error);
+    } else {
+      dispatch(emptyCart());
     }
   };
   return (

@@ -9,7 +9,7 @@ const Categorie = ({ name, image }) => {
         <img
           src={image}
           alt={name}
-          className="h-[480px] w-[640px] object-cover object-center max-h-[38rem]"
+          className="h-[280px] w-[400px] object-cover object-center"
         />
         <figcaption className=" bg-black/30 absolute z-100 top-0 left-0 w-full h-full flex flex-col justify-center items-center p-2">
           <h2 className="mb-4 p-2 uppercase text-xl sm:text-2xl md:text-3xl text-white font-bold text-center">
