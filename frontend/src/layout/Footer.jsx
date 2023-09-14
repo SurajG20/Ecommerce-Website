@@ -11,14 +11,14 @@ import {
 
 const Footer = () => {
   return (
-    <footer className="relative bg-teal-200 pt-8 pb-6 ">
+    <footer className="relative bg-teal-200 pt-4 pb-4 ">
       <div className="container mx-auto px-4">
         <div className="flex flex-wrap text-left lg:text-left">
           <div className="w-full lg:w-6/12 px-4">
             <h1 className="font-bold text-3xl uppercase mb-2 tracking-wider">
               <a href="">Bazaar</a>
             </h1>
-            <h4 className="text-3xl fonat-semibold text-blueGray-700">
+            <h4 className="text-3xl font-semibold text-blueGray-700">
               Let's keep in touch!
             </h4>
             <h5 className="text-lg mt-0 mb-2 text-blueGray-600">
@@ -137,7 +137,6 @@ const Footer = () => {
             </div>
           </div>
         </div>
-        <hr className="my-2 border-blueGray-300" />
       </div>
     </footer>
   );

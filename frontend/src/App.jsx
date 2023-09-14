@@ -9,6 +9,8 @@ import ShoppingCart from "./pages/ShoppingCart";
 import Orders from "./pages/Orders";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
+import Success from "./pages/Success";
+import Cancel from "./pages/Cancel";
 
 const App = () => {
   const user = useSelector((store) => store.auth.currentUser);
@@ -22,6 +24,8 @@ const App = () => {
       <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
 
       <Route path="/register" element={<Register />}></Route>
+      <Route path="/success" element={<Success />}></Route>
+      <Route path="/cancel" element={<Cancel />}></Route>
     </Routes>
   );
 };

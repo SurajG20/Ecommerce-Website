@@ -18,7 +18,6 @@ const Products = ({ category, filter }) => {
   useEffect(() => {
     getProducts();
   }, []);
-  // console.log(products);
   return (
     <section
       className="pb-8 mx-8 grid gap-4 md:grid-cols-2 lg:grid-cols-4"

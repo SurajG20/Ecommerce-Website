@@ -4,7 +4,6 @@ import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
   const [overlayIsShown, setOverlayIsShown] = useState(false);
-  console.log(product);
   return (
     <figure
       className="relative p-4"

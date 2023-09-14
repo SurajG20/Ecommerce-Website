@@ -95,11 +95,11 @@ const Register = () => {
             CREATE
           </button>
         </form>
-        <Link href="/login" className="">
-          <a className="my-[10px] text-[12px] cursor-pointer ">
+        <Link to="/login" className="">
+          <p className="my-[10px] text-[12px] cursor-pointer ">
             ALREADY HAVE AN ACCOUNT?
             <span className="text-blue-500 ml-1 underline">SIGN IN</span>
-          </a>
+          </p>
         </Link>
         {auth.error && (
           <span className="text-red-500 block ">Something Went Wrong...</span>

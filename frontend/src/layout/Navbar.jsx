@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 import { Badge } from "@mui/material";
 import { Search, ShoppingCart } from "@mui/icons-material";
@@ -6,7 +6,8 @@ import { useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const totalQantity = useSelector((store) => store.cart.totalQantity);
+  const totalQuantity = useSelector((store) => store.cart.totalQuantity);
+
   return (
     <nav className="grid grid-cols-2 p-4 border-b font-semibold h-18">
       <h1 className="font-bold text-3xl uppercase flex items-center justify-start px-4 tracking-wider">
@@ -21,7 +22,7 @@ const Navbar = () => {
         </Link>
         <Link to="/cart">
           <Badge
-            badgeContent={totalQantity}
+            badgeContent={totalQuantity}
             color="primary"
             className="cursor-pointer"
           >

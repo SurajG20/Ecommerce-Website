@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+dotenv.config();
 
 const userRoutes = require("./routes/user");
 const cartRoutes = require("./routes/cart");
@@ -10,24 +11,24 @@ const productRoutes = require("./routes/product");
 const authRoutes = require("./routes/auth");
 const stripeRoutes = require("./routes/stripe");
 
-dotenv.config();
-
+const cors = require("cors");
 const app = express();
 
 // Parse the body text
 app.use(bodyParser.json());
 
 // CORS
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, PATCH, DELETE"
-  );
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  next();
-});
+// app.use((req, res, next) => {
+//   res.setHeader("Access-Control-Allow-Origin", "*");
+//   res.setHeader(
+//     "Access-Control-Allow-Methods",
+//     "GET, POST, PUT, PATCH, DELETE"
+//   );
+//   res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+//   next();
+// });
 
+app.use(cors());
 // Routes
 
 app.use("/api/users", userRoutes);

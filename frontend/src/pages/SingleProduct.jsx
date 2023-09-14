@@ -89,7 +89,7 @@ const SingleProduct = () => {
               <span className="text-[20px] font-extralight ">Size</span>
               <select
                 onChange={(e) => setSize(e.target.value)}
-                className=" p-[5px] outline-none"
+                className=" p-[5px] outline-none w-12"
               >
                 {product.size?.map((s) => (
                   <option key={s} value={s} className="">
