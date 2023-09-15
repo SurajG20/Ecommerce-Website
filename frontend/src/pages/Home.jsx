@@ -1,11 +1,11 @@
 import React from "react";
 
-import Navbar from "../layout/Navbar";
-import Announcement from "../layout/Announcement";
+import Navbar from "../components/Navbar";
+import Announcement from "../components/Announcement";
 import Carousel from "../components/Carousel";
 import Categories from "../components/Categories";
 import Products from "../components/Products";
-import Footer from "../layout/Footer";
+import Footer from "../components/Footer";
 
 const Home = () => {
   return (

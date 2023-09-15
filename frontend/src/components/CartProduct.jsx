@@ -1,5 +1,5 @@
 import React from "react";
-
+import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined";
 const CartProduct = ({ product, handleDelete }) => {
   return (
     <div className="flex flex-col md:flex-row justify-between mb-4">
@@ -24,7 +24,7 @@ const CartProduct = ({ product, handleDelete }) => {
           className="text-sm lg:text-md cursor-pointer uppercase px-4 py-2 m-4 hover:text-black hover:border-black hover:bg-white bg-black text-white transition ease-out duration-500"
           onClick={() => handleDelete(product)}
         >
-          Delete
+          <DeleteForeverOutlinedIcon />
         </button>
         <div className="flex items-center justify-start mb-8">
           <span className="mx-2 text-xl h-10 w-10 rounded-2xl border flex justify-center items-center">
@@ -32,7 +32,7 @@ const CartProduct = ({ product, handleDelete }) => {
           </span>
         </div>
         <span className="block mb-6 text-4xl">
-          ₹ {product.quantity * product.price}
+          {Math.round(Math.abs((product.quantity * product.price).toFixed(2)))}
         </span>
       </div>
     </div>

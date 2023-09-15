@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
 import { Add, Remove } from "@mui/icons-material";
 import { useParams } from "react-router-dom";
@@ -7,17 +7,20 @@ import { useDispatch } from "react-redux";
 import { publicRequest } from "../request-methods";
 import { addProduct } from "../store/cart-slice";
 
-import Navbar from "../layout/Navbar";
-import Announcement from "../layout/Announcement";
-import Footer from "../layout/Footer";
+import Navbar from "../components/Navbar";
+import Announcement from "../components/Announcement";
+import Footer from "../components/Footer";
+import { Alert } from "@mui/material";
 
 const SingleProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const [product, setProduct] = useState({});
-  let [quantity, setQuantity] = useState(1);
-  let [size, setSize] = useState("S");
-  let [color, setColor] = useState("red");
+  const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState("S");
+  const [color, setColor] = useState("red");
+  const [showMsg, setShowMsg] = useState(false);
+
   const colorClass = (color) => {
     switch (color) {
       case "white":
@@ -43,18 +46,29 @@ const SingleProduct = () => {
       console.log(error);
     }
   };
-  const sizeChangeHandler = (e) => {
-    setSize(e.target.value);
-  };
-  // const colorChangeHandler = (e) => {
-  //   setSize(e.target.value);
-  // };
-  const addToCartHandler = () => {
-    dispatch(addProduct({ product, size, quantity }));
-  };
+
+  const handleSubmit = useCallback(() => {
+    dispatch(addProduct({ product, quantity, color, size }));
+    setShowMsg(true);
+    setTimeout(() => {
+      setShowMsg(false);
+    }, 3000);
+  }, [product, quantity, color, size]);
+
+  const handleQuantity = useCallback((type) => {
+    if (type === "dec") {
+      setQuantity((prev) => {
+        return prev > 1 ? prev - 1 : 1;
+      });
+    } else {
+      setQuantity((prev) => prev + 1);
+    }
+  }, []);
+
   useEffect(() => {
     getProduct();
   }, []);
+
   return (
     <>
       <Announcement />
@@ -103,9 +117,7 @@ const SingleProduct = () => {
             <div className="flex items-center justify-start">
               <span
                 className="cursor-pointer"
-                onClick={() => {
-                  quantity > 1 && setQuantity(quantity--);
-                }}
+                onClick={() => handleQuantity("dec")}
               >
                 <Remove />
               </span>
@@ -114,20 +126,31 @@ const SingleProduct = () => {
               </span>
               <span
                 className="cursor-pointer"
-                onClick={() => {
-                  setQuantity(quantity++);
-                }}
+                onClick={() => handleQuantity("inc")}
               >
                 <Add />
               </span>
             </div>
             <div>
               <button
-                onClick={addToCartHandler}
+                onClick={handleSubmit}
                 className="uppercase hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded p-4"
               >
                 Add to cart
               </button>
+            </div>
+            <div
+              className={`mt-4 sm:w-3/4 lg:w-full  transition duration-300 ${
+                !showMsg && "opacity-0"
+              }`}
+            >
+              <Alert
+                variant="outlined"
+                color="success"
+                onClose={() => setShowMsg(false)}
+              >
+                Added to cart
+              </Alert>
             </div>
           </div>
         </div>
