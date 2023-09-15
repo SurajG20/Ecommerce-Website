@@ -64,55 +64,60 @@ const ShoppingCart = () => {
     <>
       <Announcement />
       <Navbar />
-      <section className="px-8 py-4">
-        <h1 className="uppercase mt-4 mb-8 text-4xl text-center">your bag</h1>
-        <div
-          className={`mt-4 mb-8 sm:w-3/4 lg:w-1/2 transition duration-300 mx-auto ${
-            !showMsg && "opacity-0"
-          }`}
-        >
-          <Alert
-            variant="outlined"
-            severity="error"
-            onClose={() => setShowMsg(false)}
+      <section className="px-8 py-4 ">
+        {/* Title */}
+        <div>
+          <h1 className="uppercase font-semibold text-2xl text-center">
+            Your Cart
+          </h1>
+          <div
+            className={`sm:w-3/4 lg:w-1/2 transition duration-300 mx-auto ${
+              !showMsg && "opacity-0"
+            }`}
           >
-            <p className=" text-xl text-center">
+            <Alert
+              variant="outlined"
+              severity="error"
+              onClose={() => setShowMsg(false)}
+            >
               Your cart is empty. Please add items to your cart before
               proceeding
-            </p>
-          </Alert>
+            </Alert>
+          </div>
         </div>
-        <div className="grid sm:grid-cols-3 gap-4 md:gap-6 lg:gap-8">
-          <div>
+        {/* Button Container */}
+        <div className="grid sm:grid-cols-2 items-between gap-2 md:gap-4 lg:gap-6">
+          {/* Continue Shopping */}
+          <div className="flex gap-8 justify-start items-center ">
             <a
               onClick={continueShoppingClickHandler}
-              className="text-sm lg:text-md cursor-pointer uppercase  p-4 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500"
+              className="text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500"
             >
               continue shopping
             </a>
+            <p className="">Shopping Bag ({cart.totalQuantity})</p>
           </div>
-          <div className="flex">
-            <p className="mr-4 ">Shopping Bag ({cart.totalQuantity})</p>
-          </div>
-
-          <div className="flex items-center justify-center gap-4">
+          {/* Payment Button */}
+          <div className="flex justify-end gap-4">
             <button
               onClick={() => dispatch(emptyCart())}
-              className="text-sm lg:text-md cursor-pointer uppercase px-3 py-2 hover:text-black hover:border-black hover:bg-white bg-black text-white transition ease-out duration-500"
+              className="text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500"
             >
               EMPTY CART
             </button>
             <button
               onClick={handlePayment}
-              className="text-sm lg:text-md cursor-pointer uppercase px-3 py-2 hover:text-black hover:border-black hover:bg-white bg-black text-white transition ease-out duration-500"
+              className="text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500"
             >
               Checkout
             </button>
           </div>
         </div>
 
-        <div className="my-12 grid gap-8 lg:grid-cols-[2fr_1fr]">
-          <div>
+        {/* main div */}
+        <div className="my-8 grid gap-8 lg:grid-cols-[2fr_1fr] min-h-[400px] ">
+          {/* Product Container */}
+          <div className="flex flex-col gap-6 ">
             {cart.products.map((product) => (
               <CartProduct
                 key={product._id}
@@ -121,29 +126,26 @@ const ShoppingCart = () => {
               />
             ))}
           </div>
-          <div>
-            <div className="border rounded-xl p-4">
-              <h1 className="uppercase text-4xl mb-8">order summary</h1>
-              <div className="flex justify-between mb-8">
-                <span className="capitalize">subtotal</span>
-                <span>
-                  ₹ {Math.round(Math.abs(cart.totalPrice.toFixed(2)))}
-                </span>
-              </div>
-              <div className="flex justify-between mb-8">
-                <span className="capitalize">estimated shipping</span>
-                <span>₹ 00.00</span>
-              </div>
-              <div className="flex justify-between mb-8">
-                <span className="capitalize">shipping discount</span>
-                <span>-₹ 00.00</span>
-              </div>
-              <div className="flex justify-between mb-8">
-                <span className="capitalize font-bold text-2xl">Total</span>
-                <span className="font-bold text-2xl">
-                  ₹ {Math.round(Math.abs(cart.totalPrice.toFixed(2)))}
-                </span>
-              </div>
+          {/* Summary Container */}
+          <div className="border rounded-sm p-2 flex flex-col gap-4 h-fit ">
+            <h1 className="uppercase text-xl ">order summary</h1>
+            <div className="flex justify-between ">
+              <span className="text-sm capitalize">subtotal</span>
+              <span>₹ {Math.round(Math.abs(cart.totalPrice.toFixed(2)))}</span>
+            </div>
+            <div className="flex justify-between ">
+              <span className="text-sm capitalize">estimated shipping</span>
+              <span>₹ 00.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm capitalize">shipping discount</span>
+              <span>-₹ 00.00</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-sm capitalize">Total</span>
+              <span className="font-bold text-2xl">
+                ₹ {Math.round(Math.abs(cart.totalPrice.toFixed(2)))}
+              </span>
             </div>
           </div>
         </div>
