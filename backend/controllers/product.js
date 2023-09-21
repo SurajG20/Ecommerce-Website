@@ -53,25 +53,6 @@ module.exports.getProduct = async (req, res) => {
   }
 };
 
-// module.exports.getProducts = async (req, res) => {
-//   const newQuery = req.query.new;
-//   const categoryQuery = req.query.category;
-//   try {
-//     let products;
-//     if (newQuery) {
-//       products = await Product.find({}).sort({ createdAt: -1 }).limit(8);
-//     } else if (categoryQuery) {
-//       products = await Product.find({
-//         category: categoryQuery,
-//       });
-//     } else {
-//       products = await Product.find({});
-//     }
-//     res.status(200).json(products);
-//   } catch (error) {
-//     res.status(500).json(error);
-//   }
-// };
 module.exports.getProducts = async (req, res) => {
   const { page = 1, limit = 15 } = req.query;
   const newQuery = req.query.new;
@@ -95,7 +76,6 @@ module.exports.getProducts = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit, 10));
-
     const totalProducts = await Product.countDocuments(query);
 
     res.status(200).json({ products, totalProducts });

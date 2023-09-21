@@ -6,17 +6,21 @@ import { logout } from "../store/auth-slice";
 import { useState } from "react";
 import LogoutIcon from "@mui/icons-material/Logout";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-
+import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 const Navbar = () => {
-  const quantity = useSelector((store) => store.cart.totalQuantity);
-  const user = useSelector((state) => state.auth.currentUser);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showPopup, setShowPopup] = useState(false);
+  const cart = useSelector((state) => state.cart);
+  const user = useSelector((state) => state.auth.currentUser);
   const handleLogout = () => {
     dispatch(logout());
     navigate("/");
   };
+  const handleAdmin = () => {
+    navigate("/admin");
+  };
+
   return (
     <nav className="grid grid-cols-2 p-4 border-b font-semibold h-16">
       <h1 className="font-bold text-2xl uppercase flex items-center justify-start px-4 tracking-wider">
@@ -37,29 +41,44 @@ const Navbar = () => {
           <>
             <div
               onClick={() => setShowPopup((prev) => !prev)}
-              className="relative cursor-pointer ml-[10px] border space-x-3 rounded p-2 flex justify-between items-center "
+              className="relative cursor-pointer  rounded p-2 flex justify-between items-center"
             >
-              <AccountCircleIcon className="w-6 h-6 " />
-              <div className="text-[12px] sm:text-[14px] tracking-wide ">
+              <div className="text-[12px] sm:text-[14px] tracking-wide flex items-center justify-center ">
+                <AccountCircleIcon className="w-6 h-6 " />
                 {user?.username.toUpperCase()}
               </div>
-              <div
-                onClick={handleLogout}
-                className={`bg-white shadow-lg absolute bottom-[-70px] ${
-                  !showPopup && "opacity-0"
-                } z-[3] p-4 rounded-md flex items-center
+              {user.isAdmin && (
+                <div
+                  className={`bg-white shadow-lg absolute left-[-20px] bottom-[-50px] ${
+                    !showPopup && "opacity-0"
+                  } z-[3] px-4 py-2 rounded-md flex items-center
                   transition duration-300 ease-in-out `}
+                >
+                  <button
+                    className="text-[12px] sm:text-[14px] flex items-center justify-center"
+                    onClick={handleAdmin}
+                  >
+                    <AdminPanelSettingsIcon className="h-6 w-6 text-gray-600 mr-2 " />
+                    AdminPanel
+                  </button>
+                </div>
+              )}
+
+              <div
+                className="text-[12px] sm:text-[14px] cursor-pointer ml-[10px] sm:ml-[25px] "
+                onClick={handleLogout}
               >
                 <LogoutIcon className="h-6 w-6 text-gray-600 mr-2 " />
-                <button className="text-[12px] sm:text-[14px] ">LOGOUT</button>
+                LOGOUT
               </div>
             </div>
           </>
         )}
+
         <Link to="/cart">
           <Badge
             className="ml-[10px] sm:ml-[25px] cursor-pointer"
-            badgeContent={quantity}
+            badgeContent={cart.totalQuantity}
             color="primary"
           >
             <ShoppingCart />

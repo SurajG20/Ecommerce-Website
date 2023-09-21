@@ -1,15 +1,13 @@
 import React, { useRef } from "react";
-
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
 import { login } from "../store/auth-actions";
-
 const Login = () => {
   const dispatch = useDispatch();
   const auth = useSelector((store) => store.auth);
   const usernameRef = useRef();
   const passwordRef = useRef();
+
   const formSubmitHandler = (e) => {
     e.preventDefault();
     const username = usernameRef.current.value;

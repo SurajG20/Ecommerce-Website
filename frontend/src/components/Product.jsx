@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
   const [overlayIsShown, setOverlayIsShown] = useState(false);
+  console.log(product);
   return (
     <figure
       className="relative p-4 border border-gray-300 rounded-sm bg-white hover:shadow-md transition-shadow duration-300 ease-in-out"
@@ -22,7 +23,7 @@ const Product = ({ product }) => {
         />
       </div>
       <div className="mt-4">
-        <div className="flex justify-between text-sm md:text-base capitalize mb-2 text-text-black">
+        <div className="flex justify-between text-sm md:text-base capitalize mb-2 text-black">
           <Link
             to={`/product/${product._id}`}
             className="cursor-pointer line-clamp-1 font-urbanist"
@@ -30,14 +31,14 @@ const Product = ({ product }) => {
             {product.title}
           </Link>
         </div>
-        <div className="flex mb-2 gap-1 items-center">
-          <div className="bg-green-600 text-xs md:text-sm rounded-sm p-1 text-white font-semibold flex items-center gap-1">
-            <span>{product.rating}</span>
-            <StarIcon className="text-xs md:text-sm" />
-          </div>
+      </div>
+      <div className="flex mb-2 gap-1 items-center">
+        <div className="bg-green-600 text-xs md:text-sm rounded-sm p-1 text-white font-semibold flex items-center gap-1">
+          <span>{product.rating}</span>
+          <StarIcon className="text-xs md:text-sm" />
         </div>
       </div>
-      <div className="text-sm text-text-black flex gap-2">
+      <div className="text-sm text-black flex gap-2">
         <span className="font-semibold whitespace-nowrap">
           ₹{product.discountPrice}
         </span>

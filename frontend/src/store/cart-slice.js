@@ -57,33 +57,6 @@ const cartSlice = createSlice({
       state.totalQuantity += newProduct.quantity;
       state.totalPrice += newProduct.price * newProduct.quantity;
     },
-
-    // addProduct(state, action) {
-    //   const newProduct = {
-    //     _id: action.payload.product._id,
-    //     title: action.payload.product.title,
-    //     description: action.payload.product.description,
-    //     image: action.payload.product.image,
-    //     price: action.payload.product.price,
-    //     quantity: action.payload.quantity,
-    //     size: action.payload.size,
-    //     color: action.payload.color,
-    //   };
-    //   let added = false;
-
-    //   for (let oldProduct of state.products) {
-    //     if (oldProduct._id === newProduct._id) {
-    //       oldProduct.quantity += newProduct.quantity;
-    //       added = true;
-    //       break;
-    //     }
-    //   }
-    //   if (!added) {
-    //     state.products.push(newProduct);
-    //   }
-    //   state.totalQuantity += newProduct.quantity;
-    //   state.totalPrice += newProduct.price * newProduct.quantity;
-    // },
   },
 });
 

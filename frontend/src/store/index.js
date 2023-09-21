@@ -1,7 +1,8 @@
-import { configureStore, combineReducers } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from "@reduxjs/toolkit";
 
-import cartSlice from './cart-slice';
-import authSlice from './auth-slice';
+import cartSlice from "./cart-slice";
+import authSlice from "./auth-slice";
+import productSlice from "./product-slice";
 
 import {
   persistStore,
@@ -12,17 +13,18 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+} from "redux-persist";
+import storage from "redux-persist/lib/storage";
 
 // Combine the reducers first
 const rootReducer = combineReducers({
   cart: cartSlice.reducer,
-  auth: authSlice.reducer
+  auth: authSlice.reducer,
+  product: productSlice.reducer,
 });
 
 const persistConfig = {
-  key: 'root',
+  key: "root",
   version: 1,
   storage,
 };
