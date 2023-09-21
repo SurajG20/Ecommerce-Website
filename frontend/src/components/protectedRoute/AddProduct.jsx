@@ -42,7 +42,7 @@ const AddProduct = () => {
   const handleColor = useCallback((e) => {
     setColor(e.target.value.split(","));
   }, []);
-  console.log(inputs);
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const filename = new Date().getTime() + file.name;
@@ -82,10 +82,27 @@ const AddProduct = () => {
           addProduct(dispatch, products);
           getProducts(dispatch);
           setSuccess(true);
+          setInputs({
+            title: "",
+            description: "",
+            price: "",
+            discount: "",
+          });
+          setCategory([]);
+          setSize([]);
+          setColor([]);
+          setFile(null);
+          setPrevimg(null);
+          setSuccess(true);
         });
       }
     );
   };
+
+  setTimeout(() => {
+    setSuccess(false);
+    setError(false);
+  }, 5000);
   return (
     <div className=" p-2">
       <h1 className="text-2xl font-semibold ml-8 ">New Product</h1>
@@ -122,6 +139,7 @@ const AddProduct = () => {
               className="w-full p-2 border"
               name="title"
               onChange={handleChange}
+              value={inputs.title}
               required
             />
           </div>
@@ -134,6 +152,7 @@ const AddProduct = () => {
               name="description"
               onChange={handleChange}
               required
+              value={inputs.description}
             />
           </div>
           <div className="mb-4">
@@ -145,6 +164,7 @@ const AddProduct = () => {
               name="categories"
               onChange={handleCategory}
               required
+              value={category}
             />
           </div>
           <div className="mb-4">
@@ -155,6 +175,7 @@ const AddProduct = () => {
               className="w-full p-2 border"
               onChange={handleSize}
               required
+              value={size}
             />
           </div>
           <div className="mb-4">
@@ -165,6 +186,7 @@ const AddProduct = () => {
               className="w-full p-2 border"
               onChange={handleColor}
               required
+              value={color}
             />
           </div>
           <div className="mb-4">

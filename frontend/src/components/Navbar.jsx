@@ -43,8 +43,8 @@ const Navbar = () => {
               onClick={() => setShowPopup((prev) => !prev)}
               className="relative cursor-pointer  rounded p-2 flex justify-between items-center"
             >
-              <div className="text-[12px] sm:text-[14px] tracking-wide flex items-center justify-center ">
-                <AccountCircleIcon className="w-6 h-6 " />
+              <div className="text-[12px] sm:text-[14px] tracking-wide flex items-center justify-center  ">
+                <AccountCircleIcon className="w-6 h-6 mr-1" />
                 {user?.username.toUpperCase()}
               </div>
               {user.isAdmin && (

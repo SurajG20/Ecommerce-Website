@@ -8,31 +8,28 @@ const Categories = () => {
       <div className="grid gap-2 sm:grid-cols-2 md:grid-cols-3 mb-2">
         <Categorie
           name="clothes"
-          image="https://images.unsplash.com/photo-1542060748-10c28b62716f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          image="https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/clothes.avif?alt=media&token=0b2171d9-2053-42cf-80b8-2a1188df148c"
         />
         <Categorie
           name="women"
-          image="https://images.unsplash.com/photo-1496747611176-843222e1e57c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2073&q=80"
+          image="https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/women.avif?alt=media&token=17fda597-2e27-4752-853f-a97195b3bee8"
         />
         <Categorie
-          name="Mens"
-          image="https://images.unsplash.com/photo-1507680434567-5739c80be1ac?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80"
+          name="men"
+          image="https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/men.avif?alt=media&token=c54d2b65-3f32-4189-8335-b9bb3a2a6ae2"
         />
         <Categorie
-          name="Shoes"
-          image="https://images.unsplash.com/photo-1560769629-975ec94e6a86?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1964&q=80"
+          name="shoes"
+          image="https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/shoes.avif?alt=media&token=4758c7eb-2f1a-478a-9a4f-e49666ac08fd"
         />
         <Categorie
-          name="Electronics"
-          image="https://images.unsplash.com/photo-1550009158-9ebf69173e03?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1802&q=80"
+          name="electronics"
+          image="https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/electronics.avif?alt=media&token=5dbce477-6ca1-496a-93a0-cc955c73032c"
         />
-        {/* <Categorie
-          name="Furniture"
-          image="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80"
-        /> */}
+
         <Categorie
-          name="Others"
-          image="https://images.unsplash.com/photo-1635447272203-92e6fdf27245?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1965&q=80"
+          name="others"
+          image="https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/others.avif?alt=media&token=63fdba67-74e0-40e6-bf22-9a7990ec4ebf"
         />
       </div>
     </section>

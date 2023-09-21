@@ -5,23 +5,23 @@ import { Link } from "react-scroll";
 
 const CAROUSEL_DATA = [
   {
-    url: "https://images.unsplash.com/photo-1523380744952-b7e00e6e2ffa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1170&q=80",
+    url: "https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/summer.avif?alt=media&token=37fc320b-09f0-402a-ad37-3e434ddb7801",
     title: "summer sale",
     description:
       "don't compromise on style! get flat 30% off for new arrivals.",
   },
   {
-    url: "https://images.unsplash.com/photo-1575939238474-c8ada13b2724?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2071&q=80",
+    url: "https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/pink.avif?alt=media&token=af57dc9b-5613-4538-845e-f79ce7d86eee",
     title: "winter sale",
     description: "Winter is coming! don't miss out on our new collection!",
   },
   {
-    url: "https://images.unsplash.com/photo-1550995694-3f5f4a7e1bd2?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1171&q=80",
+    url: "https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/blue.avif?alt=media&token=62585a3e-c17f-4358-b31e-384faaa83550",
     title: "Special sale",
     description: " Just for you! Get flat 50% off for new arrivals.",
   },
   {
-    url: "https://images.unsplash.com/photo-1538329972958-465d6d2144ed?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80",
+    url: "https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/yellow.avif?alt=media&token=ef6bbac1-219c-4d62-9119-58499cdba86f",
     title: "autumn sale",
     description:
       "Get ready! Coming up with new arrivals, don't miss out on our new collection!",

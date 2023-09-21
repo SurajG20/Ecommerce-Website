@@ -4,7 +4,8 @@ import { Link } from "react-router-dom";
 
 const Product = ({ product }) => {
   const [overlayIsShown, setOverlayIsShown] = useState(false);
-  console.log(product);
+  const discountPrice =
+    product.price - (product.price * product.discount) / 100;
   return (
     <figure
       className="relative p-4 border border-gray-300 rounded-sm bg-white hover:shadow-md transition-shadow duration-300 ease-in-out"
@@ -40,11 +41,11 @@ const Product = ({ product }) => {
       </div>
       <div className="text-sm text-black flex gap-2">
         <span className="font-semibold whitespace-nowrap">
-          ₹{product.discountPrice}
+          ₹{discountPrice}
         </span>
         <span className="line-through whitespace-nowrap">₹{product.price}</span>
         <span className="text-green-600 whitespace-nowrap">
-          {product.discountPercent}% off
+          {product.discount}% off
         </span>
       </div>
 
