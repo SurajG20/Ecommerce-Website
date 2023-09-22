@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const connectDB = require("./db/connect");
 dotenv.config();
 
 const userRoutes = require("./routes/user");
@@ -33,14 +33,16 @@ app.use((req, res) => {
   });
 });
 
-mongoose
-  .connect(process.env.MONGO_URL)
-  .then(() => {
-    const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
+const port = process.env.PORT || 5000;
+const start = async () => {
+  try {
+    await connectDB(process.env.MONGO_URL);
+    app.listen(port, () =>
+      console.log(`Server is listening on port ${port}...`)
+    );
+  } catch (error) {
     console.log(error);
-  });
+  }
+};
+
+start();
