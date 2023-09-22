@@ -1,17 +1,17 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000/api";
+const baseURL = import.meta.env.VITE_BASE_URL;
 
 const user = JSON.parse(localStorage.getItem("persist:root"))?.auth;
 const currentUser = user && JSON.parse(user).currentUser;
 const TOKEN = currentUser?.token;
 
 export const publicRequest = axios.create({
-  baseURL: BASE_URL,
+  baseURL: baseURL,
 });
 
 export const userRequest = axios.create({
-  baseURL: BASE_URL,
+  baseURL: baseURL,
   headers: {
     Authorization: `Bearer ${TOKEN}`,
   },

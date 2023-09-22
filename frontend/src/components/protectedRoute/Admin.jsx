@@ -15,13 +15,13 @@ const Admin = () => {
       <Navbar />
       <div className="flex flex-col items-center min-h-screen py-4 mx-auto ">
         <div
-          class="items-start flex rounded-md shadow-sm mx-auto "
+          className="items-start flex rounded-md shadow-sm mx-auto "
           role="group"
         >
           <button
             type="button"
             onClick={() => setIndex(0)}
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-l-lg gap-2"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-l-lg gap-2"
           >
             <InventoryIcon /> PRODUCTS
           </button>
@@ -29,7 +29,7 @@ const Admin = () => {
           <button
             type="button"
             onClick={() => setIndex(1)}
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-r-md gap-2"
+            className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-r-md gap-2"
           >
             <AddCircleOutlineOutlinedIcon />
             ADD

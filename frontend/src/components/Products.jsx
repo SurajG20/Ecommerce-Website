@@ -21,6 +21,7 @@ const Products = ({ category }) => {
       setTotalProducts(response.data.totalProducts);
       setLoading(false);
     } catch (error) {
+      console.log(error);
       setError(true);
       setLoading(false);
     }
