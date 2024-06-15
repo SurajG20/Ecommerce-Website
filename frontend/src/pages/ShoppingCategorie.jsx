@@ -7,18 +7,16 @@ import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 import Products from "../components/Products";
 import Title from "../components/Title";
+import Layout from "../components/Layout";
 
 const ShoppingCategorie = () => {
   const { category } = useParams();
 
   return (
-    <>
-      <Announcement />
-      <Navbar />
+    <Layout>
       <Title>{`${category.charAt(0).toUpperCase()}${category.slice(1)}`}</Title>
       <Products category={category} />
-      <Footer />
-    </>
+    </Layout>
   );
 };
 

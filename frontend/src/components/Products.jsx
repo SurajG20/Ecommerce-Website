@@ -41,7 +41,7 @@ const Products = ({ category }) => {
     return <LoadingSpinner />;
   }
   if (error) {
-    return <div className="text-center">Something went wrong!</div>;
+    return <div className="text-center">No Products Available!</div>;
   }
 
   const totalPages = Math.max(Math.ceil(totalProducts / productsPerPage), 1);
