@@ -71,18 +71,18 @@ const SingleProduct = () => {
   return (
     <Layout>
       <section className='p-8 grid md:grid-cols-2 gap-8 min-h-screen'>
-        <div className='self-start aspect-square mx-auto  w-96 h-96'>
+        <div className='self-start aspect-square mx-auto w-64 sm:w-96 h-96'>
           <img src={product.image} className='object-cover w-full h-full object-top border-2 p-2 rounded-sm' />
         </div>
         <div className=''>
-          <div className='flex flex-col gap-3'>
+          <div className='flex flex-col gap-x-3 gap-y-2'>
             <h2 className='text-4xl font-semibold '>{product.title}</h2>
             <p className=' text-md font-light'>{product.description}</p>
             <span className=' text-lg font-bold'>₹ {product.price}</span>
             {/* Color and Size Container */}
-            <div className='flex justify-between sm:w-1/2 space-x-3 '>
+            <div className='flex flex-col sm:flex-row justify-start items-start sm:justify-between sm:w-1/2 gap-x-3 gap-y-4 sm:items-center'>
               {/* Color */}
-              <div className='flex items-center space-x-2 '>
+              <div className='flex items-center gap-x-2 '>
                 <span className='text-xl'>Color :</span>
                 {product.color?.map((c) => (
                   <div
@@ -113,7 +113,7 @@ const SingleProduct = () => {
               </div>
             </div>
             {/* Cart and Quantity Container */}
-            <div className='grid sm:grid-cols-3 items-center  '>
+            <div className='grid grid-cols-1 items-start sm:grid-cols-3 gap-y-4 sm:items-center  '>
               {/* Quantity Counter */}
               <div className='flex items-center justify-start gap-x-3'>
                 <span className='cursor-pointer' onClick={() => handleQuantity('dec')}>
