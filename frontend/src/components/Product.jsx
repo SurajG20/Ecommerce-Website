@@ -20,13 +20,13 @@ const Product = ({ product }) => {
         <img
           src={product.image}
           alt={product.title}
-          className="w-full h-full object-cover object-center ease-in group-hover:scale-110 transition-transform duration-500 "
+          className="w-full h-full object-cover object-top ease-in group-hover:scale-110 transition-transform duration-500 "
         />
       </div>
       <div className="mt-4">
         <div className="flex justify-between text-sm md:text-base capitalize mb-2 text-black">
           <Link
-            to={`/product/${product._id}`}
+            to={`/products/${product._id}`}
             className="cursor-pointer line-clamp-1 font-urbanist"
           >
             {product.title}
@@ -41,7 +41,7 @@ const Product = ({ product }) => {
       </div>
       <div className="text-sm text-black flex gap-2">
         <span className="font-semibold whitespace-nowrap">
-          ₹{discountPrice}
+          ₹{discountPrice?.toFixed(2)}
         </span>
         <span className="line-through whitespace-nowrap">₹{product.price}</span>
         <span className="text-green-600 whitespace-nowrap">

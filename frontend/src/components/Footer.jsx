@@ -17,12 +17,12 @@ const Footer = () => {
         </div>
         <div className='w-full flex mx-auto justify-center flex-col sm:flex-row items-start sm:items-center gap-y-6 gap-x-12'>
           <div>
-            <button className='bg-blue-700 rounded-md shadow-lg px-8 py-3 text-center text-sm sm:text-lg font-medium text-white border border-white hover:bg-blue-600 cursor-pointer'>
+            <button className='bg-teal-700 rounded-md shadow-lg px-8 py-3 text-center text-sm sm:text-lg font-medium text-white border border-white hover:bg-teal-500 cursor-pointer'>
               SUBSCRIBE FOR OFFERS
             </button>
           </div>
           <div>
-            <button className='bg-white-700 rounded-md shadow-lg px-8 py-3 text-center text-sm sm:text-lg font-medium text-blue-700 border border-blue-700 hover:bg-gray-300 cursor-pointer'>
+            <button className='bg-white-700 rounded-md shadow-lg px-8 py-3 text-center text-sm sm:text-lg font-medium text-teal-700 border border-teal-700 hover:bg-gray-300 cursor-pointer'>
               CONTACT SUPPORT
             </button>
           </div>
@@ -30,7 +30,7 @@ const Footer = () => {
         <div className='grid grid-cols-1 sm:grid-cols-4 sm:space-x-12 gap-y-6 w-full mx-auto sm:px-20'>
           <div className='flex flex-col items-start sm:items-center justify-start'>
             <ul className='flex flex-col gap-y-3 text-base text-slate-900 font-light'>
-              <h3 className='mb-2 font-semibold text-blue-700 text-lg'>SHOP</h3>
+              <h3 className='mb-2 font-semibold text-teal-700 text-lg'>SHOP</h3>
               <Link to='#' className='p-0 cursor-pointer hover:text-gray-500'>
                 Home
               </Link>
@@ -50,7 +50,7 @@ const Footer = () => {
           </div>
           <div className='flex flex-col items-start sm:items-center  justify-start'>
             <ul className='flex flex-col gap-y-3 text-base text-slate-900 font-light'>
-              <h3 className='mb-2 font-semibold text-blue-700 text-lg'>CUSTOMER SERVICE</h3>
+              <h3 className='mb-2 font-semibold text-teal-700 text-lg'>CUSTOMER SERVICE</h3>
               <Link to='#' className='p-0 cursor-pointer hover:text-gray-500'>
                 Contact Us
               </Link>
@@ -70,7 +70,7 @@ const Footer = () => {
           </div>
           <div className='flex flex-col items-start sm:items-center  justify-start'>
             <ul className='flex flex-col gap-y-3 text-base text-slate-900 font-light'>
-              <h3 className='mb-2 font-semibold text-blue-700 text-lg'>ABOUT US</h3>
+              <h3 className='mb-2 font-semibold text-teal-700 text-lg'>ABOUT US</h3>
               <Link to='#' className='p-0 cursor-pointer hover:text-gray-500'>
                 Our Story
               </Link>
@@ -90,7 +90,7 @@ const Footer = () => {
           </div>
           <div className='flex flex-col items-start sm:items-center  justify-start'>
             <ul className='flex flex-col gap-y-3 text-base text-slate-900 font-light'>
-              <h3 className='mb-2 font-semibold text-blue-700 text-lg'>LEGAL</h3>
+              <h3 className='mb-2 font-semibold text-teal-700 text-lg'>LEGAL</h3>
               <Link to='#' className='p-0 cursor-pointer hover:text-gray-500'>
                 Privacy Policy
               </Link>

@@ -17,7 +17,7 @@ module.exports = {
       },
       backgroundImage: {
         login:
-          "url('https://images.pexels.com/photos/2112648/pexels-photo-2112648.jpeg?auto=compress&cs=tinysrgb&w=600')"
+          "url('https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/clark-street-mercantile-P3pI6xzovu0-unsplash.jpg?alt=media&token=57977edf-9d52-4a4d-80d2-7d0dcfaf0454')"
       }
     }
   },
