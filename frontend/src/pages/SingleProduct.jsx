@@ -75,10 +75,10 @@ const SingleProduct = () => {
           <img src={product.image} className='object-cover w-full h-full object-top border-2 p-2 rounded-sm' />
         </div>
         <div className=''>
-          <div className='flex flex-col gap-x-3 gap-y-2'>
+          <div className='flex flex-col gap-x-3 gap-y-4 items-start px-2'>
             <h2 className='text-4xl font-semibold '>{product.title}</h2>
-            <p className=' text-md font-light'>{product.description}</p>
-            <span className=' text-lg font-bold'>₹ {product.price}</span>
+            <p className=' text-lg font-light'>{product.description}</p>
+            <span className=' text-xl font-bold'>₹ {product.price}</span>
             {/* Color and Size Container */}
             <div className='flex flex-col sm:flex-row justify-start items-start sm:justify-between sm:w-1/2 gap-x-3 gap-y-4 sm:items-center'>
               {/* Color */}
@@ -113,7 +113,7 @@ const SingleProduct = () => {
               </div>
             </div>
             {/* Cart and Quantity Container */}
-            <div className='grid grid-cols-1 items-start sm:grid-cols-3 gap-y-4 sm:items-center  '>
+            <div className='grid grid-cols-1 items-start sm:grid-cols-3 gap-y-6 sm:items-center  '>
               {/* Quantity Counter */}
               <div className='flex items-center justify-start gap-x-3'>
                 <span className='cursor-pointer' onClick={() => handleQuantity('dec')}>
@@ -130,7 +130,7 @@ const SingleProduct = () => {
               <div>
                 <button
                   onClick={handleSubmit}
-                  className=' hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
+                  className='w-full hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
                 >
                   Add to cart
                 </button>

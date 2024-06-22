@@ -31,7 +31,7 @@ const Login = () => {
   };
   return (
     <Layout>
-      <div className='px-8 w-full h-screen flex justify-center items-center bg-login bg-no-repeat backdrop-blur-md  bg-cover'>
+      <div className='px-8 w-full h-screen flex justify-center items-center   bg-login bg-no-repeat backdrop-blur-md  bg-cover'>
         <form
           onSubmit={formSubmitHandler}
           action=''

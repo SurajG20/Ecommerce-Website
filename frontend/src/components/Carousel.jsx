@@ -59,7 +59,7 @@ const Carousel = () => {
       />
       <div className='absolute h-full w-full top-0 left-0 bg-black/50'></div>
       <div className='absolute h-full w-full top-0 left-0 flex flex-col justify-center items-center text-white uppercase px-4 text-center'>
-        <h1 className='text-4xl md:text-6xl font-bold mb-8'>{CAROUSEL_DATA[currentIndex].title}</h1>
+        <h1 className='text-4xl md:text-6xl leading-snug  font-bold mb-8'>{CAROUSEL_DATA[currentIndex].title}</h1>
         <p className='tracking-wider mb-16 text-md md:text-xl'>{CAROUSEL_DATA[currentIndex].description}</p>
         <Link to='categories' spy={true} smooth={true} offset={50} duration={500}>
           <button className='border p-3 bg-white text-black text-lg hover:bg-teal-600 hover:border-none hover:text-white transition ease-out	duration-500'>

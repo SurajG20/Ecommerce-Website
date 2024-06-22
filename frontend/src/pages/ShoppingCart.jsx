@@ -63,7 +63,7 @@ const ShoppingCart = () => {
       <section className='px-8 py-4 '>
         {/* Title */}
         <div>
-          <h1 className='uppercase font-semibold text-2xl text-center'>Your Cart</h1>
+          <h1 className='uppercase font-semibold text-3xl text-pretty tracking-wider text-center'>Your Cart</h1>
           <div className={`sm:w-3/4 lg:w-1/2 transition duration-300 mx-auto ${!showMsg && 'opacity-0'}`}>
             <Alert variant='outlined' severity='error' onClose={() => setShowMsg(false)}>
               Your cart is empty. Please add items to your cart before proceeding
@@ -71,28 +71,28 @@ const ShoppingCart = () => {
           </div>
         </div>
         {/* Button Container */}
-        <div className='grid sm:grid-cols-2 items-between gap-2 md:gap-4 lg:gap-6'>
+        <div className='grid grid-cols-2 items-between mx-auto  gap-2 md:gap-4 lg:gap-6 w-full '>
           {/* Continue Shopping */}
-          <div className='flex gap-8 justify-start items-center '>
+          <div className='flex gap-8 justify-start items-center flex-col sm:flex-row'>
             <a
               onClick={continueShoppingClickHandler}
-              className='text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500'
+              className='text-[12px] sm:text-lg capitalize cursor-pointer   hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
             >
               continue shopping
             </a>
-            <p className=''>Shopping Bag ({cart.totalQuantity})</p>
+            <p className='tracking-wide text-lg leading-snug'>Shopping Bag [{cart.totalQuantity}]</p>
           </div>
           {/* Payment Button */}
-          <div className='flex justify-end gap-4'>
+          <div className='flex flex-col sm:justify-end gap-4 sm:flex-row'>
             <button
               onClick={() => dispatch(emptyCart())}
-              className='text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500'
+              className='text-[12px] sm:text-lg capitalize cursor-pointer  hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
             >
               EMPTY CART
             </button>
             <button
               onClick={handlePayment}
-              className='text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500'
+              className='text-[12px] sm:text-lg capitalize cursor-pointer  hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
             >
               Checkout
             </button>
@@ -100,7 +100,7 @@ const ShoppingCart = () => {
         </div>
 
         {/* main div */}
-        <div className='my-8 grid gap-8 lg:grid-cols-[2fr_1fr] min-h-[400px] '>
+        <div className='my-12 grid gap-8 lg:grid-cols-[2fr_1fr] min-h-[400px] '>
           {/* Product Container */}
           <div className='flex flex-col gap-6 '>
             {cart.products.map((product) => (
@@ -108,7 +108,7 @@ const ShoppingCart = () => {
             ))}
           </div>
           {/* Summary Container */}
-          <div className='border rounded-sm p-2 flex flex-col gap-4 h-fit '>
+          <div className='border rounded-sm  p-2 flex flex-col gap-4 h-fit '>
             <h1 className='uppercase text-xl '>order summary</h1>
             <div className='flex justify-between '>
               <span className='text-sm capitalize'>subtotal</span>

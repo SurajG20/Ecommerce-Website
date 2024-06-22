@@ -57,9 +57,6 @@ const Navbar = () => {
       ) : (
         <>
           <ListItem onClick={handleLogout}>
-            <ListItemIcon>
-              <LogoutIcon />
-            </ListItemIcon>
             <ListItemText
               primary='Logout'
               className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
@@ -67,9 +64,6 @@ const Navbar = () => {
           </ListItem>
           {data?.user?.role === 'admin' && (
             <ListItem onClick={handleAdmin}>
-              <ListItemIcon>
-                <AdminPanelSettingsIcon />
-              </ListItemIcon>
               <ListItemText
                 primary='Admin Panel'
                 className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
@@ -79,11 +73,6 @@ const Navbar = () => {
         </>
       )}
       <ListItem component={Link} to='/cart'>
-        {/* <ListItemIcon>
-          <Badge badgeContent={cart.totalQuantity} color='primary'>
-            <CiShoppingCart className='w-10 h-10' />
-          </Badge>
-        </ListItemIcon> */}
         <ListItemText
           primary='Cart'
           className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'

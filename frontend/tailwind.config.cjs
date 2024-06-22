@@ -17,7 +17,7 @@ module.exports = {
       },
       backgroundImage: {
         login:
-          "url('https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/clark-street-mercantile-P3pI6xzovu0-unsplash.jpg?alt=media&token=57977edf-9d52-4a4d-80d2-7d0dcfaf0454')"
+          "url('https://firebasestorage.googleapis.com/v0/b/ecommerce-website-7369e.appspot.com/o/clark-street-mercantile-P3pI6xzovu0-unsplash-min.webp?alt=media&token=817b027c-cbbe-4308-8c40-9a9f7455ba36')"
       }
     }
   },
