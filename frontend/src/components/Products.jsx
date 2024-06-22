@@ -52,22 +52,22 @@ const Products = ({ category }) => {
   }
   return (
     <div>
-      <section
-        className="pb-8 mx-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5"
-        id="products"
-      >
+      <section className='pb-8 mx-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5' id='products'>
         {products.map((product) => (
           <Product key={product._id} product={product} />
         ))}
       </section>
-      <div className="flex justify-center mt-4">
-        <nav aria-label="Page navigation example">
-          <ul className="list-style-none flex items-center">
+      <div className='flex justify-center mt-4'>
+        <nav aria-label='Page navigation example'>
+          <ul className='list-style-none flex items-center space-x-1'>
             <li>
               <a
-                className="relative block rounded bg-transparent px-3 py-1.5 text-2xl text-neutral-600 font-bold  transition-all duration-300 hover:bg-neutral-100 "
-                href="#"
-                onClick={() => handlePageChange(page - 1)}
+                className={`relative block rounded-full bg-transparent px-3 py-1.5 text-2xl text-neutral-600 font-bold transition-all duration-300 hover:bg-neutral-200 ${
+                  page === 1 ? 'cursor-not-allowed' : 'hover:bg-neutral-100'
+                }`}
+                href='#'
+                onClick={() => page > 1 && handlePageChange(page - 1)}
+                aria-disabled={page === 1}
               >
                 <span>&laquo;</span>
               </a>
@@ -75,8 +75,10 @@ const Products = ({ category }) => {
             {pageNumbers.map((_, i) => (
               <li key={i}>
                 <a
-                  className="relative block rounded bg-transparent px-3 py-1.5 text-xl font-semibold  text-neutral-600 transition-all duration-300 hover:bg-neutral-100 "
-                  href="#"
+                  className={`relative block rounded-full px-3 py-1.5 text-xl font-semibold text-neutral-600 transition-all duration-300 ${
+                    page === i + 1 ? 'bg-neutral-200 text-neutral-900' : 'bg-transparent hover:bg-neutral-100'
+                  }`}
+                  href='#'
                   onClick={() => handlePageChange(i + 1)}
                 >
                   {i + 1}
@@ -85,9 +87,12 @@ const Products = ({ category }) => {
             ))}
             <li>
               <a
-                className="relative block rounded bg-transparent px-3 py-1.5 text-2xl text-neutral-600 transition-all duration-300 font-bold hover:bg-neutral-100 "
-                href="#"
-                onClick={() => handlePageChange(page + 1)}
+                className={`relative block rounded-full bg-transparent px-3 py-1.5 text-2xl text-neutral-600 font-bold transition-all duration-300 hover:bg-neutral-200 ${
+                  page === pageNumbers.length ? 'cursor-not-allowed' : 'hover:bg-neutral-100'
+                }`}
+                href='#'
+                onClick={() => page < pageNumbers.length && handlePageChange(page + 1)}
+                aria-disabled={page === pageNumbers.length}
               >
                 <span>&raquo;</span>
               </a>
