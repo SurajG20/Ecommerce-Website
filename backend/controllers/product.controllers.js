@@ -3,18 +3,9 @@ const { StatusCodes } = require('http-status-codes');
 const CustomError = require('../errors');
 
 const addProduct = async (req, res) => {
-  const { title, description, image, category, size, color, price, discount, inStock } = req.body;
-  if (
-    !title ||
-    !description ||
-    !image ||
-    !category ||
-    !size ||
-    !color ||
-    !price ||
-    !discount ||
-    inStock === undefined
-  ) {
+  const { title, description, image, category, size, color, price, discount } = req.body;
+  console.log(req.body);
+  if (!title || !description || !image || !category || !size || !color || !price || !discount) {
     throw new CustomError.BadRequestError('Please provide all the required fields.');
   }
   const newProduct = new Product({
@@ -25,8 +16,7 @@ const addProduct = async (req, res) => {
     size,
     color,
     price,
-    discount,
-    inStock
+    discount
   });
   try {
     const savedProduct = await newProduct.save();
@@ -42,17 +32,7 @@ const addProduct = async (req, res) => {
 const updateProduct = async (req, res) => {
   const { id } = req.params;
   const { title, description, image, category, size, color, price, discount, inStock } = req.body;
-  if (
-    !title ||
-    !description ||
-    !image ||
-    !category ||
-    !size ||
-    !color ||
-    !price ||
-    !discount ||
-    inStock === undefined
-  ) {
+  if (!title || !description || !image || !category || !size || !color || !price || !discount) {
     throw new CustomError.BadRequestError('Please provide all the required fields.');
   }
   const productExist = await Product.findById(id);
@@ -71,8 +51,7 @@ const updateProduct = async (req, res) => {
           size,
           color,
           price,
-          discount,
-          inStock
+          discount
         }
       },
       {

@@ -5,34 +5,41 @@ const initialState = {
   isFetching: false,
   error: false
 };
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     loginStart(state) {
       state.isFetching = true;
+      state.error = false; // Reset error on new login attempt
     },
     loginSuccess(state, action) {
       state.isFetching = false;
       state.currentUser = action.payload;
+      state.error = false; // Clear error on successful login
     },
     loginFailure(state) {
       state.isFetching = false;
-      state.error = true;
+      state.error = true; // Set error on login failure
     },
-    registerStart: (state) => {
+    registerStart(state) {
       state.isFetching = true;
+      state.error = false; // Reset error on new registration attempt
     },
-    registerSuccess: (state,action) => {
+    registerSuccess(state, action) {
       state.isFetching = false;
       state.currentUser = action.payload;
+      state.error = false; // Clear error on successful registration
     },
-    registerFailure: (state) => {
+    registerFailure(state) {
       state.isFetching = false;
-      state.error = true;
+      state.error = true; // Set error on registration failure
     },
-    logout: (state) => {
+    logout(state) {
       state.currentUser = null;
+      state.isFetching = false;
+      state.error = false; // Reset error on logout
     }
   }
 });
