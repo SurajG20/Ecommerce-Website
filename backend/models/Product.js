@@ -37,7 +37,7 @@ const ProductSchema = new Schema(
 
     inStock: {
       type: Boolean,
-      default: [true, 'Please Provide InStock']
+      default: true
     }
   },
   {

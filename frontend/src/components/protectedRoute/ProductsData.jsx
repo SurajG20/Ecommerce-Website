@@ -10,7 +10,7 @@ export default function ProductData() {
   useEffect(() => {
     getProducts(dispatch);
   }, [dispatch]);
-  const products = useSelector((state) => state.product.products.products);
+  const products = useSelector((state) => state?.product?.products?.products);
 
   const handleDelete = (id) => {
     deleteProduct(dispatch, id).then(() => {
