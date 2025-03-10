@@ -1,57 +1,29 @@
-const { attachCookiesToResponse, createTokenUser } = require('../utils');
-const User = require('../models/User');
-const { StatusCodes } = require('http-status-codes');
-const CustomError = require('../errors');
+import { AuthService } from '../services/auth.service.js';
+import { createUserSchema, loginSchema } from '../validations/user.validation.js';
+import responseHandler from '../utils/responseHandler.js';
 
-const register = async (req, res) => {
-  const { email, name, password } = req.body;
-  const emailAlreadyExists = await User.findOne({ email });
-  if (emailAlreadyExists) {
-    throw new CustomError.BadRequestError('Email already exists');
+export class AuthController {
+  static async register(req, res) {
+    const { error, value } = createUserSchema.validate(req.body);
+    if (error) {
+      return responseHandler.error(res)(error.details[0].message);
+    }
+
+    const result = await AuthService.register(value);
+    return responseHandler.success(res)('User registered successfully', result);
   }
 
-  // first registered user is an admin
-  const isFirstAccount = (await User.countDocuments({})) === 0;
-  const role = isFirstAccount ? 'admin' : 'user';
-
-  const user = await User.create({ name, email, password, role });
-  const tokenUser = createTokenUser(user);
-  const token = attachCookiesToResponse({ res, user: tokenUser });
-  res.status(StatusCodes.OK).json({ user: tokenUser, token: token });
-};
-
-// Login
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
-  if (!email || !password) {
-    throw new CustomError.BadRequestError('Please provide email and password');
+  static async login(req, res) {
+    const { error, value } = loginSchema.validate(req.body);
+    if (error) {
+      return responseHandler.error(res)(error.details[0].message);
+    }
+    
+    const result = await AuthService.login(value.email, value.password);
+    return responseHandler.success(res)('Logged in successfully', result);
   }
-  const user = await User.findOne({ email });
 
-  if (!user) {
-    throw new CustomError.UnauthenticatedError('Invalid Credentials');
+  static async logout(req, res) {
+    return responseHandler.success(res)('Logged out successfully');
   }
-  const isPasswordCorrect = await user.comparePassword(password);
-  if (!isPasswordCorrect) {
-    throw new CustomError.UnauthenticatedError('Invalid Credentials');
-  }
-  const tokenUser = createTokenUser(user);
-  const token = attachCookiesToResponse({ res, user: tokenUser });
-  res.status(StatusCodes.OK).json({ user: tokenUser, token: token });
-};
-
-// Logout
-const logout = async (req, res) => {
-  res.cookie('token', 'logout', {
-    httpOnly: true,
-    expires: new Date(Date.now() + 1000)
-  });
-  res.status(StatusCodes.OK).json({ msg: 'user logged out!' });
-};
-
-module.exports = {
-  register,
-  login,
-  logout
-};
+}

@@ -1,12 +1,23 @@
-const Product = require('../models/Product');
-const { StatusCodes } = require('http-status-codes');
-const CustomError = require('../errors');
+const Product = require("../models/Product");
+const { StatusCodes } = require("http-status-codes");
+const CustomError = require("../errors");
 
 const addProduct = async (req, res) => {
-  const { title, description, image, category, size, color, price, discount } = req.body;
-  console.log(req.body);
-  if (!title || !description || !image || !category || !size || !color || !price || !discount) {
-    throw new CustomError.BadRequestError('Please provide all the required fields.');
+  const { title, description, image, category, size, color, price, discount } =
+    req.body;
+  if (
+    !title ||
+    !description ||
+    !image ||
+    !category ||
+    !size ||
+    !color ||
+    !price ||
+    !discount
+  ) {
+    throw new CustomError.BadRequestError(
+      "Please provide all the required fields."
+    );
   }
   const newProduct = new Product({
     title,
@@ -16,13 +27,13 @@ const addProduct = async (req, res) => {
     size,
     color,
     price,
-    discount
+    discount,
   });
   try {
     const savedProduct = await newProduct.save();
     res.status(StatusCodes.CREATED).json({
-      message: 'Product is added successfully.',
-      product: savedProduct
+      message: "Product is added successfully.",
+      product: savedProduct,
     });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
@@ -31,9 +42,30 @@ const addProduct = async (req, res) => {
 
 const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { title, description, image, category, size, color, price, discount, inStock } = req.body;
-  if (!title || !description || !image || !category || !size || !color || !price || !discount) {
-    throw new CustomError.BadRequestError('Please provide all the required fields.');
+  const {
+    title,
+    description,
+    image,
+    category,
+    size,
+    color,
+    price,
+    discount,
+    inStock,
+  } = req.body;
+  if (
+    !title ||
+    !description ||
+    !image ||
+    !category ||
+    !size ||
+    !color ||
+    !price ||
+    !discount
+  ) {
+    throw new CustomError.BadRequestError(
+      "Please provide all the required fields."
+    );
   }
   const productExist = await Product.findById(id);
   if (!productExist) {
@@ -51,16 +83,16 @@ const updateProduct = async (req, res) => {
           size,
           color,
           price,
-          discount
-        }
+          discount,
+        },
       },
       {
-        new: true
+        new: true,
       }
     );
     res.status(StatusCodes.OK).json({
-      message: 'Product is updated successfully.',
-      updatedProduct
+      message: "Product is updated successfully.",
+      updatedProduct,
     });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
@@ -72,7 +104,7 @@ const deleteProduct = async (req, res) => {
   try {
     await Product.findByIdAndDelete(id);
     res.status(StatusCodes.OK).json({
-      message: 'Product is deleted successfully.'
+      message: "Product is deleted successfully.",
     });
   } catch (err) {
     res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
@@ -99,7 +131,7 @@ const getProducts = async (req, res) => {
 
     if (newQuery) {
       query = {
-        ...query
+        ...query,
       };
     } else if (categoryQuery) {
       query = { ...query, category: categoryQuery };
@@ -107,7 +139,10 @@ const getProducts = async (req, res) => {
 
     const skip = (page - 1) * limit;
 
-    products = await Product.find(query).sort({ createdAt: -1 }).skip(skip).limit(parseInt(limit, 10));
+    products = await Product.find(query)
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit, 10));
     const totalProducts = await Product.countDocuments(query);
 
     res.status(StatusCodes.CREATED).json({ products, totalProducts });
@@ -121,5 +156,5 @@ module.exports = {
   updateProduct,
   deleteProduct,
   getProduct,
-  getProducts
+  getProducts,
 };

@@ -1,48 +1,51 @@
-const mongoose = require('mongoose');
+import { DataTypes } from 'sequelize';
+import sequelize from '../config/database.js';
 
-const Schema = mongoose.Schema;
-
-const ProductSchema = new Schema(
-  {
-    title: {
-      type: String,
-      required: [true, 'Please Provide Title'],
-      unique: true
-    },
-    description: {
-      type: String,
-      required: [true, 'Please Provide Description']
-    },
-    image: {
-      type: String,
-      required: [true, 'Please Provide Image']
-    },
-    category: {
-      type: Array
-    },
-    size: {
-      type: Array
-    },
-    color: {
-      type: Array
-    },
-    price: {
-      type: Number,
-      required: [true, 'Please Provide Price']
-    },
-    discount: {
-      type: Number,
-      required: [true, 'Please Provide Discount']
-    },
-
-    inStock: {
-      type: Boolean,
-      default: true
-    }
+const Product = sequelize.define('Product', {
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
   },
-  {
-    timestamps: true
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false
+  },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  category: {
+    type: DataTypes.JSON,
+    defaultValue: []
+  },
+  size: {
+    type: DataTypes.JSON,
+    defaultValue: []
+  },
+  color: {
+    type: DataTypes.JSON,
+    defaultValue: []
+  },
+  price: {
+    type: DataTypes.DECIMAL(10, 2),
+    allowNull: false
+  },
+  discount: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  inStock: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: true
   }
-);
+}, {
+  timestamps: true
+});
 
-module.exports = mongoose.model('Product', ProductSchema);
+export default Product;

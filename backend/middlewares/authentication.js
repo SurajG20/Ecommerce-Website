@@ -1,42 +1,30 @@
-const CustomError = require("../errors");
-const { isTokenValid } = require("../utils/jwt");
+import { JWTService } from '../services/jwt.service.js';
+import { CustomError } from '../errors/index.js';
+import { UserService } from '../services/user.service.js';
 
-const authenticateUser = async (req, res, next) => {
-  let token;
-  const authHeader = req.headers.authorization;
-  if (authHeader && authHeader.startsWith("Bearer")) {
-    token = authHeader.split(" ")[1];
-  }
-  // check cookies
-  else if (req.cookies.token) {
-    token = req.cookies.token;
-  }
-
-  if (!token) {
-    throw new CustomError.UnauthenticatedError("Authentication invalid");
-  }
+export const authenticateUser = async (req, res, next) => {
   try {
-    const payload = isTokenValid({ token });
-    req.user = {
-      userId: payload.userId,
-      role: payload.role,
-      name:payload.name
-    };
+    const authHeader = req.headers.authorization;
+    if (!authHeader?.startsWith('Bearer ')) {
+      throw new CustomError.UnauthenticatedError('Authentication invalid');
+    }
 
+    const token = authHeader.split(' ')[1];
+    const payload = JWTService.verifyToken(token);
+    
+    const user = await UserService.findUserById(payload.id);
+    req.user = user;
     next();
   } catch (error) {
-    throw new CustomError.UnauthenticatedError("Authentication invalid");
+    next(new CustomError.UnauthenticatedError('Authentication invalid'));
   }
 };
-const authorizeRoles = (...roles) => {
+
+export const authorizePermissions = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
-      throw new CustomError.UnauthorizedError(
-        "Unauthorized to access this route"
-      );
+      throw new CustomError.UnauthorizedError('Unauthorized to access this route');
     }
     next();
   };
 };
-
-module.exports = { authenticateUser, authorizeRoles };
