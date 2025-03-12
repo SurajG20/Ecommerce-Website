@@ -7,7 +7,7 @@ const sequelize = new Sequelize(
   Config.SQL_PASSWORD,
   {
     host: Config.SQL_HOST,
-    dialect: "postgres", 
+    dialect: "postgres",
     dialectOptions: {
       ssl: {
         require: true,

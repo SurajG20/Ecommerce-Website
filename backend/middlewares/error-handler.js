@@ -1,33 +1,30 @@
-const { StatusCodes } = require('http-status-codes')
-const errorHandlerMiddleware = (err, req, res, next) => {
-  let customError = {
-    // set default
-    statusCode: err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR,
-    msg: err.message || 'Something went wrong try again later',
+import logger from "../config/logger.js";
+import ResponseHandler from '../utils/responseHandler.js';
+
+const errorHandler = (err, req, res, next) => {
+  logger.error(`${err.message} - ${req.originalUrl} - ${req.method}`);
+
+  // Handle Sequelize errors
+  if (err.name === 'SequelizeValidationError') {
+    return ResponseHandler.error(res)(err.errors[0].message);
   }
 
-  // if (err instanceof CustomAPIError) {
-  //   return res.status(err.statusCode).json({ msg: err.message })
-  // }
-
-  if (err.name === 'ValidationError') {
-    customError.msg = Object.values(err.errors)
-      .map((item) => item.message)
-      .join(',')
-    customError.statusCode = 400
-  }
-  if (err.code && err.code === 11000) {
-    customError.msg = `Duplicate value entered for ${Object.keys(
-      err.keyValue
-    )} field, please choose another value`
-    customError.statusCode = 400
-  }
-  if (err.name === 'CastError') {
-    customError.msg = `No item found with id : ${err.value}`
-    customError.statusCode = 404
+  if (err.name === 'SequelizeUniqueConstraintError') {
+    return ResponseHandler.error(res)(`${err.errors[0].path} already exists`);
   }
 
-  return res.status(customError.statusCode).json({ msg: customError.msg })
-}
+  // Handle JWT errors
+  if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+    return ResponseHandler.unauthorize(res)('Invalid or expired token');
+  }
 
-module.exports = errorHandlerMiddleware
+  // Handle known error status
+  if (err.status) {
+    return ResponseHandler.error(res)(err.message);
+  }
+
+  // Default server error
+  return ResponseHandler.serverError(res)();
+};
+
+export default errorHandler;

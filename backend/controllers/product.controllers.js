@@ -1,160 +1,40 @@
-const Product = require("../models/Product");
-const { StatusCodes } = require("http-status-codes");
-const CustomError = require("../errors");
+import { ProductService } from '../services/product.service.js';
+import { createProductSchema, updateProductSchema } from '../validations/product.validation.js';
+import responseHandler from '../utils/responseHandler.js';
 
-const addProduct = async (req, res) => {
-  const { title, description, image, category, size, color, price, discount } =
-    req.body;
-  if (
-    !title ||
-    !description ||
-    !image ||
-    !category ||
-    !size ||
-    !color ||
-    !price ||
-    !discount
-  ) {
-    throw new CustomError.BadRequestError(
-      "Please provide all the required fields."
-    );
-  }
-  const newProduct = new Product({
-    title,
-    description,
-    image,
-    category,
-    size,
-    color,
-    price,
-    discount,
-  });
-  try {
-    const savedProduct = await newProduct.save();
-    res.status(StatusCodes.CREATED).json({
-      message: "Product is added successfully.",
-      product: savedProduct,
-    });
-  } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).send(err);
-  }
-};
-
-const updateProduct = async (req, res) => {
-  const { id } = req.params;
-  const {
-    title,
-    description,
-    image,
-    category,
-    size,
-    color,
-    price,
-    discount,
-    inStock,
-  } = req.body;
-  if (
-    !title ||
-    !description ||
-    !image ||
-    !category ||
-    !size ||
-    !color ||
-    !price ||
-    !discount
-  ) {
-    throw new CustomError.BadRequestError(
-      "Please provide all the required fields."
-    );
-  }
-  const productExist = await Product.findById(id);
-  if (!productExist) {
-    throw new CustomError.NotFoundError(`No product found with id: ${id}`);
-  }
-  try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      id,
-      {
-        $set: {
-          title,
-          description,
-          image,
-          category,
-          size,
-          color,
-          price,
-          discount,
-        },
-      },
-      {
-        new: true,
-      }
-    );
-    res.status(StatusCodes.OK).json({
-      message: "Product is updated successfully.",
-      updatedProduct,
-    });
-  } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
-  }
-};
-
-const deleteProduct = async (req, res) => {
-  const { id } = req.params;
-  try {
-    await Product.findByIdAndDelete(id);
-    res.status(StatusCodes.OK).json({
-      message: "Product is deleted successfully.",
-    });
-  } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
-  }
-};
-
-const getProduct = async (req, res) => {
-  try {
-    const product = await Product.findById(req.params.id);
-    res.status(StatusCodes.OK).json(product);
-  } catch (err) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
-  }
-};
-
-const getProducts = async (req, res) => {
-  const { page = 1, limit = 15 } = req.query;
-  const newQuery = req.query.new;
-  const categoryQuery = req.query.category;
-
-  try {
-    let products;
-    let query = {};
-
-    if (newQuery) {
-      query = {
-        ...query,
-      };
-    } else if (categoryQuery) {
-      query = { ...query, category: categoryQuery };
+export class ProductController {
+  static async createProduct(req, res) {
+    const { error, value } = createProductSchema.validate(req.body);
+    if (error) {
+      return responseHandler.error(res)(error.details[0].message);
     }
 
-    const skip = (page - 1) * limit;
-
-    products = await Product.find(query)
-      .sort({ createdAt: -1 })
-      .skip(skip)
-      .limit(parseInt(limit, 10));
-    const totalProducts = await Product.countDocuments(query);
-
-    res.status(StatusCodes.CREATED).json({ products, totalProducts });
-  } catch (error) {
-    res.status(StatusCodes.INTERNAL_SERVER_ERROR).json(err);
+    const product = await ProductService.createProduct(value);
+    return responseHandler.success(res)('Product created successfully', product);
   }
-};
 
-module.exports = {
-  addProduct,
-  updateProduct,
-  deleteProduct,
-  getProduct,
-  getProducts,
-};
+  static async getAllProducts(req, res) {
+    const result = await ProductService.getAllProducts(req.query);
+    return responseHandler.success(res)('Products retrieved successfully', result);
+  }
+
+  static async getProductById(req, res) {
+    const product = await ProductService.getProductById(req.params.id);
+    return responseHandler.success(res)('Product retrieved successfully', product);
+  }
+
+  static async updateProduct(req, res) {
+    const { error, value } = updateProductSchema.validate(req.body);
+    if (error) {
+      return responseHandler.error(res)(error.details[0].message);
+    }
+
+    const product = await ProductService.updateProduct(req.params.id, value);
+    return responseHandler.success(res)('Product updated successfully', product);
+  }
+
+  static async deleteProduct(req, res) {
+    await ProductService.deleteProduct(req.params.id);
+    return responseHandler.success(res)('Product deleted successfully');
+  }
+}

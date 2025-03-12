@@ -1,22 +1,28 @@
-const express = require('express');
+import express from 'express';
+import { ProductController } from '../controllers/product.controllers.js';
+import { authenticateUser, authorizePermissions } from '../middlewares/authentication.js';
+
 const router = express.Router();
 
-const {
-  addProduct,
-  updateProduct,
-  deleteProduct,
-  getProduct,
-  getProducts
-} = require('../controllers/product.controllers');
+router.route('/')
+  .post(
+    authenticateUser, 
+    authorizePermissions('admin'), 
+    ProductController.createProduct
+  )
+  .get(ProductController.getAllProducts);
 
-const { authenticateUser, authorizeRoles } = require('../middlewares/authentication');
+router.route('/:id')
+  .get(ProductController.getProductById)
+  .patch(
+    authenticateUser, 
+    authorizePermissions('admin'), 
+    ProductController.updateProduct
+  )
+  .delete(
+    authenticateUser, 
+    authorizePermissions('admin'), 
+    ProductController.deleteProduct
+  );
 
-router.route('/').get(getProducts).post(authenticateUser, authorizeRoles('admin'), addProduct);
-
-router
-  .route('/:id')
-  .patch(authenticateUser, authorizeRoles('admin'), updateProduct)
-  .delete(authenticateUser, authorizeRoles('admin'), deleteProduct)
-  .get(getProduct);
-
-module.exports = router;
+export default router;

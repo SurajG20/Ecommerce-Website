@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 import { connectDB } from "./config/database.js";
 import mainRoutes from './routes/main.routes.js';
 import notFoundMiddleware from "./middlewares/not-found.js";
-import errorHandlerMiddleware from "./middlewares/error-handler.js";
+import errorHandler from "./middlewares/error-handler.js";
 
 dotenv.config();
 
@@ -37,15 +37,13 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/api/v1", mainRoutes);
 
 app.use(notFoundMiddleware);
-app.use(errorHandlerMiddleware);
+app.use(errorHandler);
 
 const port = process.env.PORT || 5000;
 
 const startServer = async () => {
   try {
     await connectDB();
-    console.log('Database connected successfully');
-
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });

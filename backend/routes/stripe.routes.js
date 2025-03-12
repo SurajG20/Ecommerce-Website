@@ -1,10 +1,17 @@
-const express = require("express");
-const Stripe = require("stripe");
+import express from "express";
+import Stripe from "stripe";
+import ResponseHandler from '../utils/responseHandler.js';
+
 const stripe = Stripe(process.env.STRIPE_SECRET);
 const router = express.Router();
 
 router.post("/", async (req, res) => {
   const { products } = req.body;
+  
+  if (!products || !Array.isArray(products) || products.length === 0) {
+    return ResponseHandler.error(res)('Invalid products data');
+  }
+
   try {
     const lineItems = products.map((product) => ({
       price_data: {
@@ -17,19 +24,19 @@ router.post("/", async (req, res) => {
       },
       quantity: product.quantity,
     }));
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
       success_url: `${process.env.CLIENT_URL}/success`,
-
       cancel_url: `${process.env.CLIENT_URL}/cancel`,
     });
 
-    res.json({ id: session.id });
+    return ResponseHandler.success(res)('Checkout session created', { id: session.id });
   } catch (error) {
-    console.log(error);
+    return ResponseHandler.error(res)('Failed to create checkout session');
   }
 });
 
-module.exports = router;
+export default router;

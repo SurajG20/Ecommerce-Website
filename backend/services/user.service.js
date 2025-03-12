@@ -1,6 +1,6 @@
 import User from '../models/User.js';
-import { CustomError } from '../errors/index.js';
 import { Op } from 'sequelize';
+import ResponseHandler from '../utils/responseHandler.js';
 
 export class UserService {
   static async createUser(userData) {
@@ -9,7 +9,7 @@ export class UserService {
     });
     
     if (existingUser) {
-      throw new CustomError.BadRequestError('Email already exists');
+      return ResponseHandler.error('Email already exists');
     }
 
     const user = await User.create(userData);
@@ -19,18 +19,22 @@ export class UserService {
   static async findUserById(id) {
     const user = await User.findByPk(id);
     if (!user) {
-      throw new CustomError.NotFoundError('User not found');
+      return ResponseHandler.notFound('User not found');
     }
     return user;
   }
 
   static async findUserByEmail(email) {
     const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return ResponseHandler.notFound('User not found');
+    }
     return user;
   }
 
   static async updateUser(id, updateData) {
     const user = await this.findUserById(id);
+    if (user.success === false) return user;
     
     if (updateData.email) {
       const existingUser = await User.findOne({
@@ -41,7 +45,7 @@ export class UserService {
       });
       
       if (existingUser) {
-        throw new CustomError.BadRequestError('Email already exists');
+        return ResponseHandler.error('Email already exists');
       }
     }
 
@@ -50,6 +54,8 @@ export class UserService {
 
   static async deleteUser(id) {
     const user = await this.findUserById(id);
+    if (user.success === false) return user;
+    
     await user.destroy();
     return true;
   }

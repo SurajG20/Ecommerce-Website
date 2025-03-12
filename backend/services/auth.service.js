@@ -1,6 +1,6 @@
 import { UserService } from './user.service.js';
 import { JWTService } from './jwt.service.js';
-import { CustomError } from '../errors/index.js';
+import ResponseHandler from '../utils/responseHandler.js';
 import User from '../models/User.js';
 
 export class AuthService {
@@ -24,17 +24,17 @@ export class AuthService {
 
   static async login(email, password) {
     if (!email || !password) {
-      throw new CustomError.BadRequestError('Please provide email and password');
+      return ResponseHandler.error('Please provide email and password');
     }
 
     const user = await User.findOne({ where: { email } });
     if (!user) {
-      throw new CustomError.UnauthenticatedError('Invalid credentials');
+      return ResponseHandler.unauthorize('Invalid credentials');
     }
 
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
-      throw new CustomError.UnauthenticatedError('Invalid credentials');
+      return ResponseHandler.unauthorize('Invalid credentials');
     }
 
     const token = JWTService.generateAuthToken(user);
@@ -49,4 +49,4 @@ export class AuthService {
       token
     };
   }
-} 
+}

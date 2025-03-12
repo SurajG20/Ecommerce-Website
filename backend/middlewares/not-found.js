@@ -1,3 +1,7 @@
-const notFound = (req, res) => res.status(404).send('Route does not exist')
+import ResponseHandler from '../utils/responseHandler.js';
 
-module.exports = notFound
+const notFound = (req, res) => {
+  return ResponseHandler.notFound(res)('Route does not exist');
+};
+
+export default notFound;
