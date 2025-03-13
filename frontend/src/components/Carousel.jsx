@@ -1,8 +1,18 @@
 import { useEffect, useState } from "react";
-import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { Link } from "react-scroll";
 import { cn } from "../utils/cn";
 import PropTypes from "prop-types";
+import {
+  Carousel as CarouselComponent,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "./ui/carousel";
+import { Button } from "./ui/button";
+import { useMediaQuery } from "../hooks/use-media-query";
+import Autoplay from "embla-carousel-autoplay";
 
 const CAROUSEL_DATA = [
   {
@@ -29,104 +39,136 @@ const CAROUSEL_DATA = [
   },
 ];
 
-const CarouselButton = ({ children, onClick, className }) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "w-12 h-12 rounded-full bg-background/20 backdrop-blur-sm absolute top-1/2 -translate-y-1/2 flex items-center justify-center",
-      "hover:bg-background/40 transition-colors duration-200",
-      "focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2",
-      className
-    )}
-  >
-    {children}
-  </button>
-);
+const CarouselSlide = ({ slide, currentIndex }) => {
+  const isActive = currentIndex === CAROUSEL_DATA.indexOf(slide);
 
-CarouselButton.propTypes = {
-  children: PropTypes.node.isRequired,
-  onClick: PropTypes.func.isRequired,
-  className: PropTypes.string,
+  return (
+    <CarouselItem className="relative h-[calc(100vh-104px)]">
+      {/* Background Image */}
+      <div className="absolute inset-0">
+        <img
+          src={slide.url}
+          alt={slide.title}
+          className="w-full h-full object-cover transition-transform duration-500"
+          loading={isActive ? "eager" : "lazy"}
+        />
+        <div className="absolute inset-0 bg-black/30 backdrop-blur-[1px]" />
+      </div>
+
+      {/* Content */}
+      <div className="relative h-full flex flex-col items-center justify-center text-center px-4 text-white">
+        <h1
+          className={cn(
+            "text-4xl md:text-6xl font-bold mb-8 uppercase",
+            "animate-in fade-in slide-in-from-bottom duration-500",
+            "tracking-wider"
+          )}
+        >
+          {slide.title}
+        </h1>
+        <p
+          className={cn(
+            "tracking-wider mb-16 text-md md:text-xl max-w-2xl",
+            "animate-in fade-in slide-in-from-bottom duration-500 delay-200"
+          )}
+        >
+          {slide.description}
+        </p>
+        <Link
+          to="categories"
+          spy={true}
+          smooth={true}
+          offset={50}
+          duration={500}
+          className="animate-in fade-in slide-in-from-bottom duration-500 delay-300"
+        >
+          <Button
+            size="lg"
+            className="group"
+          >
+            Shop Now
+            <ArrowRight className="h-4 w-4 ml-2 transition-transform group-hover:translate-x-1" />
+          </Button>
+        </Link>
+      </div>
+    </CarouselItem>
+  );
+};
+
+CarouselSlide.propTypes = {
+  slide: PropTypes.shape({
+    url: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+  }).isRequired,
+  currentIndex: PropTypes.number.isRequired,
 };
 
 const Carousel = () => {
+  const [api, setApi] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const incrementIndex = () => {
-    setCurrentIndex(
-      (currentIndex) => (currentIndex + 1) % CAROUSEL_DATA.length
-    );
-  };
-
-  const decrementIndex = () => {
-    setCurrentIndex((currentIndex) =>
-      currentIndex === 0 ? CAROUSEL_DATA.length - 1 : currentIndex - 1
-    );
-  };
+  const isMobile = useMediaQuery("(max-width: 768px)");
 
   useEffect(() => {
-    const autoScrollInterval = setInterval(incrementIndex, 10000);
-    return () => clearInterval(autoScrollInterval);
-  }, []);
+    if (!api) return;
+
+    api.on("select", () => {
+      setCurrentIndex(api.selectedScrollSnap());
+    });
+  }, [api]);
 
   return (
-    <section className="relative h-[calc(100vh-104px)] overflow-hidden">
-      <CarouselButton onClick={decrementIndex} className="left-4">
-        <ChevronLeft className="h-6 w-6 text-primary-foreground" />
-      </CarouselButton>
+    <CarouselComponent
+      setApi={setApi}
+      className="relative"
+      plugins={[
+        Autoplay({
+          delay: 10000,
+        }),
+      ]}
+      opts={{
+        loop: true,
+        align: "start",
+      }}
+    >
+      <CarouselContent>
+        {CAROUSEL_DATA.map((slide, index) => (
+          <CarouselSlide
+            key={index}
+            slide={slide}
+            currentIndex={currentIndex}
+          />
+        ))}
+      </CarouselContent>
 
-      <div className="relative h-full w-full">
-        <img
-          loading="lazy"
-          src={CAROUSEL_DATA[currentIndex].url}
-          alt={CAROUSEL_DATA[currentIndex].title}
-          className="w-full h-full object-cover transition-all duration-500 ease-out"
-        />
+      {!isMobile && (
+        <>
+          <CarouselPrevious
+            className="left-4 bg-background/20 hover:bg-background/40 backdrop-blur-sm border-none"
+          />
+          <CarouselNext
+            className="right-4 bg-background/20 hover:bg-background/40 backdrop-blur-sm border-none"
+          />
+        </>
+      )}
 
-        <div className="absolute inset-0 bg-background/50 backdrop-blur-[2px]" />
-
-        <div className="absolute inset-0 flex flex-col justify-center items-center text-primary-foreground uppercase px-4 text-center">
-          <h1 className="text-4xl md:text-6xl font-bold mb-8 animate-in fade-in slide-in-from-bottom duration-500">
-            {CAROUSEL_DATA[currentIndex].title}
-          </h1>
-          <p className="tracking-wider mb-16 text-md md:text-xl max-w-2xl animate-in fade-in slide-in-from-bottom duration-500 delay-200">
-            {CAROUSEL_DATA[currentIndex].description}
-          </p>
-          <Link
-            to="categories"
-            spy={true}
-            smooth={true}
-            offset={50}
-            duration={500}
-          >
-            <button className="btn btn-primary inline-flex items-center gap-2 animate-in fade-in slide-in-from-bottom duration-500 delay-300">
-              Shop Now
-              <ArrowRight className="h-5 w-5" />
-            </button>
-          </Link>
-        </div>
-      </div>
-
-      <CarouselButton onClick={incrementIndex} className="right-4">
-        <ChevronRight className="h-6 w-6 text-primary-foreground" />
-      </CarouselButton>
-
+      {/* Pagination Dots */}
       <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
         {CAROUSEL_DATA.map((_, index) => (
           <button
             key={index}
-            onClick={() => setCurrentIndex(index)}
+            onClick={() => api?.scrollTo(index)}
             className={cn(
-              "w-2 h-2 rounded-full transition-all duration-300",
+              "h-2 rounded-full transition-all duration-300",
               index === currentIndex
                 ? "bg-primary w-8"
-                : "bg-primary/50 hover:bg-primary/75"
+                : "bg-primary/50 hover:bg-primary/75 w-2"
             )}
             aria-label={`Go to slide ${index + 1}`}
           />
         ))}
       </div>
-    </section>
+    </CarouselComponent>
   );
 };
 

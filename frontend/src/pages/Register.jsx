@@ -5,6 +5,12 @@ import { registerSchema } from "../schemas/auth";
 import useAuth from "../hooks/useAuth";
 import Layout from "../components/Layout";
 import { toast } from "sonner";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+import { Label } from "../components/ui/label";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
+import { Checkbox } from "../components/ui/checkbox";
+import { Loader2 } from "lucide-react";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -34,94 +40,123 @@ const Register = () => {
 
   return (
     <Layout>
-      <div className="h-screen w-screen flex items-center justify-center bg-cover bg-login">
-        <div className="p-[20px] w-3/4 sm:w-2/5 bg-white border-2 border-teal-400">
-          <h1 className="text-[24px] font-light">CREATE AN ACCOUNT</h1>
-
-          <form className="flex flex-wrap w-full" onSubmit={handleSubmit(onSubmit)}>
-            <div className="flex-1 min-w-[40%] mt-5 mr-2">
-              <input
-                type="text"
-                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
-                placeholder="Full Name"
-                {...register("name")}
-              />
-              {errors.name && (
-                <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
-              )}
-            </div>
-
-            <div className="flex-1 min-w-[40%] mt-5 mr-2">
-              <input
-                type="email"
-                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
-                placeholder="Email"
-                {...register("email")}
-              />
-              {errors.email && (
-                <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
-              )}
-            </div>
-
-            <div className="flex-1 min-w-[40%] mt-5 mr-2">
-              <input
-                type="password"
-                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
-                placeholder="Password"
-                {...register("password")}
-              />
-              {errors.password && (
-                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
-              )}
-            </div>
-
-            <div className="flex-1 min-w-[40%] mt-5 mr-2">
-              <input
-                type="password"
-                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
-                placeholder="Confirm Password"
-                {...register("confirmPassword")}
-              />
-              {errors.confirmPassword && (
-                <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
-              )}
-            </div>
-
-            <div className="w-full mt-5">
-              <label className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
-                  {...register("acceptTerms")}
+      <div className="min-h-screen flex items-center justify-center bg-muted/40 py-12 px-4 sm:px-6 lg:px-8">
+        <Card className="w-full max-w-md">
+          <CardHeader className="space-y-1">
+            <CardTitle className="text-2xl font-bold text-center">Create an account</CardTitle>
+            <CardDescription className="text-center">
+              Enter your details to create your account
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <CardContent className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  {...register("name")}
+                  disabled={isLoading}
                 />
-                <span className="text-sm">
-                  By creating an account, I consent to the processing of my personal data in accordance with the{" "}
-                  <b>PRIVACY POLICY</b>
-                </span>
-              </label>
+                {errors.name && (
+                  <p className="text-sm text-destructive">{errors.name.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="name@example.com"
+                  {...register("email")}
+                  disabled={isLoading}
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Create a password"
+                  {...register("password")}
+                  disabled={isLoading}
+                />
+                {errors.password && (
+                  <p className="text-sm text-destructive">{errors.password.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  placeholder="Confirm your password"
+                  {...register("confirmPassword")}
+                  disabled={isLoading}
+                />
+                {errors.confirmPassword && (
+                  <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
+                )}
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="acceptTerms"
+                  {...register("acceptTerms")}
+                  disabled={isLoading}
+                />
+                <Label
+                  htmlFor="acceptTerms"
+                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
+                  I agree to the{" "}
+                  <Link to="/terms" className="text-primary hover:underline">
+                    Terms of Service
+                  </Link>{" "}
+                  and{" "}
+                  <Link to="/privacy" className="text-primary hover:underline">
+                    Privacy Policy
+                  </Link>
+                </Label>
+              </div>
               {errors.acceptTerms && (
-                <p className="mt-1 text-sm text-red-500">{errors.acceptTerms.message}</p>
+                <p className="text-sm text-destructive">{errors.acceptTerms.message}</p>
               )}
-            </div>
-
-            <div className="w-full mt-5">
-              <button
+            </CardContent>
+            <CardFooter className="flex flex-col gap-4">
+              <Button
                 type="submit"
+                className="w-full"
                 disabled={isLoading}
-                className="w-2/5 py-[15px] px-[20px] bg-teal-700 hover:bg-teal-500 text-white cursor-pointer rounded transition-colors duration-200 disabled:bg-teal-500 disabled:cursor-not-allowed"
               >
-                {isLoading ? "Creating Account..." : "CREATE"}
-              </button>
-            </div>
+                {isLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating account...
+                  </>
+                ) : (
+                  "Create account"
+                )}
+              </Button>
+              <p className="text-sm text-center text-muted-foreground">
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-primary hover:underline"
+                >
+                  Sign in
+                </Link>
+              </p>
+            </CardFooter>
           </form>
-
-          <Link to="/login">
-            <p className="mt-4 text-sm cursor-pointer hover:text-gray-400 transition-colors duration-200">
-              ALREADY HAVE AN ACCOUNT?{" "}
-              <span className="text-blue-500 ml-1 underline">SIGN IN</span>
-            </p>
-          </Link>
-        </div>
+        </Card>
       </div>
     </Layout>
   );

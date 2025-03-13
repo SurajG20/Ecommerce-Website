@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ShoppingCart, User, LogOut, Settings, Menu } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Settings, Menu, ChevronDown } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../redux/features/authSlice';
@@ -8,16 +8,25 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+  SheetClose,
+} from "./ui/sheet";
 import { Button } from "./ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
+import { Badge } from "./ui/badge";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const cart = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
 
@@ -32,28 +41,34 @@ const Navbar = () => {
 
   const handleAdmin = () => {
     navigate('/admin');
+    setIsOpen(false);
   };
 
-  const UserMenu = () => (
+  const UserDropdown = () => (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-2">
-          <User size={20} />
-          <span className="text-sm font-medium">{user?.name?.toUpperCase()}</span>
+        <Button variant="ghost" size="sm" className="flex items-center gap-2">
+          <User className="h-4 w-4" />
+          <span className="text-sm font-medium hidden md:block">
+            {user?.name?.split(' ')[0]}
+          </span>
+          <ChevronDown className="h-4 w-4 hidden md:block" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+        <DropdownMenuSeparator />
         {user?.role === 'admin' && (
           <>
             <DropdownMenuItem onClick={handleAdmin} className="cursor-pointer">
-              <Settings size={18} className="mr-2" />
+              <Settings className="h-4 w-4 mr-2" />
               Admin Panel
             </DropdownMenuItem>
             <DropdownMenuSeparator />
           </>
         )}
-        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
-          <LogOut size={18} className="mr-2" />
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer text-red-600">
+          <LogOut className="h-4 w-4 mr-2" />
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -62,113 +77,121 @@ const Navbar = () => {
 
   const CartButton = () => (
     <Link to="/cart">
-      <Button variant="ghost" className="relative">
-        <ShoppingCart size={24} />
+      <Button variant="ghost" size="sm" className="relative">
+        <ShoppingCart className="h-5 w-5" />
         {cart.totalQuantity > 0 && (
-          <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+          <Badge
+            variant="destructive"
+            className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0"
+          >
             {cart.totalQuantity}
-          </span>
+          </Badge>
         )}
       </Button>
     </Link>
   );
 
   const MobileMenu = () => (
-    <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="md:hidden">
-          <Menu size={24} />
+        <Button variant="ghost" size="sm" className="md:hidden">
+          <Menu className="h-5 w-5" />
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent side="right" className="w-[300px] sm:w-[400px]">
         <SheetHeader>
           <SheetTitle>Menu</SheetTitle>
         </SheetHeader>
         <div className="flex flex-col gap-4 mt-6">
           {!user ? (
-            <>
-              <Link to="/register">
-                <Button variant="outline" className="w-full">
+            <div className="grid gap-4">
+              <Link to="/register" onClick={() => setIsOpen(false)}>
+                <Button variant="outline" className="w-full justify-start">
                   Register
                 </Button>
               </Link>
-              <Link to="/login">
-                <Button variant="outline" className="w-full">
+              <Link to="/login" onClick={() => setIsOpen(false)}>
+                <Button className="w-full justify-start">
                   Sign In
                 </Button>
               </Link>
-            </>
+            </div>
           ) : (
-            <>
-              <div className="flex items-center gap-2 px-4 py-2">
-                <User size={20} />
+            <div className="grid gap-4">
+              <div className="flex items-center gap-2 px-2">
+                <User className="h-4 w-4" />
                 <span className="font-medium">{user.name}</span>
               </div>
               {user.role === 'admin' && (
                 <Button
                   variant="outline"
-                  className="w-full flex items-center gap-2"
+                  className="justify-start"
                   onClick={handleAdmin}
                 >
-                  <Settings size={18} />
+                  <Settings className="h-4 w-4 mr-2" />
                   Admin Panel
                 </Button>
               )}
               <Button
-                variant="outline"
-                className="w-full flex items-center gap-2"
-                onClick={handleLogout}
+                variant="destructive"
+                className="justify-start"
+                onClick={() => {
+                  handleLogout();
+                  setIsOpen(false);
+                }}
               >
-                <LogOut size={18} />
+                <LogOut className="h-4 w-4 mr-2" />
                 Logout
               </Button>
-            </>
+            </div>
           )}
-          <Link to="/cart">
-            <Button variant="outline" className="w-full flex items-center gap-2">
-              <ShoppingCart size={18} />
-              Cart ({cart.totalQuantity})
-            </Button>
-          </Link>
+          <SheetClose asChild>
+            <Link to="/cart">
+              <Button variant="outline" className="w-full justify-start gap-2">
+                <ShoppingCart className="h-4 w-4" />
+                Cart ({cart.totalQuantity})
+              </Button>
+            </Link>
+          </SheetClose>
         </div>
       </SheetContent>
     </Sheet>
   );
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <nav className="container flex h-14 items-center">
         <div className="flex flex-1 items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center">
-            <h1 className="text-2xl font-serif text-teal-600">Bazaar</h1>
+            <h1 className="text-2xl font-serif text-primary">Bazaar</h1>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2">
             {!user ? (
               <>
                 <Link to="/register">
-                  <Button variant="outline">Register</Button>
+                  <Button variant="ghost" size="sm">Register</Button>
                 </Link>
                 <Link to="/login">
-                  <Button variant="outline">Sign In</Button>
+                  <Button size="sm">Sign In</Button>
                 </Link>
               </>
             ) : (
-              <UserMenu />
+              <UserDropdown />
             )}
             <CartButton />
           </div>
 
           {/* Mobile Navigation */}
-          <div className="md:hidden flex items-center gap-4">
+          <div className="md:hidden flex items-center gap-2">
             <CartButton />
             <MobileMenu />
           </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </header>
   );
 };
 
