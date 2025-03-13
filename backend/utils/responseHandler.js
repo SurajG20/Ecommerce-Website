@@ -3,9 +3,8 @@ class ResponseHandler {
     return (message, data = null) => {
       return res.status(200).json({
         success: true,
-        code: 200,
         message,
-        data
+        data,
       });
     };
   }
@@ -14,20 +13,18 @@ class ResponseHandler {
     return (message, data = null) => {
       return res.status(201).json({
         success: true,
-        code: 201,
         message,
-        data
+        data,
       });
     };
   }
 
   static error(res) {
     return (message, data = null) => {
-      return res.status(400).json({
+      return res.status(202).json({
         success: false,
-        code: 400,
         message,
-        data
+        data,
       });
     };
   }
@@ -36,9 +33,8 @@ class ResponseHandler {
     return (message, data = null) => {
       return res.status(401).json({
         success: false,
-        code: 401,
         message,
-        data
+        data,
       });
     };
   }
@@ -47,9 +43,8 @@ class ResponseHandler {
     return (message, data = null) => {
       return res.status(403).json({
         success: false,
-        code: 403,
         message,
-        data
+        data,
       });
     };
   }
@@ -58,9 +53,8 @@ class ResponseHandler {
     return (message, data = null) => {
       return res.status(404).json({
         success: false,
-        code: 404,
         message,
-        data
+        data,
       });
     };
   }
@@ -69,9 +63,8 @@ class ResponseHandler {
     return (message = 'Internal server error', data = null) => {
       return res.status(500).json({
         success: false,
-        code: 500,
         message,
-        data
+        data,
       });
     };
   }
@@ -80,9 +73,8 @@ class ResponseHandler {
     return (message, data = null) => {
       return res.status(429).json({
         success: false,
-        code: 429,
         message,
-        data
+        data,
       });
     };
   }

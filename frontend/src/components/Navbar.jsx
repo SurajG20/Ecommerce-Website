@@ -1,162 +1,173 @@
 import { useState } from 'react';
-import { Badge, IconButton, Drawer, List, ListItem, ListItemText, ListItemIcon } from '@mui/material';
-import { CiShoppingCart } from 'react-icons/ci';
+import { ShoppingCart, User, LogOut, Settings, Menu } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
-import { logout } from '../store/auth-slice';
-import LogoutIcon from '@mui/icons-material/Logout';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
-import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
-import { toast } from 'react-toastify';
+import { logoutUser } from '../redux/features/authSlice';
+import { toast } from 'sonner';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
+import { Button } from "./ui/button";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "./ui/sheet";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const [showPopup, setShowPopup] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const cart = useSelector((state) => state.cart);
-  const data = useSelector((state) => state.auth.currentUser);
+  const { user } = useSelector((state) => state.auth);
 
-  const handleLogout = () => {
-    dispatch(logout()).then(() => {
-      toast.success('Logged out successfully');
-    });
-    navigate('/');
+  const handleLogout = async () => {
+    try {
+      await dispatch(logoutUser()).unwrap();
+      navigate('/');
+    } catch (error) {
+      toast.error('Logout failed');
+    }
   };
 
   const handleAdmin = () => {
     navigate('/admin');
   };
 
-  const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
-    setDrawerOpen(open);
-  };
+  const UserMenu = () => (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" className="flex items-center gap-2">
+          <User size={20} />
+          <span className="text-sm font-medium">{user?.name?.toUpperCase()}</span>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        {user?.role === 'admin' && (
+          <>
+            <DropdownMenuItem onClick={handleAdmin} className="cursor-pointer">
+              <Settings size={18} className="mr-2" />
+              Admin Panel
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+          </>
+        )}
+        <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+          <LogOut size={18} className="mr-2" />
+          Logout
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 
-  const menuItems = (
-    <List>
-      {!data ? (
-        <>
-          <ListItem component={Link} to='/register'>
-            <ListItemText
-              primary='Register'
-              className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
-            />
-          </ListItem>
-          <ListItem component={Link} to='/login'>
-            <ListItemText
-              primary='Sign In'
-              className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
-            />
-          </ListItem>
-        </>
-      ) : (
-        <>
-          <ListItem onClick={handleLogout}>
-            <ListItemText
-              primary='Logout'
-              className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
-            />
-          </ListItem>
-          {data?.user?.role === 'admin' && (
-            <ListItem onClick={handleAdmin}>
-              <ListItemText
-                primary='Admin Panel'
-                className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
-              />
-            </ListItem>
+  const CartButton = () => (
+    <Link to="/cart">
+      <Button variant="ghost" className="relative">
+        <ShoppingCart size={24} />
+        {cart.totalQuantity > 0 && (
+          <span className="absolute -top-2 -right-2 bg-teal-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+            {cart.totalQuantity}
+          </span>
+        )}
+      </Button>
+    </Link>
+  );
+
+  const MobileMenu = () => (
+    <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
+      <SheetTrigger asChild>
+        <Button variant="ghost" size="icon" className="md:hidden">
+          <Menu size={24} />
+        </Button>
+      </SheetTrigger>
+      <SheetContent>
+        <SheetHeader>
+          <SheetTitle>Menu</SheetTitle>
+        </SheetHeader>
+        <div className="flex flex-col gap-4 mt-6">
+          {!user ? (
+            <>
+              <Link to="/register">
+                <Button variant="outline" className="w-full">
+                  Register
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="outline" className="w-full">
+                  Sign In
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <div className="flex items-center gap-2 px-4 py-2">
+                <User size={20} />
+                <span className="font-medium">{user.name}</span>
+              </div>
+              {user.role === 'admin' && (
+                <Button
+                  variant="outline"
+                  className="w-full flex items-center gap-2"
+                  onClick={handleAdmin}
+                >
+                  <Settings size={18} />
+                  Admin Panel
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                className="w-full flex items-center gap-2"
+                onClick={handleLogout}
+              >
+                <LogOut size={18} />
+                Logout
+              </Button>
+            </>
           )}
-        </>
-      )}
-      <ListItem component={Link} to='/cart'>
-        <ListItemText
-          primary='Cart'
-          className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3 text-center'
-        />
-      </ListItem>
-    </List>
+          <Link to="/cart">
+            <Button variant="outline" className="w-full flex items-center gap-2">
+              <ShoppingCart size={18} />
+              Cart ({cart.totalQuantity})
+            </Button>
+          </Link>
+        </div>
+      </SheetContent>
+    </Sheet>
   );
 
   return (
-    <nav className='grid grid-cols-2 p-4 border-b font-semibold h-fit'>
-      <h1 className='font-bold text-2xl uppercase flex items-center justify-start px-4 tracking-wider'>
-        <a href='/' className='text-3xl font-serif text-teal-600'>
-          Bazaar
-        </a>
-      </h1>
-      <div className='flex-[2] sm:flex-1 flex items-center justify-end'>
-        <div className='hidden sm:flex items-center'>
-          {!data && (
-            <>
-              <Link
-                to='/register'
-                className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
-              >
-                Register
-              </Link>
-              <Link
-                to='/login'
-                className='text-[12px] sm:text-lg capitalize cursor-pointer ml-[10px] sm:ml-[25px] hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
-              >
-                Sign In
-              </Link>
-            </>
-          )}
-          {data && (
-            <>
-              <div
-                onClick={() => setShowPopup((prev) => !prev)}
-                className='relative cursor-pointer rounded p-2 flex justify-between items-center'
-              >
-                <AccountCircleIcon className='w-6 h-6 mr-1' />
-                <div className='text-[12px] sm:text-[14px] tracking-wide flex items-center justify-center'>
-                  {data?.user?.name?.toUpperCase()}
-                </div>
-                {data?.user?.role === 'admin' && showPopup && (
-                  <div className='bg-white shadow-lg absolute left-[-20px] bottom-[-50px] z-[3] px-4 py-2 rounded-md flex items-center transition duration-300 ease-in-out'>
-                    <button
-                      className='text-[12px] sm:text-[14px] flex items-center justify-center'
-                      onClick={handleAdmin}
-                    >
-                      <AdminPanelSettingsIcon className='h-6 w-6 text-gray-600 mr-2' />
-                      Admin Panel
-                    </button>
-                  </div>
-                )}
-                <div
-                  className='text-[12px] sm:text-[14px] cursor-pointer ml-[10px] sm:ml-[25px]'
-                  onClick={handleLogout}
-                >
-                  <LogoutIcon className='h-6 w-6 text-gray-600 mr-2' />
-                  LOGOUT
-                </div>
-              </div>
-            </>
-          )}
-          <Link to='/cart' className='ml-[10px] sm:ml-[30px] cursor-pointer'>
-            <Badge badgeContent={cart.totalQuantity} color='primary'>
-              <CiShoppingCart className='w-8 h-8' />
-            </Badge>
+    <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center">
+        <div className="flex flex-1 items-center justify-between">
+          {/* Logo */}
+          <Link to="/" className="flex items-center">
+            <h1 className="text-2xl font-serif text-teal-600">Bazaar</h1>
           </Link>
-        </div>
-        <div className='flex justify-end sm:hidden'>
-          <IconButton edge='start' color='inherit' aria-label='menu' onClick={toggleDrawer(true)}>
-            <MenuIcon />
-          </IconButton>
+
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center gap-4">
+            {!user ? (
+              <>
+                <Link to="/register">
+                  <Button variant="outline">Register</Button>
+                </Link>
+                <Link to="/login">
+                  <Button variant="outline">Sign In</Button>
+                </Link>
+              </>
+            ) : (
+              <UserMenu />
+            )}
+            <CartButton />
+          </div>
+
+          {/* Mobile Navigation */}
+          <div className="md:hidden flex items-center gap-4">
+            <CartButton />
+            <MobileMenu />
+          </div>
         </div>
       </div>
-      <Drawer anchor='right' open={drawerOpen} onClose={toggleDrawer(false)}>
-        <div className='flex justify-end p-4'>
-          <IconButton onClick={toggleDrawer(false)}>
-            <CloseIcon />
-          </IconButton>
-        </div>
-        {menuItems}
-      </Drawer>
     </nav>
   );
 };

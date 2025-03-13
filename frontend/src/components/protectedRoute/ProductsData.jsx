@@ -1,95 +1,133 @@
-import { DataGrid } from "@mui/x-data-grid";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
 import { useEffect } from "react";
-import { getProducts, deleteProduct } from "../../store/product-actions";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
-export default function ProductData() {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    getProducts(dispatch);
-  }, [dispatch]);
-  const products = useSelector((state) => state?.product?.products?.products);
+import PropTypes from "prop-types";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "../ui/table";
+import { Button } from "../ui/button";
+import { Pencil, Trash2, Loader2, AlertCircle } from "lucide-react";
+import { fetchProducts, deleteProduct } from "../../redux/features/productSlice";
 
-  const handleDelete = (id) => {
-    deleteProduct(dispatch, id).then(() => {
-      // Fetch the updated list of products after deletion
-      getProducts(dispatch);
-    });
+const ProductsData = () => {
+  const dispatch = useDispatch();
+  const { products, isLoading, error } = useSelector((state) => state.products);
+
+  useEffect(() => {
+    dispatch(fetchProducts({}));
+  }, [dispatch]);
+
+  const handleDelete = async (id) => {
+    try {
+      await dispatch(deleteProduct(id)).unwrap();
+      dispatch(fetchProducts({}));
+    } catch (error) {
+      // Error is handled by the thunk and displayed via toast
+      console.error("Failed to delete product:", error);
+    }
   };
 
-  const columns = [
-    { field: "_id", headerName: "ID", width: 200 },
-    {
-      field: "product",
-      headerName: "Product",
-      width: 300,
-      renderCell: (params) => {
-        return (
-          <div className="flex items-center">
-            <img
-              className="w-8 h-8 rounded-sm object-cover mr-3"
-              src={params.row.image}
-              alt=""
-            />
-            <p className="line-clamp-1">{params.row.title}</p>
-          </div>
-        );
-      },
-    },
-    { field: "category", headerName: "Category", width: 120 },
-    {
-      field: "inStock",
-      headerName: "Stock",
-      width: 100,
-    },
+  if (isLoading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+      </div>
+    );
+  }
 
-    {
-      field: "price",
-      headerName: "Price",
-      width: 100,
-    },
-    {
-      field: "discount",
-      headerName: "Discount",
-      width: 100,
-    },
-    {
-      field: "action",
-      headerName: "Action",
-      width: 150,
-      renderCell: (params) => {
-        return (
-          <>
-            <Link to={"/admin/product/" + params.row._id}>
-              <button className="rounded-[12px] px-1 py-3 text-zinc-500cursor-pointer mr-5">
-                <ModeEditIcon />
-              </button>
-            </Link>
-            <DeleteIcon
-              className="text-zinc-500 cursor-pointer"
-              onClick={() => handleDelete(params.row._id)}
-            />
-          </>
-        );
-      },
-    },
-  ];
+  if (error) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="flex items-center gap-2 text-red-600">
+            <AlertCircle className="h-5 w-5" />
+            <p className="text-lg">{error}</p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => dispatch(fetchProducts({}))}
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex mx-auto flex-col p-2">
-      <h1 className="text-2xl font-semibold ">Products</h1>
-      {products && (
-        <DataGrid
-          rows={products}
-          disableSelectionOnClick
-          columns={columns}
-          pageSize={8}
-          getRowId={(row) => row._id}
-          checkboxSelection
-        />
-      )}
+    <div className="container mx-auto py-8">
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[100px]">Image</TableHead>
+              <TableHead>Product</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>Stock</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>Discount</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {products?.products?.map((product) => (
+              <TableRow key={product._id}>
+                <TableCell>
+                  <img
+                    src={product.image}
+                    alt={product.title}
+                    className="w-12 h-12 rounded-md object-cover"
+                  />
+                </TableCell>
+                <TableCell className="font-medium">
+                  <div className="line-clamp-1 max-w-[200px]">
+                    {product.title}
+                  </div>
+                </TableCell>
+                <TableCell>{product.category?.join(", ")}</TableCell>
+                <TableCell>{product.inStock ? "Yes" : "No"}</TableCell>
+                <TableCell>₹{product.price}</TableCell>
+                <TableCell>{product.discount}%</TableCell>
+                <TableCell className="text-right space-x-2">
+                  <Link to={`/admin/product/${product._id}`}>
+                    <Button variant="outline" size="icon">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => handleDelete(product._id)}
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
-}
+};
+
+ProductsData.propTypes = {
+  products: PropTypes.arrayOf(
+    PropTypes.shape({
+      _id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      image: PropTypes.string.isRequired,
+      category: PropTypes.arrayOf(PropTypes.string),
+      inStock: PropTypes.bool,
+      price: PropTypes.number.isRequired,
+      discount: PropTypes.number.isRequired,
+    })
+  ),
+};
+
+export default ProductsData;

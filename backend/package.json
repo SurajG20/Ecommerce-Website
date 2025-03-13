@@ -2,17 +2,19 @@
   "name": "ecommerce-app",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
-  "type": "module",
-  "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon index.js"
-  },
-  "author": "",
   "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "format": "prettier --write .",
+    "start": "node index.js"
+  },
   "dependencies": {
+    "@u3u/prettier-config": "^5.2.0",
     "bcryptjs": "^2.4.3",
-    "compression": "^1.7.5",
+    "compression": "^1.8.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
@@ -24,11 +26,9 @@
     "joi": "^17.13.3",
     "jsonwebtoken": "^9.0.2",
     "morgan": "^1.10.0",
-    "mysql2": "^3.12.0",
-    "node-cron": "^3.0.3",
     "pg": "^8.14.0",
     "pg-hstore": "^2.3.4",
-    "sequelize": "^6.37.5",
+    "sequelize": "^6.37.6",
     "stripe": "^13.11.0",
     "winston": "^3.17.0"
   },

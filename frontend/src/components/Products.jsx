@@ -1,107 +1,134 @@
-import React, { useEffect, useState } from "react";
-import { publicRequest } from "../request-methods";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchProducts } from "../redux/features/productSlice";
 import Product from "./Product";
-import LoadingSpinner from "./Loading";
+import { Loader2 } from "lucide-react";
+import { Button } from "./ui/button";
+import { cn } from "../utils/cn";
+import PropTypes from "prop-types";
 
 const Products = ({ category }) => {
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const { products, isLoading, error } = useSelector((state) => state.products);
   const [page, setPage] = useState(1);
-  const [totalProducts, setTotalProducts] = useState(0);
   const productsPerPage = 15;
 
-  const getProducts = async () => {
-    try {
-      const url = category
-        ? `/products?category=${category}&page=${page}&limit=${productsPerPage}`
-        : `/products?page=${page}&limit=${productsPerPage}`;
-      const response = await publicRequest.get(url);
-      setProducts(response.data.products);
-      setTotalProducts(response.data.totalProducts);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-      setError(true);
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    dispatch(fetchProducts({ category, page, limit: productsPerPage }));
+  }, [dispatch, category, page]);
+
+  const totalProducts = products?.length || 0;
+  const totalPages = Math.max(Math.ceil(totalProducts / productsPerPage), 1);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
       setPage(newPage);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
-  useEffect(() => {
-    getProducts();
-  }, [category, page]);
-
-  if (loading) {
-    return <LoadingSpinner />;
+  if (isLoading) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-teal-600" />
+      </div>
+    );
   }
+
   if (error) {
-    return <div className="text-center">No Products Available!</div>;
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-lg text-red-600">{error}</p>
+          <Button
+            variant="outline"
+            onClick={() => dispatch(fetchProducts({ category, page, limit: productsPerPage }))}
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
   }
 
-  const totalPages = Math.max(Math.ceil(totalProducts / productsPerPage), 1);
+  const startIndex = (page - 1) * productsPerPage;
+  const endIndex = startIndex + productsPerPage;
+  const currentProducts = products?.slice(startIndex, endIndex) || [];
 
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
   return (
-    <div>
-      <section className='pb-8 mx-8 grid gap-4 md:grid-cols-2 lg:grid-cols-5' id='products'>
-        {products.map((product) => (
+    <div className="space-y-8">
+      {/* Products Grid */}
+      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 px-4 sm:px-6 lg:px-8">
+        {currentProducts.map((product) => (
           <Product key={product._id} product={product} />
         ))}
       </section>
-      <div className='flex justify-center mt-4'>
-        <nav aria-label='Page navigation example'>
-          <ul className='list-style-none flex items-center space-x-1'>
-            <li>
-              <a
-                className={`relative block rounded-full bg-transparent px-3 py-1.5 text-2xl text-neutral-600 font-bold transition-all duration-300 hover:bg-neutral-200 ${
-                  page === 1 ? 'cursor-not-allowed' : 'hover:bg-neutral-100'
-                }`}
-                href='#'
-                onClick={() => page > 1 && handlePageChange(page - 1)}
-                aria-disabled={page === 1}
-              >
-                <span>&laquo;</span>
-              </a>
-            </li>
-            {pageNumbers.map((_, i) => (
-              <li key={i}>
-                <a
-                  className={`relative block rounded-full px-3 py-1.5 text-xl font-semibold text-neutral-600 transition-all duration-300 ${
-                    page === i + 1 ? 'bg-neutral-200 text-neutral-900' : 'bg-transparent hover:bg-neutral-100'
-                  }`}
-                  href='#'
-                  onClick={() => handlePageChange(i + 1)}
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-center mt-8">
+          <nav className="flex items-center gap-1" aria-label="Pagination">
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(page - 1)}
+              disabled={page === 1}
+              className="h-8 w-8"
+            >
+              <span className="sr-only">Previous page</span>
+              &laquo;
+            </Button>
+
+            {[...Array(totalPages)].map((_, index) => {
+              const pageNumber = index + 1;
+              const isCurrentPage = pageNumber === page;
+              const isNearCurrentPage =
+                Math.abs(pageNumber - page) <= 2 ||
+                pageNumber === 1 ||
+                pageNumber === totalPages;
+
+              if (!isNearCurrentPage) {
+                if (pageNumber === 2 || pageNumber === totalPages - 1) {
+                  return <span key={pageNumber} className="px-2">...</span>;
+                }
+                return null;
+              }
+
+              return (
+                <Button
+                  key={pageNumber}
+                  variant={isCurrentPage ? "default" : "outline"}
+                  size="icon"
+                  onClick={() => handlePageChange(pageNumber)}
+                  className={cn(
+                    "h-8 w-8",
+                    isCurrentPage && "bg-teal-600 hover:bg-teal-500"
+                  )}
                 >
-                  {i + 1}
-                </a>
-              </li>
-            ))}
-            <li>
-              <a
-                className={`relative block rounded-full bg-transparent px-3 py-1.5 text-2xl text-neutral-600 font-bold transition-all duration-300 hover:bg-neutral-200 ${
-                  page === pageNumbers.length ? 'cursor-not-allowed' : 'hover:bg-neutral-100'
-                }`}
-                href='#'
-                onClick={() => page < pageNumbers.length && handlePageChange(page + 1)}
-                aria-disabled={page === pageNumbers.length}
-              >
-                <span>&raquo;</span>
-              </a>
-            </li>
-          </ul>
-        </nav>
-      </div>
+                  {pageNumber}
+                </Button>
+              );
+            })}
+
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => handlePageChange(page + 1)}
+              disabled={page === totalPages}
+              className="h-8 w-8"
+            >
+              <span className="sr-only">Next page</span>
+              &raquo;
+            </Button>
+          </nav>
+        </div>
+      )}
     </div>
   );
+};
+
+Products.propTypes = {
+  category: PropTypes.string,
 };
 
 export default Products;

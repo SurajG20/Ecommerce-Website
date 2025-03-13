@@ -10,11 +10,11 @@ export const authenticateUser = async (req, res, next) => {
     }
 
     const token = authHeader.split(' ')[1];
-    
+
     try {
       const payload = JWTService.verifyToken(token);
       const user = await UserService.findUserById(payload.id);
-      
+
       if (!user) {
         return responseHandler.unauthorize(res)('User no longer exists');
       }

@@ -1,34 +1,29 @@
-import { Sequelize } from "sequelize";
-import Config from "./config.js";
+import { Sequelize } from 'sequelize';
+import Config from './config.js';
 
-const sequelize = new Sequelize(
-  Config.SQL_DATABASE,
-  Config.SQL_USERNAME,
-  Config.SQL_PASSWORD,
-  {
-    host: Config.SQL_HOST,
-    dialect: "postgres",
-    dialectOptions: {
-      ssl: {
-        require: true,
-        rejectUnauthorized: false
-      }
+const sequelize = new Sequelize(Config.SQL_DATABASE, Config.SQL_USERNAME, Config.SQL_PASSWORD, {
+  host: Config.SQL_HOST,
+  dialect: 'postgres',
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
     },
-    logging: false,
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    }
-  }
-);
+  },
+  logging: false,
+  pool: {
+    max: 5,
+    min: 0,
+    acquire: 30000,
+    idle: 10000,
+  },
+});
 
 export const connectDB = async () => {
   try {
     await sequelize.authenticate();
     console.log('Database connected successfully');
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log('Models synchronized');
   } catch (error) {
     console.error('Database connection failed:', error);

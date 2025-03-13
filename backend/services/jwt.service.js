@@ -1,14 +1,15 @@
 import jwt from 'jsonwebtoken';
+import Config from '../config/config.js';
 
 export class JWTService {
   static createToken(payload) {
-    return jwt.sign(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_LIFETIME
+    return jwt.sign(payload, Config.JWT_SECRET, {
+      expiresIn: Config.JWT_LIFETIME,
     });
   }
 
   static verifyToken(token) {
-    return jwt.verify(token, process.env.JWT_SECRET);
+    return jwt.verify(token, Config.JWT_SECRET);
   }
 
   static generateAuthToken(user) {
@@ -16,9 +17,9 @@ export class JWTService {
       id: user.id,
       name: user.name,
       email: user.email,
-      role: user.role
+      role: user.role,
     };
     const token = this.createToken(payload);
     return token;
   }
-} 
+}

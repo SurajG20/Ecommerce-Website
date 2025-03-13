@@ -1,130 +1,126 @@
-import { Link } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { register } from '../store/auth-actions';
-import { useNavigate } from 'react-router-dom';
-import React, { useRef, useState } from 'react';
-import isValidEmail from '../utils/isMailValid';
-import Layout from '../components/Layout';
-import { toast } from 'react-toastify';
+import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema } from "../schemas/auth";
+import useAuth from "../hooks/useAuth";
+import Layout from "../components/Layout";
+import { toast } from "sonner";
+
 const Register = () => {
-  const dispatch = useDispatch();
-  const auth = useSelector((store) => store.auth);
-  const nameRef = useRef();
-  const emailRef = useRef();
-  const passwordRef = useRef();
-  const confirmPasswordRef = useRef();
   const navigate = useNavigate();
+  const { register: registerUser, isLoading } = useAuth();
 
-  const [acceptTerms, setAcceptTerms] = useState(false); // State for checkbox
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      acceptTerms: false,
+    },
+  });
 
-  const formSubmitHandler = (e) => {
-    e.preventDefault();
-    const name = nameRef.current.value;
-    const password = passwordRef.current.value;
-    const confirmPassword = confirmPasswordRef.current.value;
-    const email = emailRef.current.value;
-    if (isValidEmail(email)) {
-      toast.warn(isValidEmail(email));
-      return;
+  const onSubmit = async (data) => {
+    try {
+      await registerUser(data);
+      reset();
+      navigate("/login");
+    } catch (error) {
+      toast.error(error.message || "Registration failed");
     }
-    if (password !== confirmPassword) {
-      toast.warn('Passwords do not match');
-      return;
-    }
-    if (password.length < 6) {
-      toast.warn('Password must be at least 6 characters long');
-      return;
-    }
-    if (!acceptTerms) {
-      toast.warn('Please accept the terms and conditions');
-      return;
-    }
-    if (!password.trim() || !name.trim() || !email.trim()) return;
-    dispatch(
-      register({
-        name,
-        password,
-        email
-      })
-    );
-    navigate('/');
-
-    nameRef.current.value = '';
-    passwordRef.current.value = '';
-    confirmPasswordRef.current.value = '';
-    emailRef.current.value = '';
   };
 
   return (
     <Layout>
-      <div className='h-screen w-screen flex items-center justify-center bg-cover bg-login'>
-        <div className='p-[20px] w-3/4 sm:w-2/5 bg-white border-2 border-teal-400'>
-          <h1 className='text-[24px] font-light '>CREATE AN ACCOUNT</h1>
-          <form action='' className='flex flex-wrap w-full ' onSubmit={formSubmitHandler}>
-            <input
-              type='text'
-              className='flex-1 min-w-2/5 mt-[20px] mr-[10px] p-[10px] outline-none
-            border '
-              required={true}
-              autoComplete='name'
-              placeholder='Full Name'
-              ref={nameRef}
-            />
-            <input
-              type='email'
-              className='flex-1 min-w-2/5 mt-[20px] mr-[10px] p-[10px] outline-none
-            border '
-              placeholder='Email'
-              ref={emailRef}
-              required={true}
-              autoComplete='email'
-            />
-            <input
-              type='password'
-              className='flex-1 min-w-2/5 mt-[20px] mr-[10px] p-[10px] outline-none
-            border '
-              placeholder='Password'
-              ref={passwordRef}
-              required={true}
-              autoComplete='password'
-            />
-            <input
-              type='Password'
-              className='flex-1 min-w-2/5 mt-[20px] mr-[10px] p-[10px] outline-none
-            border '
-              ref={confirmPasswordRef}
-              required={true}
-              autoComplete='password'
-              placeholder='Confirm Password'
-            />
-            <div className='flex items-center mt-[20px]'>
+      <div className="h-screen w-screen flex items-center justify-center bg-cover bg-login">
+        <div className="p-[20px] w-3/4 sm:w-2/5 bg-white border-2 border-teal-400">
+          <h1 className="text-[24px] font-light">CREATE AN ACCOUNT</h1>
+
+          <form className="flex flex-wrap w-full" onSubmit={handleSubmit(onSubmit)}>
+            <div className="flex-1 min-w-[40%] mt-5 mr-2">
               <input
-                type='checkbox'
-                className='mr-[10px]'
-                checked={acceptTerms}
-                onChange={(e) => setAcceptTerms(e.target.checked)}
+                type="text"
+                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
+                placeholder="Full Name"
+                {...register("name")}
               />
-              <span className='text-[12px] my-[20px] '>
-                By creating an account, I consent to the processing of my personal data in accordance with the{' '}
-                <b>PRIVACY POLICY</b>
-              </span>
+              {errors.name && (
+                <p className="mt-1 text-sm text-red-500">{errors.name.message}</p>
+              )}
             </div>
-            <div className='w-full'>
+
+            <div className="flex-1 min-w-[40%] mt-5 mr-2">
+              <input
+                type="email"
+                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
+                placeholder="Email"
+                {...register("email")}
+              />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-500">{errors.email.message}</p>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-[40%] mt-5 mr-2">
+              <input
+                type="password"
+                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
+                placeholder="Password"
+                {...register("password")}
+              />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-500">{errors.password.message}</p>
+              )}
+            </div>
+
+            <div className="flex-1 min-w-[40%] mt-5 mr-2">
+              <input
+                type="password"
+                className="w-full p-[10px] border rounded focus:outline-none focus:border-teal-500"
+                placeholder="Confirm Password"
+                {...register("confirmPassword")}
+              />
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-500">{errors.confirmPassword.message}</p>
+              )}
+            </div>
+
+            <div className="w-full mt-5">
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  className="w-4 h-4 text-teal-600 border-gray-300 rounded focus:ring-teal-500"
+                  {...register("acceptTerms")}
+                />
+                <span className="text-sm">
+                  By creating an account, I consent to the processing of my personal data in accordance with the{" "}
+                  <b>PRIVACY POLICY</b>
+                </span>
+              </label>
+              {errors.acceptTerms && (
+                <p className="mt-1 text-sm text-red-500">{errors.acceptTerms.message}</p>
+              )}
+            </div>
+
+            <div className="w-full mt-5">
               <button
-                disabled={auth.isFetching}
-                className='w-2/5 py-[15px] px-[20px] bg-[teal] hover:bg-teal-500 text-white cursor-pointer mb-3 mt-[20px]'
+                type="submit"
+                disabled={isLoading}
+                className="w-2/5 py-[15px] px-[20px] bg-teal-700 hover:bg-teal-500 text-white cursor-pointer rounded transition-colors duration-200 disabled:bg-teal-500 disabled:cursor-not-allowed"
               >
-                CREATE
+                {isLoading ? "Creating Account..." : "CREATE"}
               </button>
             </div>
           </form>
-          <Link to='/login' className=''>
-            <p className='my-[10px] text-[12px] cursor-pointer hover:text-gray-400'>
-              ALREADY HAVE AN ACCOUNT?
-              <span className='text-blue-500 ml-1 underline '>SIGN IN</span>
+
+          <Link to="/login">
+            <p className="mt-4 text-sm cursor-pointer hover:text-gray-400 transition-colors duration-200">
+              ALREADY HAVE AN ACCOUNT?{" "}
+              <span className="text-blue-500 ml-1 underline">SIGN IN</span>
             </p>
           </Link>
-          {/* {auth.error && <span className='text-red-500 block '>Something Went Wrong...</span>} */}
         </div>
       </div>
     </Layout>

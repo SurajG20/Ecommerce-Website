@@ -1,14 +1,13 @@
-import express from "express";
-import morgan from "morgan";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import cors from "cors";
+import cors from 'cors';
 import dotenv from 'dotenv';
-
-import { connectDB } from "./config/database.js";
+import express from 'express';
+import rateLimit from 'express-rate-limit';
+import helmet from 'helmet';
+import morgan from 'morgan';
+import { connectDB } from './config/database.js';
+import errorHandler from './middlewares/error-handler.js';
+import notFoundMiddleware from './middlewares/not-found.js';
 import mainRoutes from './routes/main.routes.js';
-import notFoundMiddleware from "./middlewares/not-found.js";
-import errorHandler from "./middlewares/error-handler.js";
 
 dotenv.config();
 
@@ -21,7 +20,7 @@ const limiter = rateLimit({
   max: process.env.RATE_LIMIT || 100,
   message: {
     status: 429,
-    message: "Too many requests, please try again later.",
+    message: 'Too many requests, please try again later.',
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -30,11 +29,18 @@ const limiter = rateLimit({
 app.use(limiter);
 app.use(helmet());
 app.use(cors());
-app.use(morgan("dev"));
+app.use(morgan('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-app.use("/api/v1", mainRoutes);
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'success',
+    message: 'Server is running',
+  });
+});
+
+app.use('/api/v1', mainRoutes);
 
 app.use(notFoundMiddleware);
 app.use(errorHandler);

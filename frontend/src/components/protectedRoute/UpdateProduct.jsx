@@ -1,8 +1,10 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Upload } from "lucide-react";
+import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useMemo, useState } from "react";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-
 import {
   getStorage,
   ref,
@@ -10,59 +12,103 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 import app from "../../firebase";
-import { getProducts, updateProduct } from "../../store/product-actions";
+import { productSchema } from "../../schemas/product";
+import { updateProduct, fetchProducts } from "../../redux/features/productSlice";
 import Footer from "../Footer";
 import Announcements from "../Announcement";
 import Navbar from "../Navbar";
+import { cn } from "../../utils/cn";
+
+const Input = ({ label, error, ...props }) => (
+  <div className="mb-4">
+    <label className="text-gray-700 font-semibold block mb-2">{label}</label>
+    <input
+      className={cn(
+        "w-full p-2 border rounded-md",
+        "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+        "transition-all duration-200",
+        error && "border-red-500"
+      )}
+      {...props}
+    />
+    {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+  </div>
+);
 
 export default function UpdateProduct() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const location = useLocation();
   const productId = location.pathname.split("/")[3];
-  const product = useSelector((state) =>
-    state.product.products.products.find((i) => i._id === productId)
-  );
-  const [data, setData] = useState({
-    title: product.title,
-    description: product.description,
-    price: product.price,
-    discount: product.discount,
-  });
-  console.log(data);
+
+  const { products, isLoading } = useSelector((state) => state.products);
+  const product = products?.find((p) => p._id === productId);
+
   const [file, setFile] = useState(null);
-  const [img, setImg] = useState(null);
-  const [Previmg, setPrevimg] = useState(null);
-  const [category, setCategory] = useState([product.category.join(",")]);
-  const [size, setSize] = useState([product.size.join(",")]);
-  const [color, setColor] = useState([product.color.join(",")]);
-  const [error, setError] = useState(false);
-  const dispatch = useDispatch();
-  const [success, setSuccess] = useState(false);
-  const { isFetching } = useSelector((state) => state.product);
+  const [previewImage, setPreviewImage] = useState(product?.image);
+  const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleChange = useCallback((e) => {
-    setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
-  }, []);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(productSchema),
+    defaultValues: {
+      title: product?.title || "",
+      description: product?.description || "",
+      price: product?.price || 0,
+      discount: product?.discount || 0,
+      category: product?.category?.join(", ") || "",
+      size: product?.size?.join(", ") || "",
+      color: product?.color?.join(", ") || "",
+    },
+  });
 
-  const handleCategory = useCallback((e) => {
-    setCategory(e.target.value.split(","));
-  }, []);
+  useEffect(() => {
+    if (!products?.length) {
+      dispatch(fetchProducts());
+    }
+  }, [dispatch, products]);
 
-  const handleSize = useCallback((e) => {
-    setSize(e.target.value.split(","));
-  }, []);
+  useEffect(() => {
+    if (product) {
+      reset({
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        discount: product.discount,
+        category: product.category.join(", "),
+        size: product.size.join(", "),
+        color: product.color.join(", "),
+      });
+      setPreviewImage(product.image);
+    }
+  }, [product, reset]);
 
-  const handleColor = useCallback((e) => {
-    setColor(e.target.value.split(","));
-  }, []);
+  const handleFileChange = (e) => {
+    const selectedFile = e.target.files[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreviewImage(URL.createObjectURL(selectedFile));
+    }
+  };
 
-  const handleUpload = useCallback(
-    (e) => {
-      e.preventDefault();
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!file) {
+      toast.error("Please select a file first!");
+      return;
+    }
 
-      const fileName = new Date().getTime() + file.name;
-      const storage = getStorage(app);
-      const storageRef = ref(storage, fileName);
+    setIsUploading(true);
+    const fileName = new Date().getTime() + file.name;
+    const storage = getStorage(app);
+    const storageRef = ref(storage, fileName);
 
+    try {
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on(
@@ -70,202 +116,150 @@ export default function UpdateProduct() {
         (snapshot) => {
           const progress =
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log("Upload is " + progress + "% done");
-          switch (snapshot.state) {
-            case "paused":
-              console.log("Upload is paused");
-              break;
-            case "running":
-              console.log("Upload is running");
-              break;
-            default:
-              break;
-          }
+          toast.info(`Upload is ${Math.round(progress)}% done`);
         },
         (error) => {
-          setError(true);
+          toast.error("Upload failed!");
+          setIsUploading(false);
         },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-            setImg(downloadURL);
-          });
+        async () => {
+          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+          setUploadedImageUrl(downloadURL);
+          toast.success("Image uploaded successfully!");
+          setIsUploading(false);
         }
       );
-    },
-    [file, img]
-  );
-
-  const handleUpdate = useCallback(() => {
-    const products = {
-      ...data,
-      image: img ? img : product.image,
-      category,
-      size,
-      color,
-    };
-    updateProduct(dispatch, productId, products);
-    getProducts(dispatch);
-    setSuccess(true);
-  }, [data, img, category, size, color, productId, dispatch]);
-
-  setTimeout(() => {
-    if (success) {
-      setSuccess(false);
+    } catch (error) {
+      toast.error("Upload failed!");
+      setIsUploading(false);
     }
-  }, 3000);
+  };
+
+  const onSubmit = async (data) => {
+    try {
+      const updatedProduct = {
+        ...data,
+        image: uploadedImageUrl || product.image,
+        price: Number(data.price),
+        discount: Number(data.discount),
+      };
+
+      await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
+      navigate("/admin");
+    } catch (error) {
+      toast.error(error.message || "Failed to update product");
+    }
+  };
+
+  if (!product) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <>
       <Announcements />
       <Navbar />
-      <div className="flex flex-col items-center min-h-screen py-4 mx-auto ">
-        <div className=" p-2">
-          <div className="flex justify-between">
-            <h1 className="text-2xl font-semibold ml-8 ">Update Products</h1>
+      <div className="container mx-auto py-8">
+        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-6">
+          <div className="flex justify-between items-center mb-6">
+            <h1 className="text-2xl font-bold">Update Product</h1>
             <Link to="/admin">
-              <button className="text-sm lg:text-md cursor-pointer uppercase px-3 py-2 border-2 border-black hover:bg-black hover:text-white transition ease-out duration-500 mr-5">
-                ALL PRODUCTS
-              </button>
+              <button className="btn btn-outline">All Products</button>
             </Link>
           </div>
-          <div className="grid grid-cols-3 gap-x-16 p-8">
-            <img
-              className="w-full h-[90%] aspect-[3/4] object-cover "
-              alt="preview image"
-              src={Previmg ? Previmg : product.image}
-            />
-            <form className="col-span-2 mt-4 grid grid-cols-2 gap-x-10 gap-y-3">
-              <div className="mb-4 flex gap-6 items-center">
-                <label
-                  className="text-gray-700 font-semibold border-2 border-gray-700 p-2 cursor-pointer rounded-lg "
-                  htmlFor="file"
-                >
-                  Select File
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100">
+              <img
+                className="w-full h-full object-cover"
+                alt="Product preview"
+                src={previewImage}
+              />
+            </div>
+
+            <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-2 space-y-4">
+              <div className="flex items-center gap-4 mb-6">
+                <label className="btn btn-outline">
+                  <input
+                    type="file"
+                    className="hidden"
+                    onChange={handleFileChange}
+                    accept="image/*"
+                  />
+                  Select Image
                 </label>
-                <input
-                  type="file"
-                  id="file"
-                  className=" hidden"
-                  onChange={(e) => {
-                    setFile(e.target.files[0]);
-                    setPrevimg(URL.createObjectURL(e.target.files[0]));
-                  }}
-                />
-                <button
-                  onClick={handleUpload}
-                  className=" px-3  rounded-lg text-white  cursor-pointer bg-black "
-                >
-                  <CloudUploadIcon />
-                </button>
+                {file && (
+                  <button
+                    type="button"
+                    onClick={handleUpload}
+                    disabled={isUploading}
+                    className={cn(
+                      "btn btn-primary",
+                      isUploading && "opacity-50 cursor-not-allowed"
+                    )}
+                  >
+                    <Upload className="w-4 h-4 mr-2" />
+                    {isUploading ? "Uploading..." : "Upload"}
+                  </button>
+                )}
               </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">Title</label>
-                <input
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <Input
+                  label="Title"
                   type="text"
-                  placeholder={product.title}
-                  value={data.title}
-                  className="w-full p-2 border"
-                  name="title"
-                  onChange={handleChange}
-                  required
+                  error={errors.title?.message}
+                  {...register("title")}
                 />
-              </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">
-                  Description
-                </label>
-                <input
+                <Input
+                  label="Description"
                   type="text"
-                  placeholder={product.description}
-                  value={data.description}
-                  className="w-full p-2 border"
-                  name="description"
-                  onChange={handleChange}
-                  required
+                  error={errors.description?.message}
+                  {...register("description")}
                 />
-              </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">
-                  Categories
-                </label>
-                <input
+                <Input
+                  label="Categories (comma-separated)"
                   type="text"
-                  placeholder={product.category.join(",")}
-                  value={category}
-                  className="w-full p-2 border"
-                  name="categories"
-                  onChange={handleCategory}
-                  required
+                  error={errors.category?.message}
+                  {...register("category")}
                 />
-              </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">Size</label>
-                <input
+                <Input
+                  label="Sizes (comma-separated)"
                   type="text"
-                  placeholder={product.size.join(",")}
-                  value={size}
-                  className="w-full p-2 border"
-                  onChange={handleSize}
-                  required
+                  error={errors.size?.message}
+                  {...register("size")}
                 />
-              </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">Color</label>
-                <input
+                <Input
+                  label="Colors (comma-separated)"
                   type="text"
-                  placeholder={product.color.join(",")}
-                  value={color}
-                  className="w-full p-2 border"
-                  onChange={handleColor}
-                  required
+                  error={errors.color?.message}
+                  {...register("color")}
                 />
-              </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">Price</label>
-                <input
+                <Input
+                  label="Price"
                   type="number"
-                  placeholder={product.price}
-                  name="price"
-                  className="w-full p-2 border"
-                  onClick={handleChange}
-                  min={0}
-                  defaultValue={data.price}
-                  required
+                  error={errors.price?.message}
+                  {...register("price", { valueAsNumber: true })}
                 />
-              </div>
-              <div className="mb-4">
-                <label className="text-gray-700 font-semibold">Discount</label>
-                <input
+                <Input
+                  label="Discount (%)"
                   type="number"
-                  placeholder={product.discount}
-                  defaultValue={data.discount}
-                  className="w-full p-2 border"
-                  name="discount"
-                  step={5}
-                  min={5}
-                  onClick={handleChange}
-                  required
+                  error={errors.discount?.message}
+                  {...register("discount", { valueAsNumber: true })}
                 />
               </div>
-              <div className=" w-full  text-center col-span-2">
+
+              <div className="flex justify-center mt-6">
                 <button
-                  disabled={isFetching}
-                  onClick={handleUpdate}
-                  className="mt-4 px-10 py-2 rounded-lg bg-darkblue text-white font-semibold cursor-pointer bg-black "
+                  type="submit"
+                  disabled={isLoading || isUploading}
+                  className={cn(
+                    "btn btn-primary px-8",
+                    (isLoading || isUploading) && "opacity-50 cursor-not-allowed"
+                  )}
                 >
-                  Update
+                  {isLoading ? "Updating..." : "Update Product"}
                 </button>
-                <div className="my-2 ">
-                  {error && (
-                    <span className="text-red-500 ">
-                      Something Went Wrong...
-                    </span>
-                  )}
-                  {success && (
-                    <span className="text-green-500 mt-4 ">
-                      Updated successfully...
-                    </span>
-                  )}
-                </div>
               </div>
             </form>
           </div>

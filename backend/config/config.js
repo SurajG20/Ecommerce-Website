@@ -1,4 +1,4 @@
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -10,6 +10,8 @@ const Config = {
   SQL_PASSWORD: env.DB_PASSWORD,
   SQL_HOST: env.DB_HOST,
   PORT: env.PORT,
+  JWT_SECRET: env.JWT_SECRET,
+  JWT_LIFETIME: env.JWT_LIFETIME,
 };
 
 export default Object.freeze(Config);

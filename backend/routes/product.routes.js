@@ -4,25 +4,15 @@ import { authenticateUser, authorizePermissions } from '../middlewares/authentic
 
 const router = express.Router();
 
-router.route('/')
-  .post(
-    authenticateUser, 
-    authorizePermissions('admin'), 
-    ProductController.createProduct
-  )
+router
+  .route('/')
+  .post(authenticateUser, authorizePermissions('admin'), ProductController.createProduct)
   .get(ProductController.getAllProducts);
 
-router.route('/:id')
+router
+  .route('/:id')
   .get(ProductController.getProductById)
-  .patch(
-    authenticateUser, 
-    authorizePermissions('admin'), 
-    ProductController.updateProduct
-  )
-  .delete(
-    authenticateUser, 
-    authorizePermissions('admin'), 
-    ProductController.deleteProduct
-  );
+  .patch(authenticateUser, authorizePermissions('admin'), ProductController.updateProduct)
+  .delete(authenticateUser, authorizePermissions('admin'), ProductController.deleteProduct);
 
 export default router;

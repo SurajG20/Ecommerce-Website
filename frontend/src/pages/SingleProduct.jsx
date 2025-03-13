@@ -1,150 +1,208 @@
-import React, { useState, useEffect, useCallback } from 'react';
-
-import { Add, Remove } from '@mui/icons-material';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-
-import { publicRequest } from '../request-methods';
-import { addProduct } from '../store/cart-slice';
-
-import { Alert } from '@mui/material';
+import { Minus, Plus, ShoppingCart, AlertCircle, X } from 'lucide-react';
+import { addToCart } from '../redux/features/cartSlice';
+import ApiClass from '../utils/api';
 import Layout from '../components/Layout';
+import { toast } from 'sonner';
 
 const SingleProduct = () => {
   const { id } = useParams();
-  console.log(id);
   const dispatch = useDispatch();
-  const [product, setProduct] = useState({});
+  const [product, setProduct] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [quantity, setQuantity] = useState(1);
-  const [size, setSize] = useState('S');
-  const [color, setColor] = useState('red');
-  const [showMsg, setShowMsg] = useState(false);
+  const [size, setSize] = useState('');
+  const [color, setColor] = useState('');
 
-  const colorClass = (color) => {
-    switch (color) {
-      case 'white':
-        return 'bg-[white]';
-      case 'black':
-        return 'bg-[black]';
-      case 'red':
-        return 'bg-[red]';
-      case 'blue':
-        return 'bg-[blue]';
-      case 'green':
-        return 'bg-[green]';
-      case 'yellow':
-        return 'bg-[yellow]';
-    }
+  const colorStyles = {
+    white: 'bg-white border-2',
+    black: 'bg-black',
+    red: 'bg-red-500',
+    blue: 'bg-blue-500',
+    green: 'bg-green-500',
+    yellow: 'bg-yellow-400',
   };
-  const getProduct = async () => {
-    try {
-      const url = `/products/${id}`;
-      const response = await publicRequest.get(url);
-      setProduct(response.data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  const handleSubmit = useCallback(() => {
-    dispatch(addProduct({ product, quantity, color, size }));
-    setShowMsg(true);
-    setTimeout(() => {
-      setShowMsg(false);
-    }, 3000);
-  }, [product, quantity, color, size]);
-
-  const handleQuantity = useCallback((type) => {
-    if (type === 'dec') {
-      setQuantity((prev) => {
-        return prev > 1 ? prev - 1 : 1;
-      });
-    } else {
-      setQuantity((prev) => prev + 1);
-    }
-  }, []);
 
   useEffect(() => {
-    getProduct();
-  }, []);
+    const fetchProduct = async () => {
+      try {
+        setLoading(true);
+        const data = await ApiClass.getRequest(`/products/${id}`);
+        setProduct(data);
+        // Set default values for size and color
+        if (data.size?.length > 0) setSize(data.size[0]);
+        if (data.color?.length > 0) setColor(data.color[0]);
+      } catch (err) {
+        setError(err.message);
+        toast.error(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  return (
-    <Layout>
-      <section className='p-8 grid md:grid-cols-2 gap-8 min-h-screen'>
-        <div className='self-start aspect-square mx-auto w-64 sm:w-96 h-96'>
-          <img src={product.image} className='object-cover w-full h-full object-top border-2 p-2 rounded-sm' />
+    fetchProduct();
+  }, [id]);
+
+  const handleQuantityChange = (change) => {
+    setQuantity(prev => Math.max(1, prev + change));
+  };
+
+  const handleAddToCart = () => {
+    if (!size || !color) {
+      toast.error('Please select both size and color');
+      return;
+    }
+
+    const cartItem = {
+      id: product._id,
+      title: product.title,
+      description: product.description,
+      price: product.price,
+      image: product.image,
+      quantity,
+      size,
+      color,
+    };
+
+    dispatch(addToCart(cartItem));
+  };
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-teal-700"></div>
         </div>
-        <div className=''>
-          <div className='flex flex-col gap-x-3 gap-y-4 items-start px-2'>
-            <h2 className='text-4xl font-semibold '>{product.title}</h2>
-            <p className=' text-lg font-light'>{product.description}</p>
-            <span className=' text-xl font-bold'>₹ {product.price}</span>
-            {/* Color and Size Container */}
-            <div className='flex flex-col sm:flex-row justify-start items-start sm:justify-between sm:w-1/2 gap-x-3 gap-y-4 sm:items-center'>
-              {/* Color */}
-              <div className='flex items-center gap-x-2 '>
-                <span className='text-xl'>Color :</span>
-                {product.color?.map((c) => (
-                  <div
-                    key={c}
-                    onClick={() => setColor(c)}
-                    className={`w-8 h-8 rounded-full border ${color === c && 'ring border-0'} ${colorClass(
-                      c
-                    )} mx-[5px] cursor-pointer `}
-                  ></div>
-                ))}
-              </div>
-              {/* Size */}
-              <div className='flex items-center gap-x-2'>
-                <span className='text-xl  whitespace-nowrap '>Size :</span>
-                <select
-                  onChange={(e) => setSize(e.target.value)}
-                  className=' w-full py-1 px-2 bg-white border border-gray-300 rounded-md'
-                >
-                  <option value='' disabled>
-                    Select Size
-                  </option>
-                  {product.size?.map((s) => (
-                    <option key={s} value={s} className=''>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            {/* Cart and Quantity Container */}
-            <div className='grid grid-cols-1 items-start sm:grid-cols-3 gap-y-6 sm:items-center  '>
-              {/* Quantity Counter */}
-              <div className='flex items-center justify-start gap-x-3'>
-                <span className='cursor-pointer' onClick={() => handleQuantity('dec')}>
-                  <Remove />
-                </span>
-                <span className='mx-2 text-lg h-8 w-8 rounded-2xl border flex justify-center items-center'>
-                  {quantity}
-                </span>
-                <span className='cursor-pointer ' onClick={() => handleQuantity('inc')}>
-                  <Add />
-                </span>
-              </div>
-              {/* Cart Button */}
-              <div>
-                <button
-                  onClick={handleSubmit}
-                  className='w-full hover:bg-teal-700 hover:text-white transition ease-out duration-500 border-teal-700 border rounded px-6 py-3'
-                >
-                  Add to cart
-                </button>
-              </div>
-              {/* Alert Component */}
-              <div className={`mt-4 sm:w-3/4 lg:w-full  transition duration-300 ${!showMsg && 'opacity-0'}`}>
-                <Alert variant='outlined' color='success' onClose={() => setShowMsg(false)}>
-                  Added to cart
-                </Alert>
-              </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="max-w-md w-full p-4">
+            <div className="flex items-center gap-2 p-4 text-red-800 border border-red-300 rounded-lg bg-red-50">
+              <AlertCircle size={20} />
+              <p>{error}</p>
+              <button onClick={() => setError(null)} className="ml-auto hover:text-red-600">
+                <X size={20} />
+              </button>
             </div>
           </div>
         </div>
-      </section>
+      </Layout>
+    );
+  }
+
+  if (!product) return null;
+
+  return (
+    <Layout>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="grid md:grid-cols-2 gap-8">
+          {/* Product Image */}
+          <div className="aspect-square rounded-lg overflow-hidden bg-gray-100">
+            <img
+              src={product.image}
+              alt={product.title}
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+
+          {/* Product Details */}
+          <div className="flex flex-col gap-6">
+            <div>
+              <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
+              <p className="text-gray-600">{product.description}</p>
+            </div>
+
+            <div className="text-2xl font-bold text-teal-700">
+              ₹{product.price}
+            </div>
+
+            {/* Color Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Color
+              </label>
+              <div className="flex gap-2">
+                {product.color?.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setColor(c)}
+                    className={`
+                      w-10 h-10 rounded-full ${colorStyles[c]}
+                      ${color === c ? 'ring-2 ring-offset-2 ring-teal-700' : ''}
+                      transition-all duration-200
+                    `}
+                    title={c}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Size Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Size
+              </label>
+              <div className="flex gap-2">
+                {product.size?.map((s) => (
+                  <button
+                    key={s}
+                    onClick={() => setSize(s)}
+                    className={`
+                      px-4 py-2 border rounded-md
+                      ${size === s ? 'bg-teal-700 text-white border-teal-700' : 'border-gray-300 hover:border-teal-700'}
+                      transition-all duration-200
+                    `}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Quantity Selection */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Quantity
+              </label>
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => handleQuantityChange(-1)}
+                  disabled={quantity <= 1}
+                  className="p-2 rounded-md hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <Minus size={20} />
+                </button>
+                <span className="w-12 text-center text-lg font-medium">
+                  {quantity}
+                </span>
+                <button
+                  onClick={() => handleQuantityChange(1)}
+                  className="p-2 rounded-md hover:bg-gray-100"
+                >
+                  <Plus size={20} />
+                </button>
+              </div>
+            </div>
+
+            {/* Add to Cart Button */}
+            <button
+              onClick={handleAddToCart}
+              className="flex items-center justify-center gap-2 w-full py-3 px-8 bg-teal-700 text-white rounded-md hover:bg-teal-600 transition-colors duration-200"
+            >
+              <ShoppingCart size={20} />
+              Add to Cart
+            </button>
+          </div>
+        </div>
+      </div>
     </Layout>
   );
 };

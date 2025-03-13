@@ -1,6 +1,6 @@
 import { ProductService } from '../services/product.service.js';
-import { createProductSchema, updateProductSchema } from '../validations/product.validation.js';
 import responseHandler from '../utils/responseHandler.js';
+import { createProductSchema, updateProductSchema } from '../validations/product.validation.js';
 
 export class ProductController {
   static async createProduct(req, res) {

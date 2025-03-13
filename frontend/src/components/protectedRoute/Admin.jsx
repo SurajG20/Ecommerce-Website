@@ -1,8 +1,7 @@
 import Announcements from "../Announcement";
 import Navbar from "../Navbar";
 import Footer from "../Footer";
-import AddCircleOutlineOutlinedIcon from "@mui/icons-material/AddCircleOutlineOutlined";
-import InventoryIcon from "@mui/icons-material/Inventory";
+import { Package, PlusCircle } from "lucide-react";
 import ProductList from "./ProductsData";
 import { useState } from "react";
 import AddProduct from "./AddProduct";
@@ -23,7 +22,7 @@ const Admin = () => {
             onClick={() => setIndex(0)}
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-l-lg gap-2"
           >
-            <InventoryIcon /> PRODUCTS
+            <Package size={20} /> PRODUCTS
           </button>
 
           <button
@@ -31,7 +30,7 @@ const Admin = () => {
             onClick={() => setIndex(1)}
             className="inline-flex items-center px-4 py-2 text-sm font-medium text-gray-900 bg-transparent border border-gray-900 rounded-r-md gap-2"
           >
-            <AddCircleOutlineOutlinedIcon />
+            <PlusCircle size={20} />
             ADD
           </button>
         </div>
