@@ -41,8 +41,10 @@ export default function UpdateProduct() {
   const location = useLocation();
   const productId = location.pathname.split("/")[3];
 
+  console.log(productId);
   const { products, isLoading } = useSelector((state) => state.products);
-  const product = products?.find((p) => p._id === productId);
+  console.log(products);
+  const product = products?.find((p) => p.id === productId);
 
   const [file, setFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(product?.image);

@@ -121,131 +121,141 @@ const ShoppingCart = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-center mb-4">Your Cart</h1>
-          {showMsg && (
-            <div className="max-w-2xl mx-auto">
-              <div className="flex items-center gap-2 p-4 text-red-800 border border-red-300 rounded-lg bg-red-50">
-                <AlertCircle size={20} />
-                <p>Your cart is empty. Please add items to your cart before proceeding.</p>
-                <button
-                  onClick={() => setShowMsg(false)}
-                  className="ml-auto hover:text-red-600"
-                >
-                  <X size={20} />
-                </button>
+      <div className="min-h-screen bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Header */}
+          <div className="mb-10">
+            <h1 className="text-4xl font-bold text-center mb-6 text-foreground">Shopping Cart</h1>
+            {showMsg && (
+              <div className="max-w-2xl mx-auto">
+                <div className="flex items-center gap-3 p-4 text-destructive border border-destructive/20 rounded-lg bg-destructive/10">
+                  <AlertCircle className="h-5 w-5" />
+                  <p>Your cart is empty. Please add items to your cart before proceeding.</p>
+                  <button
+                    onClick={() => setShowMsg(false)}
+                    className="ml-auto hover:text-destructive/80 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {error && (
-            <div className="max-w-2xl mx-auto mt-4">
-              <div className="flex items-center gap-2 p-4 text-red-800 border border-red-300 rounded-lg bg-red-50">
-                <AlertCircle size={20} />
-                <p>{error}</p>
-                <button
-                  onClick={() => setError(null)}
-                  className="ml-auto hover:text-red-600"
-                >
-                  <X size={20} />
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex flex-col sm:flex-row justify-between gap-4 mb-8">
-          <div className="flex flex-col sm:flex-row items-center gap-4">
-            <button
-              onClick={handleContinueShopping}
-              className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-md border border-teal-700 hover:bg-teal-700 hover:text-white transition-colors duration-200"
-            >
-              <ArrowLeft size={18} />
-              Continue Shopping
-            </button>
-            <div className="flex items-center gap-2 text-gray-600">
-              <ShoppingBag size={20} />
-              <span className="text-lg">Items: {cart.totalQuantity}</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col sm:flex-row gap-4">
-            <button
-              onClick={() => dispatch(clearCart())}
-              disabled={cart.products.length === 0}
-              className="flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-md border border-teal-700 hover:bg-teal-700 hover:text-white transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <Trash2 size={18} />
-              Empty Cart
-            </button>
-            <button
-              onClick={handlePayment}
-              disabled={isProcessing || cart.products.length === 0}
-              className="flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium text-white bg-teal-700 rounded-md hover:bg-teal-600 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              <CreditCard size={18} />
-              {isProcessing ? 'Processing...' : 'Checkout'}
-            </button>
-          </div>
-        </div>
-
-        {/* Cart Content */}
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Products List */}
-          <div className="lg:col-span-2">
-            {cart.products.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-lg">
-                <ShoppingBag size={48} className="mx-auto text-gray-400 mb-4" />
-                <h3 className="text-xl font-medium text-gray-600 mb-2">Your cart is empty</h3>
-                <p className="text-gray-500 mb-4">Add items to your cart to see them here</p>
-                <button
-                  onClick={handleContinueShopping}
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-white bg-teal-700 rounded-md hover:bg-teal-600 transition-colors duration-200"
-                >
-                  <ArrowLeft size={18} />
-                  Browse Products
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {cart.products.map((product) => (
-                  <CartProduct
-                    key={product.id}
-                    product={product}
-                    onDelete={handleDelete}
-                    onUpdateQuantity={handleUpdateQuantity}
-                  />
-                ))}
+            {error && (
+              <div className="max-w-2xl mx-auto mt-4">
+                <div className="flex items-center gap-3 p-4 text-destructive border border-destructive/20 rounded-lg bg-destructive/10">
+                  <AlertCircle className="h-5 w-5" />
+                  <p>{error}</p>
+                  <button
+                    onClick={() => setError(null)}
+                    className="ml-auto hover:text-destructive/80 transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
               </div>
             )}
           </div>
 
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h2 className="text-xl font-semibold mb-6">Order Summary</h2>
-              <div className="space-y-4">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Subtotal</span>
-                  <span>₹{Math.round(Math.abs(cart.totalPrice))}</span>
+          {/* Actions */}
+          <div className="flex flex-col sm:flex-row justify-between gap-6 mb-10">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <button
+                onClick={handleContinueShopping}
+                className="flex items-center gap-2 px-6 py-3 text-sm font-medium rounded-lg border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Continue Shopping
+              </button>
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <ShoppingBag className="h-5 w-5" />
+                <span className="text-lg font-medium">{cart.totalQuantity} Items</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                onClick={() => dispatch(clearCart())}
+                disabled={cart.products.length === 0}
+                className="flex items-center justify-center gap-2 px-6 py-3 text-sm font-medium rounded-lg border border-primary text-primary hover:bg-primary hover:text-primary-foreground transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <Trash2 className="h-4 w-4" />
+                Empty Cart
+              </button>
+              <button
+                onClick={handlePayment}
+                disabled={isProcessing || cart.products.length === 0}
+                className="flex items-center justify-center gap-2 px-8 py-3 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              >
+                <CreditCard className="h-4 w-4" />
+                {isProcessing ? 'Processing...' : 'Checkout'}
+              </button>
+            </div>
+          </div>
+
+          {/* Cart Content */}
+          <div className="grid lg:grid-cols-3 gap-10">
+            {/* Products List */}
+            <div className="lg:col-span-2">
+              {cart.products.length === 0 ? (
+                <div className="text-center py-16 bg-card rounded-lg border shadow-sm">
+                  <ShoppingBag className="w-16 h-16 mx-auto text-muted-foreground mb-6" />
+                  <h3 className="text-2xl font-medium text-card-foreground mb-3">Your cart is empty</h3>
+                  <p className="text-muted-foreground mb-6">Add items to your cart to see them here</p>
+                  <button
+                    onClick={handleContinueShopping}
+                    className="inline-flex items-center gap-2 px-6 py-3 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-all duration-200 shadow-sm"
+                  >
+                    <ArrowLeft className="h-4 w-4" />
+                    Browse Products
+                  </button>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Shipping</span>
-                  <span>₹0.00</span>
+              ) : (
+                <div className="space-y-6">
+                  {cart.products.map((product) => (
+                    <CartProduct
+                      key={product.id}
+                      product={product}
+                      onDelete={handleDelete}
+                      onUpdateQuantity={handleUpdateQuantity}
+                    />
+                  ))}
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Discount</span>
-                  <span>-₹0.00</span>
-                </div>
-                <div className="border-t pt-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-lg font-semibold">Total</span>
-                    <span className="text-2xl font-bold text-teal-700">
-                      ₹{Math.round(Math.abs(cart.totalPrice))}
-                    </span>
+              )}
+            </div>
+
+            {/* Order Summary */}
+            <div className="lg:col-span-1">
+              <div className="bg-card rounded-lg shadow-sm border p-8 sticky top-8">
+                <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Order Summary</h2>
+                <div className="space-y-4">
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Subtotal</span>
+                    <span className="font-medium">₹{Math.round(Math.abs(cart.totalPrice))}</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Shipping</span>
+                    <span className="font-medium">₹0.00</span>
+                  </div>
+                  <div className="flex justify-between text-muted-foreground">
+                    <span>Discount</span>
+                    <span className="font-medium">-₹0.00</span>
+                  </div>
+                  <div className="border-t border-border pt-4 mt-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-lg font-semibold text-card-foreground">Total</span>
+                      <span className="text-2xl font-bold text-primary">
+                        ₹{Math.round(Math.abs(cart.totalPrice))}
+                      </span>
+                    </div>
+                    <button
+                      onClick={handlePayment}
+                      disabled={isProcessing || cart.products.length === 0}
+                      className="w-full mt-6 flex items-center justify-center gap-2 px-8 py-4 text-sm font-medium text-primary-foreground bg-primary rounded-lg hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      {isProcessing ? 'Processing...' : 'Proceed to Checkout'}
+                    </button>
                   </div>
                 </div>
               </div>

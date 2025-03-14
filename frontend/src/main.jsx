@@ -15,7 +15,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
     <Router>
       <Provider store={store}>
         <Toaster
-          position="top-right"
+          position="bottom-right"
           expand={true}
           richColors
           closeButton

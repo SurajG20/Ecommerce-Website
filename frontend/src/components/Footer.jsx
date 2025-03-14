@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Facebook, Twitter, Linkedin } from 'lucide-react';
 import { Separator } from './ui/separator';
-import logo from '../assets/logo.svg';
 
 const footerLinks = [
   { label: 'Home', path: '/' },
@@ -27,13 +26,9 @@ const Footer = () => {
     <footer className="w-full bg-muted/40 py-6">
       <div className="container">
         <div className="flex flex-col gap-6">
-          {/* Main Footer */}
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            {/* Logo and Social */}
             <div className="flex items-center gap-4">
-              <Link to="/" className="inline-block">
-                <img src={logo} alt="Bazaar Logo" className="h-8 w-8" />
-              </Link>
+
               <div className="flex gap-3">
                 {socialLinks.map(({ Icon, label, url }) => (
                   <a
@@ -66,7 +61,6 @@ const Footer = () => {
 
           <Separator />
 
-          {/* Copyright */}
           <div className="text-xs text-center text-muted-foreground">
             © {currentYear} Bazaar Inc. All rights reserved.
           </div>
