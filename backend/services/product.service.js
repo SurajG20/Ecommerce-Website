@@ -4,15 +4,14 @@ import ResponseHandler from '../utils/responseHandler.js';
 
 export class ProductService {
   static async createProduct(productData) {
-    const existingProduct = await Product.findOne({
-      where: { title: productData.title },
-    });
-
-    if (existingProduct) {
-      return ResponseHandler.error('Product with this title already exists');
-    }
-
     const product = await Product.create(productData);
+    return product;
+  }
+
+  static async findProductbyTitle(title) {
+    const product = await Product.findOne({
+      where: { title },
+    });
     return product;
   }
 
@@ -68,37 +67,15 @@ export class ProductService {
 
   static async getProductById(id) {
     const product = await Product.findByPk(id);
-    if (!product) {
-      return ResponseHandler.notFound('Product not found');
-    }
     return product;
   }
 
   static async updateProduct(id, updateData) {
     const product = await this.getProductById(id);
-    if (product.success === false) return product;
-
-    if (updateData.title && updateData.title !== product.title) {
-      const existingProduct = await Product.findOne({
-        where: {
-          title: updateData.title,
-          id: { [Op.ne]: id },
-        },
-      });
-
-      if (existingProduct) {
-        return ResponseHandler.error('Product with this title already exists');
-      }
-    }
-
     return await product.update(updateData);
   }
 
   static async deleteProduct(id) {
-    const product = await this.getProductById(id);
-    if (product.success === false) return product;
-
-    await product.destroy();
-    return true;
+    await Product.destroy({ where: { id } });
   }
 }

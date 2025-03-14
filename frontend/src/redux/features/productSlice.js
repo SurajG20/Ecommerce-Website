@@ -20,7 +20,14 @@ export const fetchProducts = createAsyncThunk(
         ? `/products?category=${category}&page=${page}&limit=${limit}`
         : `/products?page=${page}&limit=${limit}`;
       const response = await ApiClass.getRequest(url);
-      return response;
+
+      // Handle the correct response structure
+      return {
+        products: response.data.products || [],
+        totalProducts: response.data.totalProducts || 0,
+        currentPage: parseInt(response.data.currentPage) || page,
+        totalPages: parseInt(response.data.totalPages) || 1
+      };
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to fetch products");
     }
@@ -94,7 +101,8 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.products = action.payload.products;
         state.totalProducts = action.payload.totalProducts;
-        state.totalPages = Math.ceil(action.payload.totalProducts / 15); // assuming 15 items per page
+        state.currentPage = action.payload.currentPage;
+        state.totalPages = action.payload.totalPages;
         state.error = null;
       })
       .addCase(fetchProducts.rejected, (state, action) => {

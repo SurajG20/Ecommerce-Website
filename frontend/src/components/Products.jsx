@@ -9,16 +9,13 @@ import PropTypes from "prop-types";
 
 const Products = ({ category }) => {
   const dispatch = useDispatch();
-  const { products, isLoading, error } = useSelector((state) => state.products);
-  const [page, setPage] = useState(1);
+  const { products, isLoading, error, totalPages, currentPage } = useSelector((state) => state.products);
+  const [page, setPage] = useState(currentPage);
   const productsPerPage = 15;
 
   useEffect(() => {
     dispatch(fetchProducts({ category, page, limit: productsPerPage }));
   }, [dispatch, category, page]);
-
-  const totalProducts = products?.length || 0;
-  const totalPages = Math.max(Math.ceil(totalProducts / productsPerPage), 1);
 
   const handlePageChange = (newPage) => {
     if (newPage >= 1 && newPage <= totalPages) {
@@ -51,16 +48,28 @@ const Products = ({ category }) => {
     );
   }
 
-  const startIndex = (page - 1) * productsPerPage;
-  const endIndex = startIndex + productsPerPage;
-  const currentProducts = products?.slice(startIndex, endIndex) || [];
+  if (!products || products.length === 0) {
+    return (
+      <div className="min-h-[400px] flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-lg text-gray-600">No products found</p>
+          <Button
+            variant="outline"
+            onClick={() => dispatch(fetchProducts({ category, page, limit: productsPerPage }))}
+          >
+            Refresh
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
       {/* Products Grid */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 px-4 sm:px-6 lg:px-8">
-        {currentProducts.map((product) => (
-          <Product key={product._id} product={product} />
+        {products.map((product) => (
+          <Product key={product.id} product={product} />
         ))}
       </section>
 

@@ -8,6 +8,11 @@ export class ProductController {
     if (error) {
       return responseHandler.error(res)(error.details[0].message);
     }
+    const existingProduct = await ProductService.findProductbyTitle(value.title);
+
+    if (existingProduct) {
+      return responseHandler.error(res)('Product with this title already exists');
+    }
 
     const product = await ProductService.createProduct(value);
     return responseHandler.success(res)('Product created successfully', product);
@@ -20,6 +25,9 @@ export class ProductController {
 
   static async getProductById(req, res) {
     const product = await ProductService.getProductById(req.params.id);
+    if (!product) {
+      return responseHandler.notFound(res)('Product not found');
+    }
     return responseHandler.success(res)('Product retrieved successfully', product);
   }
 
@@ -29,11 +37,21 @@ export class ProductController {
       return responseHandler.error(res)(error.details[0].message);
     }
 
+    const productWithSameTitle = await ProductService.findProductbyTitle(value.title);
+
+    if (productWithSameTitle) {
+      return responseHandler.error(res)('Product with this title already exists');
+    }
+
     const product = await ProductService.updateProduct(req.params.id, value);
     return responseHandler.success(res)('Product updated successfully', product);
   }
 
   static async deleteProduct(req, res) {
+    const product = await ProductService.getProductById(req.params.id);
+    if (!product) {
+      return responseHandler.notFound(res)('Product not found');
+    }
     await ProductService.deleteProduct(req.params.id);
     return responseHandler.success(res)('Product deleted successfully');
   }
