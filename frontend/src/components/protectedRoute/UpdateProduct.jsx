@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Upload } from "lucide-react";
+import { Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -40,14 +40,11 @@ export default function UpdateProduct() {
   const dispatch = useDispatch();
   const location = useLocation();
   const productId = location.pathname.split("/")[3];
-
-  console.log(productId);
   const { products, isLoading } = useSelector((state) => state.products);
-  console.log(products);
-  const product = products?.find((p) => p.id === productId);
+  const product = products?.find((p) => p._id === productId);
 
   const [file, setFile] = useState(null);
-  const [previewImage, setPreviewImage] = useState(product?.image);
+  const [previewImage, setPreviewImage] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -58,15 +55,6 @@ export default function UpdateProduct() {
     reset,
   } = useForm({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      title: product?.title || "",
-      description: product?.description || "",
-      price: product?.price || 0,
-      discount: product?.discount || 0,
-      category: product?.category?.join(", ") || "",
-      size: product?.size?.join(", ") || "",
-      color: product?.color?.join(", ") || "",
-    },
   });
 
   useEffect(() => {
@@ -82,9 +70,9 @@ export default function UpdateProduct() {
         description: product.description,
         price: product.price,
         discount: product.discount,
-        category: product.category.join(", "),
-        size: product.size.join(", "),
-        color: product.color.join(", "),
+        category: product.category?.join(", "),
+        size: product.size?.join(", "),
+        color: product.color?.join(", "),
       });
       setPreviewImage(product.image);
     }
@@ -120,8 +108,8 @@ export default function UpdateProduct() {
             (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
           toast.info(`Upload is ${Math.round(progress)}% done`);
         },
-        (error) => {
-          toast.error("Upload failed!");
+        (uploadError) => {
+          toast.error("Upload failed: " + uploadError.message);
           setIsUploading(false);
         },
         async () => {
@@ -132,7 +120,7 @@ export default function UpdateProduct() {
         }
       );
     } catch (error) {
-      toast.error("Upload failed!");
+      toast.error("Upload failed: " + error.message);
       setIsUploading(false);
     }
   };
@@ -144,17 +132,33 @@ export default function UpdateProduct() {
         image: uploadedImageUrl || product.image,
         price: Number(data.price),
         discount: Number(data.discount),
+        category: data.category.split(",").map((cat) => cat.trim()),
+        size: data.size.split(",").map((s) => s.trim()),
+        color: data.color.split(",").map((c) => c.trim()),
       };
 
       await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
+      toast.success("Product updated successfully!");
       navigate("/admin");
     } catch (error) {
       toast.error(error.message || "Failed to update product");
     }
   };
 
-  if (!product) {
-    return <div>Loading...</div>;
+  if (isLoading || !product) {
+    return (
+      <>
+        <Announcements />
+        <Navbar />
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="flex flex-col items-center gap-4">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="text-muted-foreground">Loading product details...</p>
+          </div>
+        </div>
+        <Footer />
+      </>
+    );
   }
 
   return (

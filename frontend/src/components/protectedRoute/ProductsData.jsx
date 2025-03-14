@@ -100,7 +100,7 @@ const ProductsData = () => {
           </TableHeader>
           <TableBody>
             {products.map((product) => (
-              <TableRow key={product._id} className="group">
+              <TableRow key={product.id} className="group">
                 <TableCell className="font-medium">
                   <div className="relative w-16 h-16 rounded-lg overflow-hidden border border-border/50 group-hover:border-primary/20 transition-colors">
                     <img
