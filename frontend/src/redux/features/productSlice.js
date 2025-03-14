@@ -76,6 +76,19 @@ export const deleteProduct = createAsyncThunk(
   }
 );
 
+export const fetchSingleProduct = createAsyncThunk(
+  "products/fetchSingle",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await ApiClass.getRequest(`/products/${id}`);
+      return response.data;
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to fetch product details");
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch product details");
+    }
+  }
+);
+
 const productSlice = createSlice({
   name: "products",
   initialState,
@@ -153,6 +166,20 @@ const productSlice = createSlice({
         state.error = null;
       })
       .addCase(deleteProduct.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      // Fetch Single Product
+      .addCase(fetchSingleProduct.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchSingleProduct.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.selectedProduct = action.payload;
+        state.error = null;
+      })
+      .addCase(fetchSingleProduct.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

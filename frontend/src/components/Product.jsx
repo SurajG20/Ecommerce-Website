@@ -28,7 +28,7 @@ const Product = ({ product }) => {
       <div className="mt-4">
         <div className="flex justify-between text-sm md:text-base capitalize mb-2 text-black">
           <Link
-            to={`/products/${product._id}`}
+            to={`/products/${product.id}`}
             className="cursor-pointer line-clamp-1 font-urbanist"
           >
             {product.title}
@@ -53,7 +53,7 @@ const Product = ({ product }) => {
 
       {overlayIsShown && (
         <Link
-          to={`/products/${product._id}`}
+          to={`/products/${product.id}`}
           className="cursor-pointer absolute top-0 left-0 w-full h-full bg-black/10 flex justify-center items-center"
         />
       )}
@@ -63,7 +63,7 @@ const Product = ({ product }) => {
 
 Product.propTypes = {
   product: PropTypes.shape({
-    _id: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     description: PropTypes.string,
     price: PropTypes.number.isRequired,

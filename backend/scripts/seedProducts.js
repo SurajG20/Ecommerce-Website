@@ -3,16 +3,12 @@ import sequelize from '../config/database.js';
 import Product from '../models/Product.js';
 
 const categories = [
-  'electronics',
-  'clothing',
+  'clothes',
+  'women',
+  'men',
   'shoes',
-  'accessories',
-  'home',
-  'beauty',
-  'sports',
-  'books',
-  'toys',
-  'food',
+  'electronics',
+  'others',
 ];
 
 const generateProducts = (count) => {
@@ -27,11 +23,7 @@ const generateProducts = (count) => {
       description: faker.commerce.productDescription(),
       price: parseFloat(faker.commerce.price({ min: 10, max: 1000 })),
       discount: faker.number.int({ min: 0, max: 30 }),
-      category: [
-        category,
-        faker.helpers.arrayElement(categories),
-        faker.helpers.arrayElement(categories),
-      ].filter((value, index, self) => self.indexOf(value) === index),
+      category: [category], // Each product belongs to one main category
       size: faker.helpers.arrayElements(
         [
           'XS',
@@ -66,21 +58,14 @@ const generateProducts = (count) => {
 const seedProducts = async () => {
   try {
     // Sync the database
-    await sequelize.sync();
+    await sequelize.sync({ force: true }); // This will drop and recreate the table
     console.log('Database synced successfully');
 
-    // Clear existing products
-    await Product.destroy({ where: {} });
-    console.log('Existing products cleared');
-
     // Generate and insert new products
-    const products = generateProducts(20); // Generate 20 products
-    for (const product of products) {
-      await Product.create(product);
-      console.log(`Added product: ${product.title}`);
-    }
+    const products = generateProducts(50); // Generate 50 products
+    await Product.bulkCreate(products);
+    console.log(`Successfully seeded ${products.length} products!`);
 
-    console.log('All products seeded successfully!');
     process.exit(0);
   } catch (error) {
     console.error('Error seeding products:', error);

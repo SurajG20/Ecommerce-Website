@@ -31,11 +31,14 @@ export class ProductService {
     const whereClause = {};
 
     if (search) {
-      whereClause.title = { [Op.iLike]: `%${search}%` };
+      whereClause[Op.or] = [
+        { title: { [Op.iLike]: `%${search}%` } },
+        { description: { [Op.iLike]: `%${search}%` } },
+      ];
     }
 
     if (category) {
-      whereClause.category = { [Op.contains]: [category] };
+      whereClause.category = { [Op.overlap]: [category] };
     }
 
     if (minPrice || maxPrice) {
@@ -48,21 +51,35 @@ export class ProductService {
       whereClause.inStock = inStock === 'true';
     }
 
+    const validSortFields = [
+      'createdAt',
+      'price',
+      'title',
+    ];
+    const sortField = validSortFields.includes(sort) ? sort : 'createdAt';
+    const sortOrder = order.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
     const offset = (page - 1) * limit;
 
-    const products = await Product.findAndCountAll({
-      where: whereClause,
-      order: [[sort, order]],
-      limit: parseInt(limit),
-      offset: parseInt(offset),
-    });
+    console.log(whereClause);
+    try {
+      const products = await Product.findAndCountAll({
+        where: whereClause,
+        order: [[sortField, sortOrder]],
+        limit: parseInt(limit),
+        offset: parseInt(offset),
+      });
 
-    return {
-      products: products.rows,
-      totalProducts: products.count,
-      currentPage: page,
-      totalPages: Math.ceil(products.count / limit),
-    };
+      return {
+        products: products.rows,
+        totalProducts: products.count,
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(products.count / limit),
+        limit: parseInt(limit),
+      };
+    } catch (error) {
+      throw new Error(`Error fetching products: ${error.message}`);
+    }
   }
 
   static async getProductById(id) {

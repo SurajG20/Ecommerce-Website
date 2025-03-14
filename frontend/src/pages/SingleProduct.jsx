@@ -1,18 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Minus, Plus, ShoppingCart, AlertCircle, X } from 'lucide-react';
 import { addToCart } from '../redux/features/cartSlice';
-import ApiClass from '../utils/api';
+import { fetchSingleProduct } from '../redux/features/productSlice';
 import Layout from '../components/Layout';
 import { toast } from 'sonner';
 
 const SingleProduct = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { selectedProduct: product, isLoading: loading, error } = useSelector((state) => state.products);
   const [quantity, setQuantity] = useState(1);
   const [size, setSize] = useState('');
   const [color, setColor] = useState('');
@@ -27,24 +25,15 @@ const SingleProduct = () => {
   };
 
   useEffect(() => {
-    const fetchProduct = async () => {
-      try {
-        setLoading(true);
-        const data = await ApiClass.getRequest(`/products/${id}`);
-        setProduct(data);
-        // Set default values for size and color
-        if (data.size?.length > 0) setSize(data.size[0]);
-        if (data.color?.length > 0) setColor(data.color[0]);
-      } catch (err) {
-        setError(err.message);
-        toast.error(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
+    dispatch(fetchSingleProduct(id));
+  }, [dispatch, id]);
 
-    fetchProduct();
-  }, [id]);
+  useEffect(() => {
+    if (product) {
+      if (product.size?.length > 0) setSize(product.size[0]);
+      if (product.color?.length > 0) setColor(product.color[0]);
+    }
+  }, [product]);
 
   const handleQuantityChange = (change) => {
     setQuantity(prev => Math.max(1, prev + change));
@@ -88,7 +77,7 @@ const SingleProduct = () => {
             <div className="flex items-center gap-2 p-4 text-red-800 border border-red-300 rounded-lg bg-red-50">
               <AlertCircle size={20} />
               <p>{error}</p>
-              <button onClick={() => setError(null)} className="ml-auto hover:text-red-600">
+              <button onClick={() => window.location.reload()} className="ml-auto hover:text-red-600">
                 <X size={20} />
               </button>
             </div>
