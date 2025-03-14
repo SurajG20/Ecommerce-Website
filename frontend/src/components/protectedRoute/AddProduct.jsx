@@ -15,6 +15,10 @@ import { cn } from '../../utils/cn';
 import DefaultImage from '../../assets/default-image.jpg';
 import { toast } from 'sonner';
 
+const VALID_CATEGORIES = ['clothes', 'women', 'men', 'shoes', 'electronics', 'others'];
+const COMMON_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'UK6', 'UK7', 'UK8', 'UK9', 'UK10', 'UK11'];
+const COMMON_COLORS = ['White', 'Black', 'Red', 'Blue', 'Green', 'Yellow', 'Brown', 'Gray', 'Navy', 'Pink'];
+
 const AddProduct = () => {
   const dispatch = useDispatch();
   const { isLoading } = useSelector((state) => state.products);
@@ -22,11 +26,17 @@ const AddProduct = () => {
   const [previewImage, setPreviewImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [customSize, setCustomSize] = useState('');
+  const [customColor, setCustomColor] = useState('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
     reset
   } = useForm({
     resolver: zodResolver(productSchema),
@@ -37,9 +47,57 @@ const AddProduct = () => {
       discount: 0,
       category: '',
       size: '',
-      color: ''
+      color: '',
+      inStock: true
     }
   });
+
+  const handleCategoryChange = (category) => {
+    const updatedCategories = selectedCategories.includes(category)
+      ? selectedCategories.filter(c => c !== category)
+      : [...selectedCategories, category];
+
+    setSelectedCategories(updatedCategories);
+    setValue('category', updatedCategories.join(', '));
+  };
+
+  const handleSizeChange = (size) => {
+    const updatedSizes = selectedSizes.includes(size)
+      ? selectedSizes.filter(s => s !== size)
+      : [...selectedSizes, size];
+
+    setSelectedSizes(updatedSizes);
+    setValue('size', updatedSizes.join(', '));
+  };
+
+  const handleColorChange = (color) => {
+    const updatedColors = selectedColors.includes(color)
+      ? selectedColors.filter(c => c !== color)
+      : [...selectedColors, color];
+
+    setSelectedColors(updatedColors);
+    setValue('color', updatedColors.join(', '));
+  };
+
+  const handleCustomSizeAdd = (e) => {
+    e.preventDefault();
+    if (customSize && !selectedSizes.includes(customSize)) {
+      const updatedSizes = [...selectedSizes, customSize];
+      setSelectedSizes(updatedSizes);
+      setValue('size', updatedSizes.join(', '));
+      setCustomSize('');
+    }
+  };
+
+  const handleCustomColorAdd = (e) => {
+    e.preventDefault();
+    if (customColor && !selectedColors.includes(customColor)) {
+      const updatedColors = [...selectedColors, customColor];
+      setSelectedColors(updatedColors);
+      setValue('color', updatedColors.join(', '));
+      setCustomColor('');
+    }
+  };
 
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
@@ -93,6 +151,21 @@ const AddProduct = () => {
 
   const onSubmit = async (data) => {
     try {
+      if (selectedCategories.length === 0) {
+        toast.error('Please select at least one category');
+        return;
+      }
+
+      if (selectedSizes.length === 0) {
+        toast.error('Please select at least one size');
+        return;
+      }
+
+      if (selectedColors.length === 0) {
+        toast.error('Please select at least one color');
+        return;
+      }
+
       const imageUrl = await uploadImage();
       if (!imageUrl && !file) {
         toast.error('Please select an image');
@@ -102,17 +175,22 @@ const AddProduct = () => {
       const productData = {
         ...data,
         image: imageUrl,
-        price: Number(data.price),
-        discount: Number(data.discount),
-        category: data.category.split(',').map(item => item.trim()),
-        size: data.size.split(',').map(item => item.trim()),
-        color: data.color.split(',').map(item => item.trim())
+        price: parseFloat(data.price),
+        discount: parseInt(data.discount) || 0,
+        category: selectedCategories,
+        size: selectedSizes,
+        color: selectedColors,
+        inStock: Boolean(data.inStock)
       };
 
       await dispatch(createProduct(productData)).unwrap();
+      toast.success('Product created successfully!');
       reset();
       setFile(null);
       setPreviewImage(null);
+      setSelectedCategories([]);
+      setSelectedSizes([]);
+      setSelectedColors([]);
     } catch (error) {
       toast.error(error.message || 'Failed to create product');
     }
@@ -185,8 +263,10 @@ const AddProduct = () => {
               <Input
                 id="price"
                 type="number"
+                step="0.01"
+                min="0"
                 placeholder="0.00"
-                {...register('price')}
+                {...register('price', { valueAsNumber: true })}
                 error={errors.price?.message}
               />
               {errors.price && (
@@ -194,40 +274,108 @@ const AddProduct = () => {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="category">Categories (comma-separated)</Label>
-              <Input
-                id="category"
-                placeholder="shirt, pants, shoes"
-                {...register('category')}
-                error={errors.category?.message}
-              />
+            <div className="space-y-2 col-span-2">
+              <Label>Categories</Label>
+              <div className="flex flex-wrap gap-2">
+                {VALID_CATEGORIES.map((category) => (
+                  <button
+                    key={category}
+                    type="button"
+                    onClick={() => handleCategoryChange(category)}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-sm font-medium capitalize",
+                      "border transition-colors",
+                      selectedCategories.includes(category)
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                    )}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
               {errors.category && (
                 <p className="text-sm text-red-500">{errors.category.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="size">Sizes (comma-separated)</Label>
-              <Input
-                id="size"
-                placeholder="S, M, L, XL"
-                {...register('size')}
-                error={errors.size?.message}
-              />
+            <div className="space-y-2 col-span-2">
+              <Label>Sizes</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {COMMON_SIZES.map((size) => (
+                  <button
+                    key={size}
+                    type="button"
+                    onClick={() => handleSizeChange(size)}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-sm font-medium",
+                      "border transition-colors",
+                      selectedSizes.includes(size)
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                    )}
+                  >
+                    {size}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add custom size"
+                  value={customSize}
+                  onChange={(e) => setCustomSize(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={handleCustomSizeAdd}
+                  disabled={!customSize}
+                  variant="outline"
+                >
+                  Add Size
+                </Button>
+              </div>
               {errors.size && (
                 <p className="text-sm text-red-500">{errors.size.message}</p>
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="color">Colors (comma-separated)</Label>
-              <Input
-                id="color"
-                placeholder="red, blue, green"
-                {...register('color')}
-                error={errors.color?.message}
-              />
+            <div className="space-y-2 col-span-2">
+              <Label>Colors</Label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {COMMON_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    type="button"
+                    onClick={() => handleColorChange(color)}
+                    className={cn(
+                      "px-3 py-1 rounded-full text-sm font-medium",
+                      "border transition-colors",
+                      selectedColors.includes(color)
+                        ? "bg-primary text-white border-primary"
+                        : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                    )}
+                  >
+                    {color}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add custom color"
+                  value={customColor}
+                  onChange={(e) => setCustomColor(e.target.value)}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onClick={handleCustomColorAdd}
+                  disabled={!customColor}
+                  variant="outline"
+                >
+                  Add Color
+                </Button>
+              </div>
               {errors.color && (
                 <p className="text-sm text-red-500">{errors.color.message}</p>
               )}
@@ -238,10 +386,10 @@ const AddProduct = () => {
               <Input
                 id="discount"
                 type="number"
-                placeholder="0"
                 min="0"
                 max="100"
-                {...register('discount')}
+                placeholder="0"
+                {...register('discount', { valueAsNumber: true })}
                 error={errors.discount?.message}
               />
               {errors.discount && (
@@ -254,7 +402,7 @@ const AddProduct = () => {
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Product description"
+              placeholder="Lightweight running shoes with breathable mesh and cushioned sole"
               className="h-32"
               {...register('description')}
               error={errors.description?.message}
@@ -262,6 +410,16 @@ const AddProduct = () => {
             {errors.description && (
               <p className="text-sm text-red-500">{errors.description.message}</p>
             )}
+          </div>
+
+          <div className="flex items-center gap-2 mb-6">
+            <input
+              type="checkbox"
+              id="inStock"
+              className="form-checkbox h-5 w-5 text-primary rounded border-gray-300"
+              {...register('inStock')}
+            />
+            <Label htmlFor="inStock">In Stock</Label>
           </div>
 
           <div className="flex justify-end">

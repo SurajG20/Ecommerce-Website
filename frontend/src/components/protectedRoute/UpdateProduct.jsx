@@ -13,11 +13,15 @@ import {
 } from "firebase/storage";
 import app from "../../firebase";
 import { productSchema } from "../../schemas/product";
-import { updateProduct, fetchProducts } from "../../redux/features/productSlice";
+import { updateProduct, fetchSingleProduct } from "../../redux/features/productSlice";
 import Footer from "../Footer";
 import Announcements from "../Announcement";
 import Navbar from "../Navbar";
 import { cn } from "../../utils/cn";
+
+const VALID_CATEGORIES = ['clothes', 'women', 'men', 'shoes', 'electronics', 'others'];
+const COMMON_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'UK6', 'UK7', 'UK8', 'UK9', 'UK10', 'UK11'];
+const COMMON_COLORS = ['White', 'Black', 'Red', 'Blue', 'Green', 'Yellow', 'Brown', 'Gray', 'Navy', 'Pink'];
 
 const Input = ({ label, error, ...props }) => (
   <div className="mb-4">
@@ -35,54 +39,146 @@ const Input = ({ label, error, ...props }) => (
   </div>
 );
 
+const TextArea = ({ label, error, ...props }) => (
+  <div className="mb-4">
+    <label className="text-gray-700 font-semibold block mb-2">{label}</label>
+    <textarea
+      className={cn(
+        "w-full p-2 border rounded-md min-h-[100px]",
+        "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
+        "transition-all duration-200",
+        error && "border-red-500"
+      )}
+      {...props}
+    />
+    {error && <p className="mt-1 text-sm text-red-500">{error}</p>}
+  </div>
+);
+
 export default function UpdateProduct() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const productId = location.pathname.split("/")[3];
-  const { products, isLoading } = useSelector((state) => state.products);
-  const product = products?.find((p) => p._id === productId);
+  const { selectedProduct, isLoading } = useSelector((state) => state.products);
 
   const [file, setFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [uploadedImageUrl, setUploadedImageUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedSizes, setSelectedSizes] = useState([]);
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [customSize, setCustomSize] = useState('');
+  const [customColor, setCustomColor] = useState('');
 
   const {
     register,
     handleSubmit,
     formState: { errors },
     reset,
+    setValue
   } = useForm({
     resolver: zodResolver(productSchema),
+    defaultValues: {
+      title: '',
+      description: '',
+      price: 0,
+      discount: 0,
+      inStock: true,
+      category: [],
+      size: [],
+      color: []
+    }
   });
 
   useEffect(() => {
-    if (!products?.length) {
-      dispatch(fetchProducts());
+    if (productId) {
+      dispatch(fetchSingleProduct(productId));
     }
-  }, [dispatch, products]);
+  }, [dispatch, productId]);
 
   useEffect(() => {
-    if (product) {
-      reset({
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        discount: product.discount,
-        category: product.category?.join(", "),
-        size: product.size?.join(", "),
-        color: product.color?.join(", "),
-      });
-      setPreviewImage(product.image);
+    if (selectedProduct) {
+      const defaultValues = {
+        title: selectedProduct.title,
+        description: selectedProduct.description,
+        price: selectedProduct.price,
+        discount: selectedProduct.discount || 0,
+        inStock: selectedProduct.inStock ?? true,
+        category: selectedProduct.category || [],
+        size: selectedProduct.size || [],
+        color: selectedProduct.color || []
+      };
+      reset(defaultValues);
+
+      setPreviewImage(selectedProduct.image);
+      setSelectedCategories(selectedProduct.category || []);
+      setSelectedSizes(selectedProduct.size || []);
+      setSelectedColors(selectedProduct.color || []);
     }
-  }, [product, reset]);
+  }, [selectedProduct, reset]);
+
+  useEffect(() => {
+    setValue('category', selectedCategories);
+    setValue('size', selectedSizes);
+    setValue('color', selectedColors);
+  }, [selectedCategories, selectedSizes, selectedColors, setValue]);
+
+  const handleCategoryChange = (category) => {
+    const updatedCategories = selectedCategories.includes(category)
+      ? selectedCategories.filter(c => c !== category)
+      : [...selectedCategories, category];
+    setSelectedCategories(updatedCategories);
+    setValue('category', updatedCategories);
+  };
+
+  const handleSizeChange = (size) => {
+    const updatedSizes = selectedSizes.includes(size)
+      ? selectedSizes.filter(s => s !== size)
+      : [...selectedSizes, size];
+    setSelectedSizes(updatedSizes);
+    setValue('size', updatedSizes);
+  };
+
+  const handleColorChange = (color) => {
+    const updatedColors = selectedColors.includes(color)
+      ? selectedColors.filter(c => c !== color)
+      : [...selectedColors, color];
+    setSelectedColors(updatedColors);
+    setValue('color', updatedColors);
+  };
+
+  const handleCustomSizeAdd = (e) => {
+    e.preventDefault();
+    if (customSize && !selectedSizes.includes(customSize)) {
+      const updatedSizes = [...selectedSizes, customSize];
+      setSelectedSizes(updatedSizes);
+      setValue('size', updatedSizes);
+      setCustomSize('');
+    }
+  };
+
+  const handleCustomColorAdd = (e) => {
+    e.preventDefault();
+    if (customColor && !selectedColors.includes(customColor)) {
+      const updatedColors = [...selectedColors, customColor];
+      setSelectedColors(updatedColors);
+      setValue('color', updatedColors);
+      setCustomColor('');
+    }
+  };
 
   const handleFileChange = (e) => {
     const selectedFile = e.target.files[0];
     if (selectedFile) {
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage);
+      }
       setFile(selectedFile);
-      setPreviewImage(URL.createObjectURL(selectedFile));
+      const previewUrl = URL.createObjectURL(selectedFile);
+      setPreviewImage(previewUrl);
     }
   };
 
@@ -94,6 +190,7 @@ export default function UpdateProduct() {
     }
 
     setIsUploading(true);
+    setUploadProgress(0);
     const fileName = new Date().getTime() + file.name;
     const storage = getStorage(app);
     const storageRef = ref(storage, fileName);
@@ -104,48 +201,88 @@ export default function UpdateProduct() {
       uploadTask.on(
         "state_changed",
         (snapshot) => {
-          const progress =
-            (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          toast.info(`Upload is ${Math.round(progress)}% done`);
+          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+          setUploadProgress(Math.round(progress));
         },
         (uploadError) => {
           toast.error("Upload failed: " + uploadError.message);
           setIsUploading(false);
+          setUploadProgress(0);
         },
         async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setUploadedImageUrl(downloadURL);
-          toast.success("Image uploaded successfully!");
-          setIsUploading(false);
+          try {
+            const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
+            setUploadedImageUrl(downloadURL);
+            setPreviewImage(downloadURL);
+            toast.success("Image uploaded successfully!");
+          } catch (error) {
+            toast.error("Failed to get download URL: " + error.message);
+          } finally {
+            setIsUploading(false);
+            setUploadProgress(0);
+          }
         }
       );
     } catch (error) {
       toast.error("Upload failed: " + error.message);
       setIsUploading(false);
+      setUploadProgress(0);
     }
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = handleSubmit(async (data) => {
     try {
+      if (selectedCategories.length === 0) {
+        toast.error('Please select at least one category');
+        return;
+      }
+
+      if (selectedSizes.length === 0) {
+        toast.error('Please select at least one size');
+        return;
+      }
+
+      if (selectedColors.length === 0) {
+        toast.error('Please select at least one color');
+        return;
+      }
+
       const updatedProduct = {
         ...data,
-        image: uploadedImageUrl || product.image,
-        price: Number(data.price),
-        discount: Number(data.discount),
-        category: data.category.split(",").map((cat) => cat.trim()),
-        size: data.size.split(",").map((s) => s.trim()),
-        color: data.color.split(",").map((c) => c.trim()),
+        image: uploadedImageUrl || selectedProduct.image,
+        price: parseFloat(data.price),
+        discount: parseInt(data.discount) || 0,
+        category: selectedCategories,
+        size: selectedSizes,
+        color: selectedColors,
+        inStock: Boolean(data.inStock)
       };
 
-      await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
-      toast.success("Product updated successfully!");
-      navigate("/admin");
+      console.log('Submitting product:', updatedProduct);
+
+      const result = await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
+
+      if (result) {
+        toast.success("Product updated successfully!");
+        navigate("/admin");
+      } else {
+        toast.error("Failed to update product");
+      }
     } catch (error) {
+      console.error('Update error:', error);
       toast.error(error.message || "Failed to update product");
     }
-  };
+  });
 
-  if (isLoading || !product) {
+  useEffect(() => {
+    return () => {
+      if (previewImage && previewImage.startsWith('blob:')) {
+        URL.revokeObjectURL(previewImage);
+      }
+    };
+  }, [previewImage]);
+
+  if (isLoading || !selectedProduct) {
     return (
       <>
         <Announcements />
@@ -170,7 +307,9 @@ export default function UpdateProduct() {
           <div className="flex justify-between items-center mb-6">
             <h1 className="text-2xl font-bold">Update Product</h1>
             <Link to="/admin">
-              <button className="btn btn-outline">All Products</button>
+              <button className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+                All Products
+              </button>
             </Link>
           </div>
 
@@ -183,9 +322,9 @@ export default function UpdateProduct() {
               />
             </div>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="md:col-span-2 space-y-4">
+            <form onSubmit={onSubmit} className="md:col-span-2 space-y-4">
               <div className="flex items-center gap-4 mb-6">
-                <label className="btn btn-outline">
+                <label className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
                   <input
                     type="file"
                     className="hidden"
@@ -200,67 +339,176 @@ export default function UpdateProduct() {
                     onClick={handleUpload}
                     disabled={isUploading}
                     className={cn(
-                      "btn btn-primary",
+                      "px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 flex items-center",
                       isUploading && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <Upload className="w-4 h-4 mr-2" />
-                    {isUploading ? "Uploading..." : "Upload"}
+                    {isUploading ? (
+                      <>
+                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        <span>Uploading... {uploadProgress}%</span>
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        <span>Upload</span>
+                      </>
+                    )}
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <Input
                   label="Title"
                   type="text"
                   error={errors.title?.message}
                   {...register("title")}
                 />
-                <Input
+                <TextArea
                   label="Description"
-                  type="text"
                   error={errors.description?.message}
                   {...register("description")}
                 />
-                <Input
-                  label="Categories (comma-separated)"
-                  type="text"
-                  error={errors.category?.message}
-                  {...register("category")}
-                />
-                <Input
-                  label="Sizes (comma-separated)"
-                  type="text"
-                  error={errors.size?.message}
-                  {...register("size")}
-                />
-                <Input
-                  label="Colors (comma-separated)"
-                  type="text"
-                  error={errors.color?.message}
-                  {...register("color")}
-                />
-                <Input
-                  label="Price"
-                  type="number"
-                  error={errors.price?.message}
-                  {...register("price", { valueAsNumber: true })}
-                />
-                <Input
-                  label="Discount (%)"
-                  type="number"
-                  error={errors.discount?.message}
-                  {...register("discount", { valueAsNumber: true })}
-                />
+
+                <div className="space-y-2">
+                  <label className="text-gray-700 font-semibold block">Categories</label>
+                  <div className="flex flex-wrap gap-2">
+                    {VALID_CATEGORIES.map((category) => (
+                      <button
+                        key={category}
+                        type="button"
+                        onClick={() => handleCategoryChange(category)}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-sm font-medium capitalize",
+                          "border transition-colors",
+                          selectedCategories.includes(category)
+                            ? "bg-primary text-white border-primary"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                        )}
+                      >
+                        {category}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-gray-700 font-semibold block">Sizes</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {COMMON_SIZES.map((size) => (
+                      <button
+                        key={size}
+                        type="button"
+                        onClick={() => handleSizeChange(size)}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-sm font-medium",
+                          "border transition-colors",
+                          selectedSizes.includes(size)
+                            ? "bg-primary text-white border-primary"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                        )}
+                      >
+                        {size}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add custom size"
+                      value={customSize}
+                      onChange={(e) => setCustomSize(e.target.value)}
+                      className="flex-1 p-2 border rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCustomSizeAdd}
+                      disabled={!customSize}
+                      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      Add Size
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-gray-700 font-semibold block">Colors</label>
+                  <div className="flex flex-wrap gap-2 mb-2">
+                    {COMMON_COLORS.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        onClick={() => handleColorChange(color)}
+                        className={cn(
+                          "px-3 py-1 rounded-full text-sm font-medium",
+                          "border transition-colors",
+                          selectedColors.includes(color)
+                            ? "bg-primary text-white border-primary"
+                            : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                        )}
+                      >
+                        {color}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Add custom color"
+                      value={customColor}
+                      onChange={(e) => setCustomColor(e.target.value)}
+                      className="flex-1 p-2 border rounded-md"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleCustomColorAdd}
+                      disabled={!customColor}
+                      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      Add Color
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Input
+                    label="Price"
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    error={errors.price?.message}
+                    {...register("price", { valueAsNumber: true })}
+                  />
+                  <Input
+                    label="Discount (%)"
+                    type="number"
+                    min="0"
+                    max="100"
+                    error={errors.discount?.message}
+                    {...register("discount", { valueAsNumber: true })}
+                  />
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="inStock"
+                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+                    {...register("inStock")}
+                  />
+                  <label htmlFor="inStock" className="text-gray-700 font-semibold">
+                    In Stock
+                  </label>
+                </div>
               </div>
 
-              <div className="flex justify-center mt-6">
+              <div className="flex justify-end mt-6">
                 <button
                   type="submit"
                   disabled={isLoading || isUploading}
                   className={cn(
-                    "btn btn-primary px-8",
+                    "px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90",
                     (isLoading || isUploading) && "opacity-50 cursor-not-allowed"
                   )}
                 >
