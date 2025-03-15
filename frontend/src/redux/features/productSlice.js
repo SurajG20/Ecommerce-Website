@@ -5,6 +5,7 @@ import ApiClass from "../../utils/api";
 const initialState = {
   products: [],
   isLoading: false,
+  isDeleting: false,
   error: null,
   selectedProduct: null,
   totalProducts: 0,
@@ -21,7 +22,6 @@ export const fetchProducts = createAsyncThunk(
         : `/products?page=${page}&limit=${limit}`;
       const response = await ApiClass.getRequest(url);
 
-      // Handle the correct response structure
       return {
         products: response.data.products || [],
         totalProducts: response.data.totalProducts || 0,
@@ -105,7 +105,6 @@ const productSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Products
       .addCase(fetchProducts.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -122,7 +121,6 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Create Product
       .addCase(createProduct.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -137,7 +135,6 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Update Product
       .addCase(updateProduct.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -154,22 +151,20 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
       })
-      // Delete Product
       .addCase(deleteProduct.pending, (state) => {
-        state.isLoading = true;
+        state.isDeleting = true;
         state.error = null;
       })
       .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.isDeleting = false;
         state.products = state.products.filter((p) => p._id !== action.payload);
         state.totalProducts -= 1;
         state.error = null;
       })
       .addCase(deleteProduct.rejected, (state, action) => {
-        state.isLoading = false;
+        state.isDeleting = false;
         state.error = action.payload;
       })
-      // Fetch Single Product
       .addCase(fetchSingleProduct.pending, (state) => {
         state.isLoading = true;
         state.error = null;

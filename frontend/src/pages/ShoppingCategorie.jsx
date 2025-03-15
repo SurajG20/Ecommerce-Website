@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
 
 import Products from "../components/Products";
-import Title from "../components/Title";
 import Layout from "../components/Layout";
 
 const ShoppingCategorie = () => {
@@ -9,7 +8,7 @@ const ShoppingCategorie = () => {
 
   return (
     <Layout>
-      <Title>{`${category.charAt(0).toUpperCase()}${category.slice(1)}`}</Title>
+      <h1 className='p-8 font-bold text-4xl'>{`${category.charAt(0).toUpperCase()}${category.slice(1)}`}</h1>
       <Products category={category} />
     </Layout>
   );

@@ -1,34 +1,40 @@
 import { Link } from 'react-router-dom';
-import { Facebook, Twitter, Linkedin } from 'lucide-react';
+import { Facebook, Twitter, Instagram } from 'lucide-react';
 import { Separator } from './ui/separator';
 
-const footerLinks = [
-  { label: 'Home', path: '/' },
-  { label: 'Products', path: '/products' },
-  { label: 'Categories', path: '/categories' },
-  { label: 'About', path: '/about' },
-  { label: 'Contact', path: '/contact' },
-  { label: 'FAQ', path: '/faq' },
-  { label: 'Terms', path: '/terms' },
-  { label: 'Privacy', path: '/privacy' },
-];
+const footerLinks = {
+  shop: [
+    { label: 'Products', path: '/products' },
+    { label: 'Categories', path: '/categories' },
+    { label: 'Orders', path: '/orders' },
+  ],
+  support: [
+    { label: 'Contact Us', path: '/contact' },
+    { label: 'FAQ', path: '/faq' },
+  ],
+  legal: [
+    { label: 'Terms & Conditions', path: '/terms' },
+    { label: 'Privacy Policy', path: '/privacy' },
+  ],
+};
 
 const socialLinks = [
   { Icon: Facebook, label: 'Facebook', url: '#' },
   { Icon: Twitter, label: 'Twitter', url: '#' },
-  { Icon: Linkedin, label: 'LinkedIn', url: '#' },
+  { Icon: Instagram, label: 'Instagram', url: '#' },
 ];
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-muted/40 py-6">
+    <footer className="w-full bg-muted/40 py-8">
       <div className="container">
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex items-center gap-4">
-
+        <div className="flex flex-col gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="flex flex-col gap-4">
+              <h3 className="font-semibold">Bazaar</h3>
               <div className="flex gap-3">
                 {socialLinks.map(({ Icon, label, url }) => (
                   <a
@@ -45,18 +51,53 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Links */}
-            <nav className="flex flex-wrap justify-center gap-x-4 gap-y-2">
-              {footerLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
+            {/* Shop Links */}
+            <div>
+              <h3 className="font-semibold mb-4">Shop</h3>
+              <nav className="flex flex-col gap-2">
+                {footerLinks.shop.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            {/* Support Links */}
+            <div>
+              <h3 className="font-semibold mb-4">Support</h3>
+              <nav className="flex flex-col gap-2">
+                {footerLinks.support.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+
+            {/* Legal Links */}
+            <div>
+              <h3 className="font-semibold mb-4">Legal</h3>
+              <nav className="flex flex-col gap-2">
+                {footerLinks.legal.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
           </div>
 
           <Separator />

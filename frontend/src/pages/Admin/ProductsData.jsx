@@ -9,14 +9,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../ui/table";
-import { Button } from "../ui/button";
+} from "../../components/ui/table";
+import { Button } from "../../components/ui/button";
 import { Pencil, Trash2, Loader2, AlertCircle, Package2, ChevronLeft, ChevronRight } from "lucide-react";
 import { fetchProducts, deleteProduct } from "../../redux/features/productSlice";
 
 const ProductsData = () => {
   const dispatch = useDispatch();
-  const { products, isLoading, error, totalPages, currentPage } = useSelector((state) => state.products);
+  const { products,  error, totalPages, currentPage, isDeleting, isLoading } = useSelector((state) => state.products);
   const [page, setPage] = useState(currentPage);
   const productsPerPage = 10;
 
@@ -149,6 +149,7 @@ const ProductsData = () => {
                       size="icon"
                       onClick={() => handleDelete(product.id)}
                       className="h-8 w-8 border-destructive/20 hover:border-destructive hover:bg-destructive/5"
+                      disabled={isDeleting}
                     >
                       <Trash2 className="h-4 w-4 text-destructive" />
                     </Button>

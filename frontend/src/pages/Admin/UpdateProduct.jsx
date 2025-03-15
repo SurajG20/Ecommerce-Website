@@ -14,9 +14,6 @@ import {
 import app from "../../firebase";
 import { productSchema } from "../../schemas/product";
 import { updateProduct, fetchSingleProduct } from "../../redux/features/productSlice";
-import Footer from "../Footer";
-import Announcements from "../Announcement";
-import Navbar from "../Navbar";
 import { cn } from "../../utils/cn";
 
 const VALID_CATEGORIES = ['clothes', 'women', 'men', 'shoes', 'electronics', 'others'];
@@ -258,8 +255,6 @@ export default function UpdateProduct() {
         inStock: Boolean(data.inStock)
       };
 
-      console.log('Submitting product:', updatedProduct);
-
       const result = await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
 
       if (result) {
@@ -285,23 +280,17 @@ export default function UpdateProduct() {
   if (isLoading || !selectedProduct) {
     return (
       <>
-        <Announcements />
-        <Navbar />
         <div className="min-h-screen bg-background flex items-center justify-center">
           <div className="flex flex-col items-center gap-4">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
             <p className="text-muted-foreground">Loading product details...</p>
           </div>
         </div>
-        <Footer />
       </>
     );
   }
 
   return (
-    <>
-      <Announcements />
-      <Navbar />
       <div className="container mx-auto py-8">
         <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-6">
           <div className="flex justify-between items-center mb-6">
@@ -519,7 +508,5 @@ export default function UpdateProduct() {
           </div>
         </div>
       </div>
-      <Footer />
-    </>
   );
 }
