@@ -82,7 +82,7 @@ const Products = ({ category }) => {
       {/* Products Grid */}
       <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 px-4 sm:px-6 lg:px-8">
         {products.map((product) => (
-          <Product key={product._id} product={product} />
+          <Product key={product.id} product={product} />
         ))}
       </section>
 

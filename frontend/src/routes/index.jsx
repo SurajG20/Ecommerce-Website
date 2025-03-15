@@ -18,6 +18,10 @@ import Categories from '../pages/Categories';
 import ProductsData from '../pages/Admin/ProductsData';
 import AddProduct from '../pages/Admin/AddProduct';
 import AdminLayout from '../components/AdminLayout';
+import ContactUs from '../pages/ContactUs';
+import FAQ from '../pages/FAQ';
+import TermsOfService from '../pages/TermsOfService';
+import PrivacyPage from '../pages/Privacy';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useSelector((store) => store.auth);
@@ -68,6 +72,22 @@ export const publicRoutes = [
   {
     path: '/cart',
     element: <ShoppingCart />,
+  },
+  {
+    path: '/contact',
+    element: <ContactUs />,
+  },
+  {
+    path: '/faq',
+    element: <FAQ />,
+  },
+  {
+    path: '/terms',
+    element: <TermsOfService />,
+  },
+  {
+    path: '/privacy',
+    element: <PrivacyPage />,
   },
 ];
 

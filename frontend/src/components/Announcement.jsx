@@ -5,17 +5,14 @@ const Announcement = () => {
     {
       text: "Super Deal! Free Shipping on Orders Over $50",
       bgColor: "bg-teal-700",
-      link: "/shipping",
     },
     {
       text: "Limited Time Offer: 20% Off All Products",
       bgColor: "bg-blue-500",
-      link: "/deals",
     },
     {
       text: "New Arrivals: Check Out Our Latest Collection",
       bgColor: "bg-yellow-500",
-      link: "/new-arrivals",
     },
   ];
 
@@ -43,12 +40,11 @@ const Announcement = () => {
       <div className="container mx-auto px-4 py-2">
         <div className="flex items-center justify-center gap-4">
           {/* Announcement Text */}
-          <a
-            href={announcements[currentAnnouncement].link}
+          <span
             className="text-center text-white font-medium hover:underline transition-all duration-300"
           >
             {announcements[currentAnnouncement].text}
-          </a>
+          </span>
         </div>
       </div>
     </div>
