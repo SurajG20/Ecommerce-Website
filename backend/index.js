@@ -8,6 +8,7 @@ import { connectDB } from './config/database.js';
 import errorHandler from './middlewares/error-handler.js';
 import notFoundMiddleware from './middlewares/not-found.js';
 import { initModels } from './models/associations.js';
+import { runSeeders } from './models/seeders.js';
 import mainRoutes from './routes/main.routes.js';
 
 dotenv.config();
@@ -51,7 +52,10 @@ const port = process.env.PORT || 5000;
 const startServer = async () => {
   try {
     await connectDB();
+
     initModels();
+    await runSeeders();
+
     app.listen(port, () => {
       console.log(`Server is running on port ${port}`);
     });
