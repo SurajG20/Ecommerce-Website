@@ -85,111 +85,113 @@ export const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center">
-        {/* Mobile Menu */}
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
-          <SheetTrigger asChild>
-            <Button variant="ghost" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden">
-              <Menu className="h-6 w-6" />
-              <span className="sr-only">Toggle menu</span>
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[300px] sm:w-[400px]">
-            <SheetHeader>
-              <SheetTitle>Menu</SheetTitle>
-            </SheetHeader>
-            <div className="flex flex-col gap-4 mt-6">
-              <div className="px-2">
-                <Link to="/" className="flex items-center" onClick={() => setIsOpen(false)}>
-                  <span className="font-bold text-xl">BAZAAR</span>
-                </Link>
-              </div>
-              <nav className="flex flex-col gap-2">
-                {mainNav.map((item) => (
-                  <SheetClose asChild key={item.path}>
-                    <Link
-                      to={item.path}
-                      className="px-2 py-1 text-foreground/60 transition-colors hover:text-foreground"
-                      onClick={() => setIsOpen(false)}
-                    >
-                      {item.label}
-                    </Link>
-                  </SheetClose>
-                ))}
-              </nav>
-              <div className="grid gap-4 mt-4">
-                {!user ? (
-                  <>
-                    <SheetClose asChild>
-                      <Link to="/register">
-                        <Button variant="outline" className="w-full justify-start">
-                          Register
-                        </Button>
-                      </Link>
-                    </SheetClose>
-                    <SheetClose asChild>
-                      <Link to="/login">
-                        <Button className="w-full justify-start">Sign In</Button>
-                      </Link>
-                    </SheetClose>
-                  </>
-                ) : (
-                  <div className="grid gap-4">
-                    <div className="flex items-center gap-2 px-2">
-                      <User className="h-4 w-4" />
-                      <span className="font-medium">{user.name}</span>
-                    </div>
-                    <SheetClose asChild>
-                      <Link to="/orders">
-                        <Button variant="outline" className="w-full justify-start">
-                          My Orders
-                        </Button>
-                      </Link>
-                    </SheetClose>
-                          {user.role === 'admin' && (
-                      <Button
-                        variant="outline"
-                        className="justify-start"
-                        onClick={handleAdmin}
+      <div className="container flex h-16 items-center justify-between">
+        <div className="flex items-center">
+          {/* Mobile Menu */}
+          <Sheet open={isOpen} onOpenChange={setIsOpen}>
+            <SheetTrigger asChild>
+              <Button variant="ghost" className="mr-2 px-0 text-base hover:bg-transparent focus-visible:bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 lg:hidden">
+                <Menu className="h-6 w-6" />
+                <span className="sr-only">Toggle menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[300px] sm:w-[400px]">
+              <SheetHeader>
+                <SheetTitle>Menu</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-6 py-6">
+                <div className="px-4">
+                  <Link to="/" className="flex items-center" onClick={() => setIsOpen(false)}>
+                    <span className="font-bold text-xl">BAZAAR</span>
+                  </Link>
+                </div>
+                <nav className="flex flex-col">
+                  {mainNav.map((item) => (
+                    <SheetClose asChild key={item.path}>
+                      <Link
+                        to={item.path}
+                        className="px-4 py-2 text-sm text-foreground/60 transition-colors hover:text-foreground hover:bg-muted"
+                        onClick={() => setIsOpen(false)}
                       >
-                        Admin Panel
+                        {item.label}
+                      </Link>
+                    </SheetClose>
+                  ))}
+                </nav>
+                <div className="px-4 pt-4 border-t">
+                  {!user ? (
+                    <div className="flex flex-col gap-3">
+                      <SheetClose asChild>
+                        <Link to="/register">
+                          <Button variant="outline" className="w-full justify-center">
+                            Register
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                      <SheetClose asChild>
+                        <Link to="/login">
+                          <Button className="w-full justify-center">Sign In</Button>
+                        </Link>
+                      </SheetClose>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-3">
+                      <div className="flex items-center gap-2 py-2 mb-2 border-b">
+                        <User className="h-4 w-4" />
+                        <span className="font-medium">{user.name}</span>
+                      </div>
+                      <SheetClose asChild>
+                        <Link to="/orders">
+                          <Button variant="outline" className="w-full justify-center">
+                            My Orders
+                          </Button>
+                        </Link>
+                      </SheetClose>
+                      {user.role === 'admin' && (
+                        <Button
+                          variant="outline"
+                          className="w-full justify-center"
+                          onClick={handleAdmin}
+                        >
+                          Admin Panel
+                        </Button>
+                      )}
+                      <Button
+                        variant="destructive"
+                        className="w-full justify-center"
+                        onClick={() => {
+                          handleLogout();
+                          setIsOpen(false);
+                        }}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Logout
                       </Button>
-                    )}
-                    <Button
-                      variant="destructive"
-                      className="justify-start"
-                      onClick={() => {
-                        handleLogout();
-                        setIsOpen(false);
-                      }}
-                    >
-                      <LogOut className="h-4 w-4 mr-2" />
-                      Logout
-                    </Button>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          </SheetContent>
-        </Sheet>
+            </SheetContent>
+          </Sheet>
 
-        {/* Logo */}
-        <Link to="/" className="mr-6 flex items-center space-x-2">
-          <span className="font-bold text-xl">BAZAAR</span>
-        </Link>
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-2">
+            <span className="font-bold text-xl">BAZAAR</span>
+          </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden lg:flex lg:flex-1 lg:gap-6">
-          {mainNav.map((item) => (
-            <Link
-              key={item.path}
-              to={item.path}
-              className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+          {/* Desktop Nav */}
+          <nav className="hidden lg:flex lg:ml-6 lg:gap-6">
+            {mainNav.map((item) => (
+              <Link
+                key={item.path}
+                to={item.path}
+                className="text-sm font-medium text-foreground/60 transition-colors hover:text-foreground"
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
 
         {/* Right Side */}
         <div className="flex items-center gap-4">
