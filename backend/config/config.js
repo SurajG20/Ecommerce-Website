@@ -12,6 +12,8 @@ const Config = {
   PORT: env.PORT,
   JWT_SECRET: env.JWT_SECRET,
   JWT_LIFETIME: env.JWT_LIFETIME,
+  STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
+  STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
 };
 
 export default Object.freeze(Config);

@@ -9,7 +9,8 @@ const router = express.Router();
 
 router.use('/auth', authRoutes);
 router.use('/products', maintenanceMode, productRoutes);
-router.use('/checkout', maintenanceMode, stripeRoutes);
+router.use('/stripe/webhook', stripeRoutes);
+router.use('/stripe', maintenanceMode, stripeRoutes);
 router.use('/admin', adminRoutes);
 
 export default router;

@@ -8,12 +8,12 @@ import { useState } from 'react';
 import { AlertCircle, ArrowLeft, ShoppingBag, Trash2, CreditCard, X } from 'lucide-react';
 import Layout from '../components/Layout';
 import { toast } from 'sonner';
+import config from '../config/config';
 
-// Initialize Stripe outside component to avoid recreating it on every render
 let stripePromise;
 const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+    stripePromise = loadStripe(config.stripePublicKey);
   }
   return stripePromise;
 };
@@ -63,7 +63,6 @@ const ShoppingCart = () => {
     try {
       const stripe = await getStripe();
 
-      // Format products for the checkout session
       const lineItems = cart.products.map(product => ({
         price_data: {
           currency: 'inr',
@@ -77,37 +76,34 @@ const ShoppingCart = () => {
               color: product.color,
             },
           },
-          unit_amount: Math.round(product.price * 100), // Stripe expects amount in smallest currency unit (paise)
+          unit_amount: Math.round(product.price * 100),
         },
         quantity: product.quantity,
       }));
 
-      // Create checkout session
-      const response = await ApiClass.postRequest('/checkout/create-session', true, {
+      const response = await ApiClass.postRequest('/stripe/create-session', true, {
         line_items: lineItems,
         customer_email: user.email,
         metadata: {
           userId: user.id,
-          cartId: Date.now().toString(), // Unique identifier for this cart checkout
+          cartId: Date.now().toString(),
         },
-        success_url: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/cart`,
+        success_url: `${window.location.origin}/success`,
+        cancel_url: `${window.location.origin}/cancel`,
       });
 
       if (response.error) {
         throw new Error(response.error.message);
       }
 
-      // Redirect to Stripe checkout
       const result = await stripe.redirectToCheckout({
-        sessionId: response.sessionId,
+        sessionId: response.data.sessionId,
       });
 
       if (result.error) {
         throw new Error(result.error.message);
       }
 
-      // Clear cart on successful redirect
       dispatch(clearCart());
     } catch (error) {
       const errorMessage = error.message || 'An error occurred during checkout';
@@ -123,7 +119,6 @@ const ShoppingCart = () => {
     <Layout>
       <div className="min-h-screen bg-background">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          {/* Header */}
           <div className="mb-10">
             <h1 className="text-4xl font-bold text-center mb-6 text-foreground">Shopping Cart</h1>
             {showMsg && (
@@ -157,7 +152,6 @@ const ShoppingCart = () => {
             )}
           </div>
 
-          {/* Actions */}
           <div className="flex flex-col sm:flex-row justify-between gap-6 mb-10">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <button
@@ -193,9 +187,7 @@ const ShoppingCart = () => {
             </div>
           </div>
 
-          {/* Cart Content */}
           <div className="grid lg:grid-cols-3 gap-10">
-            {/* Products List */}
             <div className="lg:col-span-2">
               {cart.products.length === 0 ? (
                 <div className="text-center py-16 bg-card rounded-lg border shadow-sm">
@@ -224,7 +216,6 @@ const ShoppingCart = () => {
               )}
             </div>
 
-            {/* Order Summary */}
             <div className="lg:col-span-1">
               <div className="bg-card rounded-lg shadow-sm border p-8 sticky top-8">
                 <h2 className="text-2xl font-semibold mb-6 text-card-foreground">Order Summary</h2>

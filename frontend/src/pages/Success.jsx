@@ -1,25 +1,36 @@
-import { Link } from "react-router-dom";
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { clearCart } from '../redux/features/cartSlice';
+import { Button } from '../components/ui/button';
+import { CheckCircle2 } from 'lucide-react';
+import Layout from '../components/Layout';
 
 const Success = () => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(clearCart());
+  }, [dispatch]);
+
   return (
-    <div
-      style={{
-        background:
-          'linear-gradient(rgba(255,255,255,0.5), rgba(255,255,255,0.5)), url("https://images.pexels.com/photos/6984650/pexels-photo-6984650.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940") center',
-      }}
-      className="flex justify-center items-center h-screen "
-    >
-      <div className="shadow-lg border rounded-2xl p-8 flex flex-col items-center space-y-6 justify-center w-[300px] h-[450px] bg-gray-50 ">
-        <p className="text-lg text-center ">
-          Hooray! Your Payment was successful.
+    <Layout>
+      <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-center p-4">
+        <CheckCircle2 className="w-16 h-16 text-green-500" />
+        <h1 className="text-2xl font-bold">Payment Successful!</h1>
+        <p className="text-gray-600 max-w-md">
+          Thank you for your purchase! Your order has been confirmed and will be processed shortly.
         </p>
-        <Link to="/">
-          <button className="bg-green-700 text-white px-3 py-2 transform transition duration-500 ease-in-out hover:scale-110 rounded-lg font-medium ">
-            Continue Shopping
-          </button>
-        </Link>
+        <div className="flex gap-4 mt-4">
+          <Button asChild>
+            <Link to="/orders">View Orders</Link>
+          </Button>
+          <Button variant="outline" asChild>
+            <Link to="/products">Continue Shopping</Link>
+          </Button>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 
