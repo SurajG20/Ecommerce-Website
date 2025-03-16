@@ -15,6 +15,8 @@ const initialState = {
   totalUsers: 0,
   currentUserPage: 1,
   totalUserPages: 1,
+  maintenanceMode: false,
+  isMaintenanceLoading: false,
 };
 
 export const fetchAdminProducts = createAsyncThunk(
@@ -128,6 +130,38 @@ export const updateUserStatus = createAsyncThunk(
       return rejectWithValue(response.message || "Failed to update user status");
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Failed to update user status");
+    }
+  }
+);
+
+export const getMaintenanceMode = createAsyncThunk(
+  "admin/getMaintenanceMode",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await ApiClass.getRequest("/admin/maintenance", true);
+      if (response.success) {
+        return response.data.enabled;
+      }
+      return rejectWithValue(response.message || "Failed to fetch maintenance mode status");
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch maintenance mode status");
+    }
+  }
+);
+
+export const toggleMaintenanceMode = createAsyncThunk(
+  "admin/toggleMaintenanceMode",
+  async (enabled, { rejectWithValue }) => {
+    try {
+      const response = await ApiClass.putRequest("/admin/maintenance", true, { enabled });
+      if (response.success) {
+        toast.success(`Maintenance mode ${enabled ? 'enabled' : 'disabled'} successfully`);
+        return response.data.maintenanceMode;
+      }
+      return rejectWithValue(response.message || "Failed to update maintenance mode");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update maintenance mode");
+      return rejectWithValue(error.response?.data?.message || "Failed to update maintenance mode");
     }
   }
 );
@@ -252,6 +286,32 @@ const adminSlice = createSlice({
       })
       .addCase(updateUserStatus.rejected, (state, action) => {
         state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(getMaintenanceMode.pending, (state) => {
+        state.isMaintenanceLoading = true;
+        state.error = null;
+      })
+      .addCase(getMaintenanceMode.fulfilled, (state, action) => {
+        state.isMaintenanceLoading = false;
+        state.maintenanceMode = action.payload;
+        state.error = null;
+      })
+      .addCase(getMaintenanceMode.rejected, (state, action) => {
+        state.isMaintenanceLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(toggleMaintenanceMode.pending, (state) => {
+        state.isMaintenanceLoading = true;
+        state.error = null;
+      })
+      .addCase(toggleMaintenanceMode.fulfilled, (state, action) => {
+        state.isMaintenanceLoading = false;
+        state.maintenanceMode = action.payload;
+        state.error = null;
+      })
+      .addCase(toggleMaintenanceMode.rejected, (state, action) => {
+        state.isMaintenanceLoading = false;
         state.error = action.payload;
       });
   },

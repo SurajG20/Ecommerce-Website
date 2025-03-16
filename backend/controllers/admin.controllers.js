@@ -1,6 +1,11 @@
 import { AdminService } from '../services/admin.service.js';
+import { MaintenanceService } from '../services/maintenance.services.js';
 import responseHandler from '../utils/responseHandler.js';
-import { getUsersQuerySchema, updateUserStatusSchema } from '../validations/admin.validation.js';
+import {
+  getUsersQuerySchema,
+  toggleMaintenanceModeSchema,
+  updateUserStatusSchema,
+} from '../validations/admin.validation.js';
 
 export class AdminController {
   static async getAllUsers(req, res) {
@@ -54,6 +59,34 @@ export class AdminController {
     } catch (error) {
       console.log(error);
       return responseHandler.error(res)('Error updating user status');
+    }
+  }
+
+  static async toggleMaintenanceMode(req, res) {
+    try {
+      const { error, value } = toggleMaintenanceModeSchema.validate(req.body);
+      if (error) {
+        return responseHandler.badRequest(res)(error.details[0].message);
+      }
+
+      const setting = await MaintenanceService.toggleMaintenanceMode(value.enabled, req.user.id);
+      return responseHandler.success(res)(`Maintenance mode ${value.enabled ? 'enabled' : 'disabled'} successfully`, {
+        maintenanceMode: setting.value,
+      });
+    } catch (error) {
+      return responseHandler.error(res)('Error toggling maintenance mode');
+    }
+  }
+
+  static async getMaintenanceMode(req, res) {
+    try {
+      const enabled = await MaintenanceService.getMaintenanceMode();
+      return responseHandler.success(res)('Maintenance mode status fetched successfully', {
+        enabled,
+      });
+    } catch (error) {
+      console.error(error);
+      return responseHandler.error(res)('Error fetching maintenance mode status');
     }
   }
 }

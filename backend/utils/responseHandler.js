@@ -78,6 +78,16 @@ class ResponseHandler {
       });
     };
   }
+
+  static maintenance(res) {
+    return (message, data = null) => {
+      return res.status(503).json({
+        success: false,
+        message,
+        data,
+      });
+    };
+  }
 }
 
 export default ResponseHandler;

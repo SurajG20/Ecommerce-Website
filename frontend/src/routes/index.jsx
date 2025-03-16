@@ -24,6 +24,7 @@ import TermsOfService from '../pages/TermsOfService';
 import PrivacyPage from '../pages/Privacy';
 import Users from '../pages/Admin/Users';
 import Settings from '../pages/Admin/Settings';
+import Maintenance from '../pages/Maintenance';
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useSelector((store) => store.auth);
   const location = useLocation();
@@ -89,6 +90,10 @@ export const publicRoutes = [
   {
     path: '/privacy',
     element: <PrivacyPage />,
+  },
+  {
+    path: '/maintenance',
+    element: <Maintenance />,
   },
 ];
 

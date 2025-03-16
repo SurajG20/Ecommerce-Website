@@ -15,3 +15,10 @@ export const getUsersQuerySchema = Joi.object({
   sortOrder: Joi.string().valid('asc', 'desc').default('desc'),
   isBlocked: Joi.boolean(),
 });
+
+export const toggleMaintenanceModeSchema = Joi.object({
+  enabled: Joi.boolean().required().messages({
+    'boolean.base': 'Enabled must be a boolean value',
+    'any.required': 'Enabled status is required',
+  }),
+});

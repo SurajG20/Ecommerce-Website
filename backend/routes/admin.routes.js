@@ -20,4 +20,8 @@ router.get('/products/:id', ProductController.getProductById);
 router.put('/products/:id', ProductController.updateProduct);
 router.delete('/products/:id', ProductController.deleteProduct);
 
+// Maintenance Mode Routes
+router.get('/maintenance', AdminController.getMaintenanceMode);
+router.put('/maintenance', AdminController.toggleMaintenanceMode);
+
 export default router;
