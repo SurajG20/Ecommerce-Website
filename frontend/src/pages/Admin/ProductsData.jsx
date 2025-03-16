@@ -12,22 +12,22 @@ import {
 } from "../../components/ui/table";
 import { Button } from "../../components/ui/button";
 import { Pencil, Trash2, Loader2, AlertCircle, Package2, ChevronLeft, ChevronRight } from "lucide-react";
-import { fetchProducts, deleteProduct } from "../../redux/features/productSlice";
+import { fetchAdminProducts, deleteProduct } from "../../redux/features/adminSlice";
 
 const ProductsData = () => {
   const dispatch = useDispatch();
-  const { products,  error, totalPages, currentPage, isDeleting, isLoading } = useSelector((state) => state.products);
+  const { products,  error, totalPages, currentPage, isDeleting, isLoading } = useSelector((state) => state.admin);
   const [page, setPage] = useState(currentPage);
   const productsPerPage = 10;
 
   useEffect(() => {
-    dispatch(fetchProducts({ page, limit: productsPerPage }));
+    dispatch(fetchAdminProducts({ page, limit: productsPerPage }));
   }, [dispatch, page]);
 
   const handleDelete = async (id) => {
     try {
       await dispatch(deleteProduct(id)).unwrap();
-      dispatch(fetchProducts({ page, limit: productsPerPage }));
+      dispatch(fetchAdminProducts({ page, limit: productsPerPage }));
     } catch (error) {
       console.error("Failed to delete product:", error);
     }
@@ -60,7 +60,7 @@ const ProductsData = () => {
           </div>
           <Button
             variant="outline"
-            onClick={() => dispatch(fetchProducts({ page, limit: productsPerPage }))}
+            onClick={() => dispatch(fetchAdminProducts({ page, limit: productsPerPage }))}
             className="gap-2"
           >
             <Package2 className="h-4 w-4" />

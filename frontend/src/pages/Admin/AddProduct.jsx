@@ -5,7 +5,7 @@ import { Upload, ImagePlus, Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { productSchema } from '../../schemas/product';
-import { createProduct } from '../../redux/features/productSlice';
+import { createProduct } from '../../redux/features/adminSlice';
 import app from '../../firebase';
 import { Button } from '../../components/ui/button';
 import { Input } from '../../components/ui/input';
@@ -21,7 +21,7 @@ const COMMON_COLORS = ['White', 'Black', 'Red', 'Blue', 'Green', 'Yellow', 'Brow
 
 const AddProduct = () => {
   const dispatch = useDispatch();
-  const { isLoading } = useSelector((state) => state.products);
+    const { isLoading } = useSelector((state) => state.admin);
   const [file, setFile] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -43,11 +43,11 @@ const AddProduct = () => {
     defaultValues: {
       title: '',
       description: '',
-      price: '',
+      price: 0,
       discount: 0,
-      category: '',
-      size: '',
-      color: '',
+      category: [],
+      size: [],
+      color: [],
       inStock: true
     }
   });
@@ -58,7 +58,7 @@ const AddProduct = () => {
       : [...selectedCategories, category];
 
     setSelectedCategories(updatedCategories);
-    setValue('category', updatedCategories.join(', '));
+    setValue('category', updatedCategories);
   };
 
   const handleSizeChange = (size) => {
@@ -67,7 +67,7 @@ const AddProduct = () => {
       : [...selectedSizes, size];
 
     setSelectedSizes(updatedSizes);
-    setValue('size', updatedSizes.join(', '));
+    setValue('size', updatedSizes);
   };
 
   const handleColorChange = (color) => {
@@ -76,7 +76,7 @@ const AddProduct = () => {
       : [...selectedColors, color];
 
     setSelectedColors(updatedColors);
-    setValue('color', updatedColors.join(', '));
+    setValue('color', updatedColors);
   };
 
   const handleCustomSizeAdd = (e) => {
@@ -84,7 +84,7 @@ const AddProduct = () => {
     if (customSize && !selectedSizes.includes(customSize)) {
       const updatedSizes = [...selectedSizes, customSize];
       setSelectedSizes(updatedSizes);
-      setValue('size', updatedSizes.join(', '));
+      setValue('size', updatedSizes);
       setCustomSize('');
     }
   };
@@ -94,7 +94,7 @@ const AddProduct = () => {
     if (customColor && !selectedColors.includes(customColor)) {
       const updatedColors = [...selectedColors, customColor];
       setSelectedColors(updatedColors);
-      setValue('color', updatedColors.join(', '));
+      setValue('color', updatedColors);
       setCustomColor('');
     }
   };
@@ -173,13 +173,14 @@ const AddProduct = () => {
       }
 
       const productData = {
-        ...data,
+        title: data.title.trim(),
+        description: data.description.trim(),
         image: imageUrl,
-        price: parseFloat(data.price),
-        discount: parseInt(data.discount) || 0,
         category: selectedCategories,
         size: selectedSizes,
         color: selectedColors,
+        price: parseFloat(data.price),
+        discount: parseInt(data.discount) || 0,
         inStock: Boolean(data.inStock)
       };
 

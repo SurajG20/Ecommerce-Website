@@ -13,7 +13,7 @@ import {
 } from "firebase/storage";
 import app from "../../firebase";
 import { productSchema } from "../../schemas/product";
-import { updateProduct, fetchSingleProduct } from "../../redux/features/productSlice";
+import { updateProduct, fetchAdminProductDetails } from "../../redux/features/adminSlice";
 import { cn } from "../../utils/cn";
 
 const VALID_CATEGORIES = ['clothes', 'women', 'men', 'shoes', 'electronics', 'others'];
@@ -91,7 +91,7 @@ export default function UpdateProduct() {
 
   useEffect(() => {
     if (productId) {
-      dispatch(fetchSingleProduct(productId));
+      dispatch(fetchAdminProductDetails(productId));
     }
   }, [dispatch, productId]);
 
