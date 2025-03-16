@@ -12,7 +12,7 @@ router
 router
   .route('/:id')
   .get(ProductController.getProductById)
-  .patch(authenticateUser, authorizePermissions('admin'), ProductController.updateProduct)
+  .put(authenticateUser, authorizePermissions('admin'), ProductController.updateProduct)
   .delete(authenticateUser, authorizePermissions('admin'), ProductController.deleteProduct);
 
 export default router;

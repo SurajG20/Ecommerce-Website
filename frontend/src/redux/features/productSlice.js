@@ -39,8 +39,13 @@ export const createProduct = createAsyncThunk(
   async (productData, { rejectWithValue }) => {
     try {
       const response = await ApiClass.postRequest("/products", true, productData);
-      toast.success("Product created successfully!");
-      return response.data;
+      if (response.success) {
+        toast.success("Product created successfully!");
+        return response.data;
+      } else {
+        toast.error(response.message || "Failed to create product");
+        return rejectWithValue(response.message || "Failed to create product");
+      }
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to create product");
       return rejectWithValue(error.response?.data?.message || "Failed to create product");
@@ -53,8 +58,11 @@ export const updateProduct = createAsyncThunk(
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const response = await ApiClass.putRequest(`/products/${id}`, true, data);
-      toast.success("Product updated successfully!");
-      return response.data;
+      if (response.success) {
+        toast.success("Product updated successfully!");
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Failed to update product");
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update product");
       return rejectWithValue(error.response?.data?.message || "Failed to update product");

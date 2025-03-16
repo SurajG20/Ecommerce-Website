@@ -1,15 +1,18 @@
-import { LayoutDashboard, Package, PlusCircle, Settings, Users, LogOut } from 'lucide-react';
+import { LayoutDashboard, Package, PlusCircle, Settings, Users, LogOut, Menu } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { logoutUser } from '../redux/features/authSlice';
 import { toast } from 'sonner';
 import { Button } from './ui/button';
+import { useState } from 'react';
+import { cn } from '../lib/utils';
 
 const AdminLayout = ({ children }) => {
   const location = useLocation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [isCollapsed, setIsCollapsed] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -56,11 +59,41 @@ const AdminLayout = ({ children }) => {
   return (
     <div className="min-h-screen flex">
       {/* Sidebar */}
-      <div className="w-64 bg-card border-r border-border">
-        <div className="h-16 flex items-center px-6 border-b border-border">
-          <Link to="/" className="font-bold text-xl">BAZAAR</Link>
+      <div className={cn(
+        "bg-card border-r border-border transition-all duration-300",
+        isCollapsed ? "w-16" : "w-64"
+      )}>
+        <div className={cn(
+          "h-16 flex items-center border-b border-border",
+          isCollapsed ? "px-4 justify-center" : "px-6"
+        )}>
+          {isCollapsed ? (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="p-0"
+              onClick={() => setIsCollapsed(false)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          ) : (
+            <>
+              <Link to="/" className="font-bold text-xl">BAZAAR</Link>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="ml-auto"
+                onClick={() => setIsCollapsed(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            </>
+          )}
         </div>
-        <nav className="p-4 space-y-1">
+        <nav className={cn(
+          "p-4 space-y-1",
+          isCollapsed && "flex flex-col items-center"
+        )}>
           {navigationItems.map((item) => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -68,15 +101,17 @@ const AdminLayout = ({ children }) => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-colors group ${
+                className={cn(
+                  "flex items-center space-x-3 px-4 py-2.5 rounded-lg transition-colors group",
                   isActive
-                    ? 'bg-primary text-primary-foreground'
-                    : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'
-                }`}
+                    ? "bg-primary text-primary-foreground"
+                    : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
+                  isCollapsed && "px-2 justify-center"
+                )}
                 title={item.description}
               >
                 <Icon className="h-5 w-5 flex-shrink-0" />
-                <span className="text-sm font-medium">{item.name}</span>
+                {!isCollapsed && <span className="text-sm font-medium">{item.name}</span>}
               </Link>
             );
           })}
@@ -97,7 +132,7 @@ const AdminLayout = ({ children }) => {
               className="text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <LogOut className="h-4 w-4 mr-2" />
-              Logout
+              <span className="hidden sm:inline">Logout</span>
             </Button>
           </div>
         </header>

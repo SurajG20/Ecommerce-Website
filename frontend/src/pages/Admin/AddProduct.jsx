@@ -184,7 +184,6 @@ const AddProduct = () => {
       };
 
       await dispatch(createProduct(productData)).unwrap();
-      toast.success('Product created successfully!');
       reset();
       setFile(null);
       setPreviewImage(null);
@@ -192,7 +191,8 @@ const AddProduct = () => {
       setSelectedSizes([]);
       setSelectedColors([]);
     } catch (error) {
-      toast.error(error.message || 'Failed to create product');
+      console.log(error);
+      toast.error(error || 'Failed to create product');
     }
   };
 

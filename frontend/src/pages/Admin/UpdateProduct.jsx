@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -28,7 +28,7 @@ const Input = ({ label, error, ...props }) => (
         "w-full p-2 border rounded-md",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
         "transition-all duration-200",
-        error && "border-red-500"
+        error ? "border-red-500 ring-red-500" : "border-gray-300"
       )}
       {...props}
     />
@@ -44,7 +44,7 @@ const TextArea = ({ label, error, ...props }) => (
         "w-full p-2 border rounded-md min-h-[100px]",
         "focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent",
         "transition-all duration-200",
-        error && "border-red-500"
+        error ? "border-red-500 ring-red-500" : "border-gray-300"
       )}
       {...props}
     />
@@ -53,7 +53,6 @@ const TextArea = ({ label, error, ...props }) => (
 );
 
 export default function UpdateProduct() {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const location = useLocation();
   const productId = location.pathname.split("/")[3];
@@ -81,8 +80,8 @@ export default function UpdateProduct() {
     defaultValues: {
       title: '',
       description: '',
-      price: 0,
-      discount: 0,
+      price: '0',
+      discount: '0',
       inStock: true,
       category: [],
       size: [],
@@ -101,8 +100,8 @@ export default function UpdateProduct() {
       const defaultValues = {
         title: selectedProduct.title,
         description: selectedProduct.description,
-        price: selectedProduct.price,
-        discount: selectedProduct.discount || 0,
+        price: selectedProduct.price.toString(),
+        discount: (selectedProduct.discount || 0).toString(),
         inStock: selectedProduct.inStock ?? true,
         category: selectedProduct.category || [],
         size: selectedProduct.size || [],
@@ -247,25 +246,22 @@ export default function UpdateProduct() {
       const updatedProduct = {
         ...data,
         image: uploadedImageUrl || selectedProduct.image,
-        price: parseFloat(data.price),
-        discount: parseInt(data.discount) || 0,
         category: selectedCategories,
         size: selectedSizes,
         color: selectedColors,
-        inStock: Boolean(data.inStock)
       };
 
-      const result = await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
+      await dispatch(updateProduct({ id: productId, data: updatedProduct })).unwrap();
 
-      if (result) {
-        toast.success("Product updated successfully!");
-        navigate("/admin");
-      } else {
-        toast.error("Failed to update product");
-      }
     } catch (error) {
       console.error('Update error:', error);
-      toast.error(error.message || "Failed to update product");
+      toast.error(error || "Failed to update product");
+    }
+  }, (errors) => {
+    if (Object.keys(errors).length > 0) {
+      Object.keys(errors).forEach(field => {
+        toast.error(`${field}: ${errors[field].message}`);
+      });
     }
   });
 
@@ -291,222 +287,244 @@ export default function UpdateProduct() {
   }
 
   return (
-      <div className="container mx-auto py-8">
-        <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-6">
-          <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Update Product</h1>
-            <Link to="/admin">
-              <button className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
-                All Products
-              </button>
-            </Link>
-          </div>
+    <div className="container mx-auto py-8">
+      <div className="max-w-6xl mx-auto bg-white rounded-lg shadow-sm p-6">
+        <div className="flex justify-between items-center mb-6">
+          <h1 className="text-2xl font-bold">Update Product</h1>
+          <Link to="/admin">
+            <button className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50">
+              All Products
+            </button>
+          </Link>
+        </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="aspect-square relative rounded-lg overflow-hidden bg-gray-100">
+            {previewImage ? (
               <img
                 className="w-full h-full object-cover"
                 alt="Product preview"
                 src={previewImage}
               />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-gray-400">
+                No image selected
+              </div>
+            )}
+          </div>
+
+          <form onSubmit={onSubmit} className="md:col-span-2 space-y-4">
+            <div className="flex items-center gap-4 mb-6">
+              <label className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                <input
+                  type="file"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  accept="image/*"
+                />
+                Select Image
+              </label>
+              {file && (
+                <button
+                  type="button"
+                  onClick={handleUpload}
+                  disabled={isUploading}
+                  className={cn(
+                    "px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 flex items-center",
+                    isUploading && "opacity-50 cursor-not-allowed"
+                  )}
+                >
+                  {isUploading ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      <span>Uploading... {uploadProgress}%</span>
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      <span>Upload</span>
+                    </>
+                  )}
+                </button>
+              )}
             </div>
 
-            <form onSubmit={onSubmit} className="md:col-span-2 space-y-4">
-              <div className="flex items-center gap-4 mb-6">
-                <label className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
-                  <input
-                    type="file"
-                    className="hidden"
-                    onChange={handleFileChange}
-                    accept="image/*"
-                  />
-                  Select Image
-                </label>
-                {file && (
-                  <button
-                    type="button"
-                    onClick={handleUpload}
-                    disabled={isUploading}
-                    className={cn(
-                      "px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 flex items-center",
-                      isUploading && "opacity-50 cursor-not-allowed"
-                    )}
-                  >
-                    {isUploading ? (
-                      <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                        <span>Uploading... {uploadProgress}%</span>
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        <span>Upload</span>
-                      </>
-                    )}
-                  </button>
+            <div className="grid grid-cols-1 gap-4">
+              <Input
+                label="Title"
+                type="text"
+                error={errors.title?.message}
+                {...register("title")}
+              />
+              <TextArea
+                label="Description"
+                error={errors.description?.message}
+                {...register("description")}
+              />
+
+              <div className="space-y-2">
+                <label className="text-gray-700 font-semibold block">Categories</label>
+                <div className="flex flex-wrap gap-2">
+                  {VALID_CATEGORIES.map((category) => (
+                    <button
+                      key={category}
+                      type="button"
+                      onClick={() => handleCategoryChange(category)}
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm font-medium capitalize",
+                        "border transition-colors",
+                        selectedCategories.includes(category)
+                          ? "bg-primary text-white border-primary"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                      )}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
+                {errors.category && (
+                  <p className="mt-1 text-sm text-red-500">{errors.category.message}</p>
                 )}
               </div>
 
-              <div className="grid grid-cols-1 gap-4">
-                <Input
-                  label="Title"
-                  type="text"
-                  error={errors.title?.message}
-                  {...register("title")}
-                />
-                <TextArea
-                  label="Description"
-                  error={errors.description?.message}
-                  {...register("description")}
-                />
-
-                <div className="space-y-2">
-                  <label className="text-gray-700 font-semibold block">Categories</label>
-                  <div className="flex flex-wrap gap-2">
-                    {VALID_CATEGORIES.map((category) => (
-                      <button
-                        key={category}
-                        type="button"
-                        onClick={() => handleCategoryChange(category)}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-sm font-medium capitalize",
-                          "border transition-colors",
-                          selectedCategories.includes(category)
-                            ? "bg-primary text-white border-primary"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-primary"
-                        )}
-                      >
-                        {category}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-gray-700 font-semibold block">Sizes</label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {COMMON_SIZES.map((size) => (
-                      <button
-                        key={size}
-                        type="button"
-                        onClick={() => handleSizeChange(size)}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-sm font-medium",
-                          "border transition-colors",
-                          selectedSizes.includes(size)
-                            ? "bg-primary text-white border-primary"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-primary"
-                        )}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Add custom size"
-                      value={customSize}
-                      onChange={(e) => setCustomSize(e.target.value)}
-                      className="flex-1 p-2 border rounded-md"
-                    />
+              <div className="space-y-2">
+                <label className="text-gray-700 font-semibold block">Sizes</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {COMMON_SIZES.map((size) => (
                     <button
+                      key={size}
                       type="button"
-                      onClick={handleCustomSizeAdd}
-                      disabled={!customSize}
-                      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                      onClick={() => handleSizeChange(size)}
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm font-medium",
+                        "border transition-colors",
+                        selectedSizes.includes(size)
+                          ? "bg-primary text-white border-primary"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                      )}
                     >
-                      Add Size
+                      {size}
                     </button>
-                  </div>
+                  ))}
                 </div>
-
-                <div className="space-y-2">
-                  <label className="text-gray-700 font-semibold block">Colors</label>
-                  <div className="flex flex-wrap gap-2 mb-2">
-                    {COMMON_COLORS.map((color) => (
-                      <button
-                        key={color}
-                        type="button"
-                        onClick={() => handleColorChange(color)}
-                        className={cn(
-                          "px-3 py-1 rounded-full text-sm font-medium",
-                          "border transition-colors",
-                          selectedColors.includes(color)
-                            ? "bg-primary text-white border-primary"
-                            : "bg-white text-gray-700 border-gray-300 hover:border-primary"
-                        )}
-                      >
-                        {color}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Add custom color"
-                      value={customColor}
-                      onChange={(e) => setCustomColor(e.target.value)}
-                      className="flex-1 p-2 border rounded-md"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleCustomColorAdd}
-                      disabled={!customColor}
-                      className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Add Color
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="Price"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    error={errors.price?.message}
-                    {...register("price", { valueAsNumber: true })}
-                  />
-                  <Input
-                    label="Discount (%)"
-                    type="number"
-                    min="0"
-                    max="100"
-                    error={errors.discount?.message}
-                    {...register("discount", { valueAsNumber: true })}
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
+                <div className="flex gap-2">
                   <input
-                    type="checkbox"
-                    id="inStock"
-                    className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
-                    {...register("inStock")}
+                    type="text"
+                    placeholder="Add custom size"
+                    value={customSize}
+                    onChange={(e) => setCustomSize(e.target.value)}
+                    className="flex-1 p-2 border rounded-md"
                   />
-                  <label htmlFor="inStock" className="text-gray-700 font-semibold">
-                    In Stock
-                  </label>
+                  <button
+                    type="button"
+                    onClick={handleCustomSizeAdd}
+                    disabled={!customSize}
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Add Size
+                  </button>
                 </div>
               </div>
 
-              <div className="flex justify-end mt-6">
-                <button
-                  type="submit"
-                  disabled={isLoading || isUploading}
-                  className={cn(
-                    "px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90",
-                    (isLoading || isUploading) && "opacity-50 cursor-not-allowed"
-                  )}
-                >
-                  {isLoading ? "Updating..." : "Update Product"}
-                </button>
+              <div className="space-y-2">
+                <label className="text-gray-700 font-semibold block">Colors</label>
+                <div className="flex flex-wrap gap-2 mb-2">
+                  {COMMON_COLORS.map((color) => (
+                    <button
+                      key={color}
+                      type="button"
+                      onClick={() => handleColorChange(color)}
+                      className={cn(
+                        "px-3 py-1 rounded-full text-sm font-medium",
+                        "border transition-colors",
+                        selectedColors.includes(color)
+                          ? "bg-primary text-white border-primary"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-primary"
+                      )}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    placeholder="Add custom color"
+                    value={customColor}
+                    onChange={(e) => setCustomColor(e.target.value)}
+                    className="flex-1 p-2 border rounded-md"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleCustomColorAdd}
+                    disabled={!customColor}
+                    className="px-4 py-2 text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50"
+                  >
+                    Add Color
+                  </button>
+                </div>
               </div>
-            </form>
-          </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Price"
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  error={errors.price?.message}
+                  {...register("price")}
+                />
+                <Input
+                  label="Discount (%)"
+                  type="number"
+                  min="0"
+                  max="100"
+                  error={errors.discount?.message}
+                  {...register("discount")}
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <input
+                  type="checkbox"
+                  id="inStock"
+                  className={cn(
+                    "w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary",
+                    errors.inStock && "border-red-500"
+                  )}
+                  {...register("inStock")}
+                />
+                <label htmlFor="inStock" className="text-gray-700 font-semibold">
+                  In Stock
+                </label>
+                {errors.inStock && (
+                  <p className="text-sm text-red-500">{errors.inStock.message}</p>
+                )}
+              </div>
+            </div>
+
+            <div className="flex justify-end mt-6">
+              <button
+                type="submit"
+                disabled={isLoading || isUploading}
+                className={cn(
+                  "px-6 py-2 bg-primary text-white rounded-md hover:bg-primary/90",
+                  (isLoading || isUploading) && "opacity-50 cursor-not-allowed"
+                )}
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                    <span>Updating...</span>
+                  </div>
+                ) : (
+                  "Update Product"
+                )}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
+    </div>
   );
 }
