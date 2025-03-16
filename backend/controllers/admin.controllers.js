@@ -36,21 +36,21 @@ export class AdminController {
     try {
       const { error, value } = updateUserStatusSchema.validate(req.body);
       if (error) {
-        return responseHandler.badRequest(res)(error.details[0].message);
+        return responseHandler.error(res)(error.details[0].message);
       }
 
       const { userId } = req.params;
       const user = await AdminService.getUserDetails(userId);
 
       if (!user) {
-        return responseHandler.notFound(res)('User not found');
+        return responseHandler.error(res)('User not found');
       }
       const result = await AdminService.updateUserStatus(userId, value.isBlocked);
-      if (!result.success) {
-        return responseHandler.error(res)(result.message);
+      if (result !== 1) {
+        return responseHandler.error(res)('Error updating user status');
       }
 
-      return responseHandler.success(res)(result);
+      return responseHandler.success(res)('User status updated successfully', { user });
     } catch (error) {
       console.log(error);
       return responseHandler.error(res)('Error updating user status');

@@ -22,7 +22,8 @@ import ContactUs from '../pages/ContactUs';
 import FAQ from '../pages/FAQ';
 import TermsOfService from '../pages/TermsOfService';
 import PrivacyPage from '../pages/Privacy';
-
+import Users from '../pages/Admin/Users';
+import Settings from '../pages/Admin/Settings';
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useSelector((store) => store.auth);
   const location = useLocation();
@@ -184,10 +185,7 @@ export const adminRoutes = [
     element: (
       <ProtectedRoute allowedRoles={['admin']}>
         <AdminLayout>
-          <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4">User Management</h2>
-            <p className="text-muted-foreground">User management coming soon...</p>
-          </div>
+          <Users />
         </AdminLayout>
       </ProtectedRoute>
     ),
@@ -197,10 +195,7 @@ export const adminRoutes = [
     element: (
       <ProtectedRoute allowedRoles={['admin']}>
         <AdminLayout>
-          <div className="p-4">
-            <h2 className="text-2xl font-semibold mb-4">Admin Settings</h2>
-            <p className="text-muted-foreground">Settings page coming soon...</p>
-          </div>
+          <Settings />
         </AdminLayout>
       </ProtectedRoute>
     ),

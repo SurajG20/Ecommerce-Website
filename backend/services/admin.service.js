@@ -1,6 +1,5 @@
 import { Op } from 'sequelize';
 import User from '../models/User.js';
-import ResponseHandler from '../utils/responseHandler.js';
 
 export class AdminService {
   static async getAllUsers({ page = 1, limit = 10, search = '', sortBy = 'createdAt', sortOrder = 'desc', isBlocked }) {
@@ -37,7 +36,8 @@ export class AdminService {
   }
 
   static async updateUserStatus(userId, isBlocked) {
-    await User.update({ isBlocked }, { where: { id: userId } });
+    const [result] = await User.update({ isBlocked }, { where: { id: userId } });
+    return result;
   }
 
   static async getUserDetails(userId) {
