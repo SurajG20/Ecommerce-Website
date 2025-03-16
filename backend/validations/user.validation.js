@@ -16,6 +16,13 @@ export const createUserSchema = Joi.object({
     'string.min': 'Password must be at least 6 characters long',
     'any.required': 'Password is required',
   }),
+
+  confirmPassword: Joi.string().required().messages({
+    'any.required': 'Confirm password is required',
+  }),
+  acceptTerms: Joi.boolean().required().messages({
+    'any.required': 'Please accept the terms and conditions',
+  }),
 });
 
 export const loginSchema = Joi.object({

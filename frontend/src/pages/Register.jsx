@@ -10,11 +10,14 @@ import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../components/ui/card";
 import { Checkbox } from "../components/ui/checkbox";
-import { Loader2, User, Mail, Lock, ArrowRight } from "lucide-react";
+import { Loader2, User, Mail, Lock, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useState } from "react";
 
 const Register = () => {
   const navigate = useNavigate();
   const { register: registerUser, isLoading } = useAuth();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const {
     register,
@@ -32,9 +35,9 @@ const Register = () => {
     try {
       await registerUser(data);
       reset();
-      navigate("/login");
+      navigate("/");
     } catch (error) {
-      toast.error(error.message || "Registration failed");
+      toast.error(error || "Registration failed");
     }
   };
 
@@ -94,12 +97,23 @@ const Register = () => {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
                     id="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Create a password"
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     {...register("password")}
                     disabled={isLoading}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
                 {errors.password && (
                   <p className="text-sm text-destructive">{errors.password.message}</p>
@@ -112,12 +126,23 @@ const Register = () => {
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                   <Input
                     id="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    className="pl-10"
+                    className="pl-10 pr-10"
                     {...register("confirmPassword")}
                     disabled={isLoading}
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    {showConfirmPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
                 </div>
                 {errors.confirmPassword && (
                   <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>
@@ -127,7 +152,15 @@ const Register = () => {
               <div className="flex items-center space-x-2">
                 <Checkbox
                   id="acceptTerms"
-                  {...register("acceptTerms")}
+                  onCheckedChange={(checked) => {
+                    const event = {
+                      target: {
+                        name: "acceptTerms",
+                        value: checked
+                      }
+                    };
+                    register("acceptTerms").onChange(event);
+                  }}
                   disabled={isLoading}
                   className="border-primary data-[state=checked]:bg-primary data-[state=checked]:text-primary-foreground"
                 />

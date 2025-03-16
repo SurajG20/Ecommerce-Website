@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import ApiClass from "../../utils/api";
+import ApiClass  from "../../utils/api";
 import { toast } from "sonner";
 
 const user = localStorage.getItem("user_info")
@@ -17,7 +17,7 @@ export const loginUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await ApiClass.postRequest("/auth/login", false, userData);
-      if (response?.data) {
+      if (response.success) {
         localStorage.setItem("token", response.data.token);
         localStorage.setItem("user_info", JSON.stringify(response.data.user));
         toast.success("Login successful!");
@@ -35,8 +35,10 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await ApiClass.postRequest("/auth/register", false, userData);
-      if (response?.data) {
-        toast.success("Registration successful! Please login.");
+      if (response.success) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user_info", JSON.stringify(response.data.user));
+        toast.success("Registration successful!");
         return response.data;
       }
       return rejectWithValue(response?.message || "Registration failed");
@@ -77,8 +79,9 @@ const authSlice = createSlice({
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(registerUser.fulfilled, (state) => {
+      .addCase(registerUser.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.user = action.payload.user;
         state.error = null;
       })
       .addCase(registerUser.rejected, (state, action) => {

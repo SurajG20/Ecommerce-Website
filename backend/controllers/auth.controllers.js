@@ -35,13 +35,13 @@ export class AuthController {
 
     const user = await AuthService.findUser(value.email);
     if (!user) {
-      return responseHandler.error(res)('User not found');
+      return responseHandler.error(res)('Account with this email not found');
     }
 
     const isPasswordValid = await AuthService.verifyPassword(value.password, user);
 
     if (!isPasswordValid) {
-      return responseHandler.error(res)('Invalid password');
+      return responseHandler.error(res)('Wrong password');
     }
 
     const result = await AuthService.createToken(user);
