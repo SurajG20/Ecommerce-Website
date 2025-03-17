@@ -1,5 +1,7 @@
 import Stripe from 'stripe';
 import config from '../config/config.js';
+import { OrderService } from './order.service.js';
+import { PaymentLogService } from './paymentLog.service.js';
 
 const stripe = Stripe(config.STRIPE_SECRET_KEY);
 const endpointSecret = config.STRIPE_WEBHOOK_SECRET;
@@ -11,20 +13,41 @@ export class StripeService {
     }
 
     try {
+      let customer;
+      const existingCustomers = await stripe.customers.list({
+        email: customerEmail,
+        limit: 1,
+      });
+
+      if (existingCustomers.data.length > 0) {
+        customer = existingCustomers.data[0];
+      } else {
+        customer = await stripe.customers.create({
+          email: customerEmail,
+          metadata: {
+            userId,
+            ...metadata,
+          },
+        });
+      }
+
       return stripe.checkout.sessions.create({
         payment_method_types: ['card'],
+        shipping_address_collection: {
+          allowed_countries: ['IN'],
+        },
         line_items: lineItems,
         mode: 'payment',
-        customer_email: customerEmail,
+        customer: customer.id,
         metadata: {
           userId,
+          customerId: customer.id,
           ...metadata,
         },
         success_url: successUrl,
         cancel_url: cancelUrl,
       });
     } catch (error) {
-      console.error('Stripe session creation error:', error);
       throw new Error(error.message || 'Failed to create checkout session');
     }
   }
@@ -69,29 +92,35 @@ export class StripeService {
 
   static async handleSuccessfulPayment(session) {
     try {
+      const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+        expand: ['data.price.product'],
+      });
+
       const orderDetails = {
         userId: session.metadata.userId,
-        customerEmail: session.customer_email,
-        amount: session.amount_total,
+        customerId: session.metadata.customerId,
+        customerEmail: session.customer_details.email,
+        customerName: session.customer_details.name,
+        items: lineItems.data.map((item) => ({
+          productId: item.price.product.metadata.id,
+          title: item.price.product.name,
+          price: item.price.unit_amount / 100,
+          quantity: item.quantity,
+          size: item.price.product.metadata.size,
+          color: item.price.product.metadata.color,
+          image: item.price.product.images[0],
+        })),
+        totalAmount: session.amount_total / 100,
         currency: session.currency,
         paymentStatus: session.payment_status,
-        paymentIntent: session.payment_intent,
+        paymentIntentId: session.payment_intent,
+        shippingAddress: session.customer_details.address,
       };
 
-      // Here you would:
-      // 1. Create order in your database
-      // await OrderService.create(orderDetails);
-
-      // 2. Send confirmation email
-      // await EmailService.sendOrderConfirmation({
-      //   email: orderDetails.customerEmail,
-      //   orderId: order.id,
-      //   amount: orderDetails.amount,
-      // });
-
-      console.log('Payment processed successfully:', session.id);
+      const order = await OrderService.create(orderDetails);
+      return order;
     } catch (error) {
-      console.error('Error processing successful payment:', error);
+      console.error('Error handling successful payment:', error);
       throw error;
     }
   }
@@ -99,22 +128,29 @@ export class StripeService {
   static async handleFailedPayment(paymentIntent) {
     try {
       const errorMessage = paymentIntent.last_payment_error?.message;
-      console.error('Payment failed:', errorMessage);
+      const errorCode = paymentIntent.last_payment_error?.code;
+      const errorType = paymentIntent.last_payment_error?.type;
 
       const failureDetails = {
         userId: paymentIntent.metadata.userId,
-        error: errorMessage,
+        customerId: paymentIntent.metadata.customerId,
+        customerEmail: paymentIntent.metadata.customerEmail,
+        customerName: paymentIntent.metadata.customerName,
         paymentIntentId: paymentIntent.id,
-        amount: paymentIntent.amount,
+        amount: paymentIntent.amount / 100,
         currency: paymentIntent.currency,
+        errorCode,
+        errorMessage,
+        errorType,
+        metadata: {
+          paymentMethod: paymentIntent.last_payment_error?.payment_method?.type,
+          declineCode: paymentIntent.last_payment_error?.decline_code,
+          ...paymentIntent.metadata,
+        },
       };
 
-      // Here you would:
-      // 1. Log the failure
-      // await PaymentLogService.logFailure(failureDetails);
-
-      // 2. Notify admin
-      // await NotificationService.notifyAdmin('payment_failed', failureDetails);
+      const paymentLog = await PaymentLogService.create(failureDetails);
+      return paymentLog;
     } catch (error) {
       console.error('Error handling failed payment:', error);
       throw error;

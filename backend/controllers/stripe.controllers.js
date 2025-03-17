@@ -32,7 +32,7 @@ export class StripeController {
 
   static async handleWebhook(req, res) {
     try {
-      const event = await StripeService.constructWebhookEvent(req.body, req.headers['stripe-signature']);
+      const event = await StripeService.constructWebhookEvent(req.rawBody, req.headers['stripe-signature']);
 
       await StripeService.handleWebhookEvent(event);
 
