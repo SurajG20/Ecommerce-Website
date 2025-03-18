@@ -25,6 +25,9 @@ import PrivacyPage from '../pages/Privacy';
 import Users from '../pages/Admin/Users';
 import Settings from '../pages/Admin/Settings';
 import Maintenance from '../pages/Maintenance';
+import SingleOrder from '../pages/SingleOrder';
+import Order from '@/pages/Admin/Order';
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useSelector((store) => store.auth);
   const location = useLocation();
@@ -127,6 +130,14 @@ export const protectedRoutes = [
     ),
   },
   {
+    path: '/orders/:orderId',
+    element: (
+      <ProtectedRoute>
+        <SingleOrder />
+      </ProtectedRoute>
+    ),
+  },
+  {
     path: '/success',
     element: (
       <ProtectedRoute>
@@ -181,6 +192,16 @@ export const adminRoutes = [
       <ProtectedRoute allowedRoles={['admin']}>
         <AdminLayout>
           <UpdateProduct />
+        </AdminLayout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/admin/orders',
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <AdminLayout>
+          <Order />
         </AdminLayout>
       </ProtectedRoute>
     ),

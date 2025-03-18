@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, PlusCircle, Settings, Users, LogOut, Menu } from 'lucide-react';
+import { LayoutDashboard, Package, PlusCircle, Settings, Users, LogOut, Menu, ShoppingBag } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
@@ -43,6 +43,12 @@ const AdminLayout = ({ children }) => {
       icon: PlusCircle,
       path: '/admin/add-product',
       description: 'Add new products'
+    },
+    {
+      name: 'Orders',
+      icon: ShoppingBag,
+      path: '/admin/orders',
+      description: 'Manage orders'
     },
     {
       name: 'Users',

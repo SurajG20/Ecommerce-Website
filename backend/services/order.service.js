@@ -1,3 +1,4 @@
+import { Op } from 'sequelize';
 import Order from '../models/Order.js';
 import User from '../models/User.js';
 
@@ -37,6 +38,48 @@ export class OrderService {
     }
   }
 
+  static async getAllOrders({ page = 1, limit = 10, status, startDate, endDate }) {
+    try {
+      const offset = (page - 1) * limit;
+
+      const where = {};
+
+      if (status) {
+        where.orderStatus = status;
+      }
+
+      if (startDate && endDate) {
+        where.createdAt = {
+          [Op.between]: [new Date(startDate), new Date(endDate)],
+        };
+      }
+
+      const { count, rows: orders } = await Order.findAndCountAll({
+        where,
+        order: [['createdAt', 'DESC']],
+        limit,
+        offset,
+        include: [
+          {
+            model: User,
+            as: 'user',
+            attributes: ['name', 'email'],
+          },
+        ],
+      });
+
+      return {
+        orders,
+        total: count,
+        pages: Math.ceil(count / limit),
+        currentPage: page,
+      };
+    } catch (error) {
+      console.error('Error fetching all orders:', error);
+      throw new Error('Failed to fetch orders');
+    }
+  }
+
   static async getOrderById(orderId) {
     try {
       const order = await Order.findByPk(orderId, {
@@ -60,12 +103,18 @@ export class OrderService {
     }
   }
 
-  static async getUserOrders(userId, page = 1, limit = 10) {
+  static async getUserOrders(userId, { page = 1, limit = 10, status }) {
     try {
       const offset = (page - 1) * limit;
 
+      const where = { userId };
+
+      if (status) {
+        where.orderStatus = status;
+      }
+
       const { count, rows: orders } = await Order.findAndCountAll({
-        where: { userId },
+        where,
         order: [['createdAt', 'DESC']],
         limit,
         offset,
@@ -87,54 +136,6 @@ export class OrderService {
     } catch (error) {
       console.error('Error fetching user orders:', error);
       throw new Error('Failed to fetch user orders');
-    }
-  }
-
-  static async updateOrderStatus(orderId, status) {
-    try {
-      const order = await Order.findByPk(orderId);
-
-      if (!order) {
-        throw new Error('Order not found');
-      }
-
-      await order.update({ orderStatus: status });
-      return order;
-    } catch (error) {
-      console.error('Error updating order status:', error);
-      throw new Error('Failed to update order status');
-    }
-  }
-
-  static async updatePaymentStatus(orderId, paymentStatus) {
-    try {
-      const order = await Order.findByPk(orderId);
-
-      if (!order) {
-        throw new Error('Order not found');
-      }
-
-      await order.update({ paymentStatus });
-      return order;
-    } catch (error) {
-      console.error('Error updating payment status:', error);
-      throw new Error('Failed to update payment status');
-    }
-  }
-
-  static async addTrackingNumber(orderId, trackingNumber) {
-    try {
-      const order = await Order.findByPk(orderId);
-
-      if (!order) {
-        throw new Error('Order not found');
-      }
-
-      await order.update({ trackingNumber });
-      return order;
-    } catch (error) {
-      console.error('Error adding tracking number:', error);
-      throw new Error('Failed to add tracking number');
     }
   }
 }

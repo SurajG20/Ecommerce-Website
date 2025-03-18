@@ -5,6 +5,7 @@ import ApiClass from "../../utils/api";
 const initialState = {
   users: [],
   products: [],
+  orders: [],
   isLoading: false,
   isDeleting: false,
   error: null,
@@ -17,6 +18,9 @@ const initialState = {
   totalUserPages: 1,
   maintenanceMode: false,
   isMaintenanceLoading: false,
+  totalOrders: 0,
+  currentOrderPage: 1,
+  totalOrderPages: 1,
 };
 
 export const fetchAdminProducts = createAsyncThunk(
@@ -162,6 +166,58 @@ export const toggleMaintenanceMode = createAsyncThunk(
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update maintenance mode");
       return rejectWithValue(error.response?.data?.message || "Failed to update maintenance mode");
+    }
+  }
+);
+
+export const fetchAdminOrders = createAsyncThunk(
+  "admin/fetchOrders",
+  async ({ page = 1, limit = 10, status, startDate, endDate }, { rejectWithValue }) => {
+    try {
+      const response = await ApiClass.getRequest(
+        `/admin/orders?page=${page}&limit=${limit}${status ? `&status=${status}` : ''}${startDate ? `&startDate=${startDate}` : ''}${endDate ? `&endDate=${endDate}` : ''}`,
+        true
+      );
+      if (response.success) {
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Failed to fetch orders");
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || "Failed to fetch orders");
+    }
+  }
+);
+
+export const updateOrderStatus = createAsyncThunk(
+  "admin/updateOrderStatus",
+  async ({ orderId, status }, { rejectWithValue }) => {
+    try {
+      const response = await ApiClass.patchRequest(`/admin/orders/${orderId}/status`, true, { status });
+      if (response.success) {
+        toast.success("Order status updated successfully!");
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Failed to update order status");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update order status");
+      return rejectWithValue(error.response?.data?.message || "Failed to update order status");
+    }
+  }
+);
+
+export const addTrackingNumber = createAsyncThunk(
+  "admin/addTrackingNumber",
+  async ({ orderId, trackingNumber }, { rejectWithValue }) => {
+    try {
+      const response = await ApiClass.patchRequest(`/admin/orders/${orderId}/tracking`, true, { trackingNumber });
+      if (response.success) {
+        toast.success("Tracking number added successfully!");
+        return response.data;
+      }
+      return rejectWithValue(response.message || "Failed to add tracking number");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to add tracking number");
+      return rejectWithValue(error.response?.data?.message || "Failed to add tracking number");
     }
   }
 );
@@ -313,6 +369,34 @@ const adminSlice = createSlice({
       .addCase(toggleMaintenanceMode.rejected, (state, action) => {
         state.isMaintenanceLoading = false;
         state.error = action.payload;
+      })
+      .addCase(fetchAdminOrders.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAdminOrders.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.orders = action.payload.orders;
+        state.totalOrders = action.payload.total;
+        state.currentOrderPage = action.payload.currentPage;
+        state.totalOrderPages = action.payload.pages;
+        state.error = null;
+      })
+      .addCase(fetchAdminOrders.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action) => {
+        const index = state.orders.findIndex((order) => order.id === action.payload.id);
+        if (index !== -1) {
+          state.orders[index] = action.payload;
+        }
+      })
+      .addCase(addTrackingNumber.fulfilled, (state, action) => {
+        const index = state.orders.findIndex((order) => order.id === action.payload.id);
+        if (index !== -1) {
+          state.orders[index] = action.payload;
+        }
       });
   },
 });
