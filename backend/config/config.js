@@ -14,6 +14,7 @@ const Config = {
   JWT_LIFETIME: env.JWT_LIFETIME,
   STRIPE_SECRET_KEY: env.STRIPE_SECRET_KEY,
   STRIPE_WEBHOOK_SECRET: env.STRIPE_WEBHOOK_SECRET,
+  FRONTEND_URL: env.FRONTEND_URL,
 };
 
 export default Object.freeze(Config);
