@@ -21,7 +21,6 @@ export default class ApiClass {
     return {
       headers: merge,
       params: parameters,
-      withCredentials: true,
     };
   }
 

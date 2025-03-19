@@ -31,7 +31,27 @@ const limiter = rateLimit({
 
 app.use(limiter);
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: ['https://bazaar-client.vercel.app', 'http://localhost:5173'],
+    credentials: true,
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'DELETE',
+      'PATCH',
+      'OPTIONS',
+    ],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+    ],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  }),
+);
 app.use(morgan('dev'));
 
 app.use(
