@@ -8,6 +8,7 @@ export default class ApiClass {
   static config(isToken = true, headers = null, parameters = null) {
     var defaultHeaders = {
       Accept: "application/json",
+      "Content-Type": "application/json",
     };
     var merge = {};
     if (isToken) {
@@ -20,6 +21,7 @@ export default class ApiClass {
     return {
       headers: merge,
       params: parameters,
+      withCredentials: true,
     };
   }
 
