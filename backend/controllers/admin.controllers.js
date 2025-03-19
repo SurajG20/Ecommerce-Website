@@ -1,5 +1,5 @@
 import { AdminService } from '../services/admin.service.js';
-import { MaintenanceService } from '../services/maintenance.services.js';
+import { MaintenanceService } from '../services/maintenance.service.js';
 import { OrderService } from '../services/order.service.js';
 import responseHandler from '../utils/responseHandler.js';
 import {

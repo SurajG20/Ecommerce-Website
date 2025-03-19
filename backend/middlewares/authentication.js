@@ -1,5 +1,5 @@
 import { JWTService } from '../services/jwt.service.js';
-import { MaintenanceService } from '../services/maintenance.services.js';
+import { MaintenanceService } from '../services/maintenance.service.js';
 import { UserService } from '../services/user.service.js';
 import responseHandler from '../utils/responseHandler.js';
 

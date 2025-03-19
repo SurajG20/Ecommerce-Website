@@ -31,26 +31,7 @@ const limiter = rateLimit({
 
 app.use(limiter);
 app.use(helmet());
-app.use(
-  cors({
-    origin: [config.FRONTEND_URL, 'http://localhost:5173'],
-    credentials: true,
-    methods: [
-      'GET',
-      'POST',
-      'PUT',
-      'DELETE',
-      'PATCH',
-      'OPTIONS',
-    ],
-    allowedHeaders: [
-      'Content-Type',
-      'Authorization',
-      'X-Requested-With',
-      'Accept',
-    ],
-  }),
-);
+app.use(cors());
 app.use(morgan('dev'));
 
 app.use(
@@ -65,35 +46,10 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
-let isConnected = false;
-
-const connectWithRetry = async () => {
-  if (isConnected) return;
-
-  try {
-    await connectDB();
-    isConnected = true;
-    console.log('Database connected successfully');
-
-    if (process.env.NODE_ENV !== 'production') {
-      initModels();
-      await runSeeders();
-    }
-  } catch (error) {
-    console.error('Database connection error:', error);
-  }
-};
-
-app.use(async (req, res, next) => {
-  await connectWithRetry();
-  next();
-});
-
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'Server is running',
-    database: isConnected ? 'connected' : 'disconnected',
   });
 });
 
@@ -106,7 +62,9 @@ if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 5000;
   const startServer = async () => {
     try {
-      await connectWithRetry();
+      await connectDB();
+      initModels();
+      await runSeeders();
       app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
       });
