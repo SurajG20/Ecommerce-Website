@@ -4,6 +4,7 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
+import config from './config/config.js';
 import { connectDB } from './config/database.js';
 import errorHandler from './middlewares/error-handler.js';
 import notFoundMiddleware from './middlewares/not-found.js';
@@ -32,7 +33,7 @@ app.use(limiter);
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: config.FRONTEND_URL,
     credentials: true,
   }),
 );
