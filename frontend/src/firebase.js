@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import config from "./config/config";
 
 const firebaseConfig = {
-  apiKey: config.firebaseApiKey,
+  apiKey: config.firebaseKey,
   authDomain: config.firebaseAuthDomain,
   projectId: config.firebaseProjectId,
   storageBucket: config.firebaseStorageBucket,
