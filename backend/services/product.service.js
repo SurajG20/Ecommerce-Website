@@ -1,6 +1,5 @@
 import { Op } from 'sequelize';
 import Product from '../models/Product.js';
-import ResponseHandler from '../utils/responseHandler.js';
 
 export class ProductService {
   static async createProduct(productData) {
@@ -61,7 +60,6 @@ export class ProductService {
 
     const offset = (page - 1) * limit;
 
-    console.log(whereClause);
     try {
       const products = await Product.findAndCountAll({
         where: whereClause,

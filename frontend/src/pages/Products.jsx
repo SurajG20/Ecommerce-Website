@@ -40,7 +40,28 @@ const Products = ({ category }) => {
   const productsPerPage = 15;
 
   useEffect(() => {
-    dispatch(fetchProducts({ category, page, limit: productsPerPage, search: searchQuery, sort: sortBy }));
+    const getSortField = (sortValue) => {
+      switch (sortValue) {
+        case 'newest':
+          return 'createdAt';
+        case 'price_asc':
+          return 'price_asc';
+        case 'price_desc':
+          return 'price_desc';
+        case 'popular':
+          return 'createdAt';
+        default:
+          return 'createdAt';
+      }
+    };
+
+    dispatch(fetchProducts({
+      category,
+      page,
+      limit: productsPerPage,
+      search: searchQuery,
+      sort: getSortField(sortBy)
+    }));
   }, [dispatch, category, page, searchQuery, sortBy]);
 
   const handlePageChange = (newPage) => {
@@ -52,7 +73,7 @@ const Products = ({ category }) => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    setPage(1); // Reset to first page when searching
+    setPage(1);
   };
 
   const renderContent = () => {

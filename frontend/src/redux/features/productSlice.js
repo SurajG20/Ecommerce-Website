@@ -14,11 +14,19 @@ const initialState = {
 
 export const fetchProducts = createAsyncThunk(
   "products/fetchAll",
-  async ({ category, page = 1, limit = 15 }, { rejectWithValue }) => {
+  async ({ category, page = 1, limit = 15, search = "", sort = "newest" }, { rejectWithValue }) => {
     try {
-      const url = category
-        ? `/products?category=${category}&page=${page}&limit=${limit}`
-        : `/products?page=${page}&limit=${limit}`;
+      let url = `/products?page=${page}&limit=${limit}`;
+      if (category) url += `&category=${category}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      if (sort) {
+        const sortField = sort === 'price_asc' ? 'price' : sort === 'price_desc' ? 'price' : sort;
+        url += `&sort=${sortField}`;
+        if (sort === 'price_asc') url += '&order=ASC';
+        else if (sort === 'price_desc') url += '&order=DESC';
+        else url += '&order=DESC';
+      }
+
       const response = await ApiClass.getRequest(url);
 
       return {
