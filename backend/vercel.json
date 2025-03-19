@@ -2,10 +2,6 @@
   "builds": [
     {
       "config": {
-        "excludeFiles": [
-          "logs/**",
-          "*.log"
-        ],
         "includeFiles": [
           "node_modules/**",
           "package.json",
@@ -20,13 +16,36 @@
       "use": "@vercel/node"
     }
   ],
+
   "routes": [
     {
       "dest": "index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      },
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "OPTIONS"
+      ],
       "src": "/api/(.*)"
     },
     {
       "dest": "index.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      },
+      "methods": [
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "PATCH",
+        "OPTIONS"
+      ],
       "src": "/(.*)"
     }
   ],
