@@ -2,10 +2,18 @@
   "builds": [
     {
       "config": {
+        "excludeFiles": [
+          "logs/**",
+          "*.log"
+        ],
         "includeFiles": [
           "node_modules/**",
           "package.json",
-          "package-lock.json"
+          "package-lock.json",
+          "config/**",
+          "models/**",
+          "routes/**",
+          "middlewares/**"
         ]
       },
       "src": "index.js",
