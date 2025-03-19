@@ -50,10 +50,38 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
+// Initialize database connection
+let isConnected = false;
+
+const connectWithRetry = async () => {
+  if (isConnected) return;
+
+  try {
+    await connectDB();
+    isConnected = true;
+    console.log('Database connected successfully');
+
+    if (process.env.NODE_ENV !== 'production') {
+      initModels();
+      await runSeeders();
+    }
+  } catch (error) {
+    console.error('Database connection error:', error);
+    // Don't throw error, let the request continue
+  }
+};
+
+// Connect to database before handling requests
+app.use(async (req, res, next) => {
+  await connectWithRetry();
+  next();
+});
+
 app.get('/health', (req, res) => {
   res.status(200).json({
     status: 'success',
     message: 'Server is running',
+    database: isConnected ? 'connected' : 'disconnected',
   });
 });
 
@@ -67,10 +95,7 @@ if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 5000;
   const startServer = async () => {
     try {
-      await connectDB();
-      initModels();
-      await runSeeders();
-
+      await connectWithRetry();
       app.listen(port, () => {
         console.log(`Server is running on port ${port}`);
       });
