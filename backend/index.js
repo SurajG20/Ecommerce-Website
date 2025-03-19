@@ -31,24 +31,31 @@ const limiter = rateLimit({
 
 app.use(limiter);
 app.use(helmet());
-
-// CORS configuration
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', 'https://bazaar-client.vercel.app');
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization',
-  );
-
-  if (req.method === 'OPTIONS') {
-    res.status(200).end();
-  } else {
-    next();
-  }
-});
-
+app.use(
+  cors({
+    origin: [
+      'https://bazaar-client.vercel.app',
+      'http://localhost:5173',
+      'bazaar-client.vercel.app',
+    ],
+    credentials: true,
+    methods: [
+      'GET',
+      'POST',
+      'PUT',
+      'DELETE',
+      'PATCH',
+      'OPTIONS',
+    ],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'X-Requested-With',
+      'Accept',
+    ],
+    exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  }),
+);
 app.use(morgan('dev'));
 
 app.use(
