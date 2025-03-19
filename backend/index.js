@@ -50,7 +50,6 @@ app.use(
 
 app.use(express.urlencoded({ extended: false }));
 
-// Initialize database connection
 let isConnected = false;
 
 const connectWithRetry = async () => {
@@ -67,11 +66,9 @@ const connectWithRetry = async () => {
     }
   } catch (error) {
     console.error('Database connection error:', error);
-    // Don't throw error, let the request continue
   }
 };
 
-// Connect to database before handling requests
 app.use(async (req, res, next) => {
   await connectWithRetry();
   next();
@@ -90,7 +87,6 @@ app.use('/api/v1', mainRoutes);
 app.use(notFoundMiddleware);
 app.use(errorHandler);
 
-// Initialize database and start server only in development
 if (process.env.NODE_ENV !== 'production') {
   const port = process.env.PORT || 5000;
   const startServer = async () => {
@@ -108,5 +104,4 @@ if (process.env.NODE_ENV !== 'production') {
   startServer();
 }
 
-// Export the Express app for serverless functions
 export default app;

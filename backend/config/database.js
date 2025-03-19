@@ -43,7 +43,7 @@ export const connectDB = async () => {
     }
   } catch (error) {
     console.error('Database connection failed:', error);
-    throw error; // Let the caller handle the error
+    throw error;
   }
 };
 
