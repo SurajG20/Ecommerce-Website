@@ -33,7 +33,11 @@ app.use(limiter);
 app.use(helmet());
 app.use(
   cors({
-    origin: config.FRONTEND_URL,
+    origin: [
+      config.FRONTEND_URL,
+      'https://ecommerce-website-d3ikhfgzd-suraj-goswamis-projects.vercel.app',
+      'https://ecommerce-website-self-six.vercel.app/',
+    ],
     credentials: true,
   }),
 );
