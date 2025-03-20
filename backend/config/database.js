@@ -5,6 +5,12 @@ const sequelize = new Sequelize(Config.SQL_DATABASE, Config.SQL_USERNAME, Config
   host: Config.SQL_HOST,
   dialect: 'postgres',
   logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 export const connectDB = async () => {
