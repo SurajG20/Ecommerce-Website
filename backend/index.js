@@ -31,7 +31,12 @@ const limiter = rateLimit({
 
 app.use(limiter);
 app.use(helmet());
-app.use(cors());
+app.use(
+  cors({
+    origin: config.FRONTEND_URL,
+    credentials: true,
+  }),
+);
 app.use(morgan('dev'));
 
 app.use(
